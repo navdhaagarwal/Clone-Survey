@@ -4,11 +4,10 @@ import os
 def clone_pairs(connection,  users, current_userid):
     c = connection.cursor()
     start_index = users[current_userid]
-    clones_per_user = 85
+    clones_per_user = 82
     print(start_index)
-    query = "select * from CLONE_PAIRS where id >= "+str(start_index)+" and id < " + str(start_index+clones_per_user)
+    query = "select * from CLONES where id >= "+str(start_index)+" and id < " + str(start_index+clones_per_user)
     cur = c.execute(query)
-    # connection.close()
     return cur.fetchall()
 
 
@@ -39,25 +38,33 @@ def java_content(current_clone_no, clone_pairs):
 
 
 def update_true(current_userid, current_clone_no, users):
-    connection = sqlite3.connect("clones.db")
-    print("entered")
+    connection = sqlite3.connect("clones_db.db")
     c = connection.cursor()
     index = users[current_userid] + current_clone_no - 1
     length = len(current_userid)
     participant = current_userid[length-1]
-    query = 'UPDATE CLONE_PAIRS SET participant_'+participant+ '= 1 WHERE id = ' + str(index)
+    print(participant)
+    if(participant == '1'):
+        p = 'ONE'
+    else:
+        p = 'TWO'
+    query = 'UPDATE CLONES SET participant_'+p+ '= 1 WHERE id = ' + str(index)
     print(query)
     c.execute(query)
     connection.commit()
     # connection.close()
 
 def update_false(current_userid, current_clone_no, users):
-    connection = sqlite3.connect("clones1.db")
+    connection = sqlite3.connect("clones_db.db")
     c = connection.cursor()
     index = users[current_userid] + current_clone_no - 1
     length = len(current_userid)
     participant = current_userid[length-1]
-    query = 'UPDATE CLONE_PAIRS SET participant_'+participant+ '= 0 WHERE id = ' + str(index)
+    if(participant == '1'):
+        p = 'ONE'
+    else:
+        p = 'TWO'
+    query = 'UPDATE CLONES SET participant_'+p+ '= 0 WHERE id = ' + str(index)
     c.execute(query)
     connection.commit()
     # connection.close()

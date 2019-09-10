@@ -7,7 +7,7 @@ from functions import users
 app = Flask(__name__)
 
 app.secret_key = "random"
-app.database = "clones.db"
+app.database = "clones_db.db"
 app.users = users()
 
 # login required decorator
@@ -25,12 +25,13 @@ def login_required(f):
 @app.route('/', methods=['GET','POST'])
 @login_required
 def home():
+
     current_userid = session['userid']
     current_clone_no = session['current_clone_no']
     clone_pairs = session['clone_pairs']
     current_clone_pair = clone_pairs[current_clone_no-1]
+
     lines = [str(current_clone_pair[3]+1), str(current_clone_pair[4]+1), str(current_clone_pair[6]+1), str(current_clone_pair[7]+1)]
-    print(lines)
     contents, contents1 , info= java_content(current_clone_no, clone_pairs)
 
     if (request.method == 'POST'):
@@ -51,7 +52,7 @@ def home():
                 return redirect(url_for("home"))
 
         if ('Next' in request.form):
-            if(current_clone_no < 85):
+            if(current_clone_no < 82):
                 current_clone_no += 1
                 session['current_clone_no'] = current_clone_no
                 return redirect(url_for("home"))
@@ -77,11 +78,7 @@ def login():
     return render_template('login.html',error=error)
 
 def check_user(user_id):
-    if (user_id in app.users):
-        # app.users.pop(user_id)
-        return True
-    else :
-        return False
+    return (user_id in app.users)
 
 @app.route('/logout')
 @login_required
