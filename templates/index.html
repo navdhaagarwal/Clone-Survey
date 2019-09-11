@@ -11,12 +11,12 @@
   </head>
 
   <body>
-    <div class="container" style="border-radius: 5px; margin-top: 10px; margin-left: 25px; width: 1300px; height: 50px; background-color: hsla(24, 20%, 50%,.3)">
+    <div class="container" style="border-radius: 5px; margin:1%; margin-bottom: 0% ;width:96%; background-color: hsla(24, 20%, 50%,.3)">
       
       <form action="#" method="POST">
         <div class="row">
             <div class="col-sm-3 col-md-3 col-lg-3">
-              <div class="row" style="margin-top: 10px">
+              <div class="row" style="margin-top: 2.25%">
                   <div class="col-sm-3 col-md-3 col-lg-3">
                       <input type="submit" class="btn btn-danger btn-sm " id="fat-btn" name = "Prev" value="Prev">
                   </div>
@@ -31,12 +31,11 @@
               </div>
             </div>
             <div class="col-sm-1 col-md-1 col-lg-1">
-
             </div>
             <div class="col-sm-2 col-md-2 col-lg-2">
-              <h4 align="center" style="margin-top: 15px;"> Is it a clone ? </h4>
+              <h4 align="center" style="padding:0.5%"> Is it a clone ? </h4>
             </div>
-            <div class="col-sm-2 col-md-2 col-lg-2" style="margin-top: 7px">
+            <div class="col-sm-2 col-md-2 col-lg-2" style="padding:0.5%">
               <div class="btn-group btn-group-toggle" data-toggle="buttons">
                   <label class="btn btn-primary">
                     <input type="radio" name="Is_Clone" id="option1" autocomplete="off" value="clone"> Yes
@@ -60,14 +59,14 @@
       </div>
     {% endfor %}
     
-    <div class="container" style="margin: 10px; width: 1330px">
+    <div class="container" style="margin: 1%; width: 98%; height: 10%;">
         
-      <div style="height:520px; width:640px; float:left; margin-right: 20px; overflow-y:scroll; overflow-x: scroll">
+      <div style="height:620px; width:49%; float:left; margin-right: 2%; overflow-y:scroll; overflow-x: scroll">
         <pre class="line-numbers" data-line="{{lines[0]}}-{{lines[1]}}" style="width: 350%; font-size: 12.5px"><code class="language-java">
             {{contents}}
           </code></pre>
       </div>
-      <div style="height:520px; width:640px; float:left; overflow-y:scroll; overflow-x: scroll">
+      <div style="height:620px; width:49%; float:left; overflow-y:scroll; overflow-x: scroll">
           <pre class="line-numbers" data-line="{{lines[2]}}-{{lines[3]}}" style="width: 350%; font-size: 12.5px"><code class="language-java">
               {{contents1}}
             </code></pre>
@@ -75,8 +74,8 @@
 
     </div>
 
-    <div class="container" style="border-radius: 5px; margin-top: 10px; margin-left: 25px; width: 1300px; height: 50px; background-color: hsla(24, 20%, 50%,.3)">
-      <div class="row" style="margin-top: 10px">
+    <div class="container" style="border-radius: 5px;  width:96%; background-color: hsla(24, 20%, 50%,.3)">
+      <div class="row" style="padding: 0.5%">
           <div class="col-sm-3 col-md-3 col-lg-3" align = "center">
             <h6>File 1 = {{info[0]}}</h6>
           </div>
