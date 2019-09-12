@@ -37,24 +37,8 @@ def java_content(current_clone_no, clone_pairs):
     return contents, contents1, info
 
 
-def update_true(current_userid, current_clone_no, users):
-    connection = sqlite3.connect("clones_db.db")
-    c = connection.cursor()
-    index = users[current_userid] + current_clone_no - 1
-    length = len(current_userid)
-    participant = current_userid[length-1]
-    print(participant)
-    if(participant == '1'):
-        p = 'ONE'
-    else:
-        p = 'TWO'
-    query = 'UPDATE CLONES SET participant_'+p+ '= 1 WHERE id = ' + str(index)
-    print(query)
-    c.execute(query)
-    connection.commit()
-    # connection.close()
 
-def update_false(current_userid, current_clone_no, users):
+def update(current_userid, current_clone_no, users, result):
     connection = sqlite3.connect("clones_db.db")
     c = connection.cursor()
     index = users[current_userid] + current_clone_no - 1
@@ -64,15 +48,8 @@ def update_false(current_userid, current_clone_no, users):
         p = 'ONE'
     else:
         p = 'TWO'
-    query = 'UPDATE CLONES SET participant_'+p+ '= 0 WHERE id = ' + str(index)
+    query = 'UPDATE CLONES SET participant_'+p+ '= '+str(result)+' WHERE id = ' + str(index)
     c.execute(query)
     connection.commit()
-    # connection.close()
-
-
-
-# content, content1 = java_content(sqlite3.connect("clones.db"))
-# print(len(content1))
-
 
 

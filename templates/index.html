@@ -8,6 +8,20 @@
     <link href="static/collect.css" rel="stylesheet" />
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+    <script>
+        function text_val() {
+          var text_value = "None";
+          if(document.getElementsByName("Clone_result")[0].checked) {
+            text_value = "Yes";
+          }
+          else if(document.getElementsByName("Clone_result")[1].checked)
+          {
+            text_value = "No";
+          }
+          document.getElementsByName("result")[0].value = text_value;
+        }
+        
+      </script>
   </head>
 
   <body>
@@ -18,7 +32,7 @@
             <div class="col-sm-3 col-md-3 col-lg-3">
               <div class="row" style="margin-top: 2.25%">
                   <div class="col-sm-3 col-md-3 col-lg-3">
-                      <input type="submit" class="btn btn-danger btn-sm " id="fat-btn" name = "Prev" value="Prev">
+                      <input type="submit" class="btn btn-danger btn-sm " id="fat-btn" name = "Prev" value="Prev" onclick="output_val()">
                   </div>
                   
                   <div class="col-sm-4 col-md-4 col-lg-4">
@@ -26,24 +40,32 @@
                   </div>
                    
                   <div class="col-sm-3 col-md-3 col-lg-3">
-                      <input type="submit" class="btn btn-primary btn-sm " id="fat-btn" name = "Next" value="Next">
+                      <input type="submit" class="btn btn-primary btn-sm " id="fat-btn" name = "Next" value="Next" onclick="output_val()">
                   </div>
               </div>
             </div>
+
             <div class="col-sm-1 col-md-1 col-lg-1">
             </div>
-            <div class="col-sm-2 col-md-2 col-lg-2">
-              <h4 align="center" style="padding:0.5%"> Is it a clone ? </h4>
+            <div class="col-sm-2 col-md-2 col-lg-2" style="padding:0.25%">
+              <h4 align="center" > Is it a clone ? </h4>
             </div>
-            <div class="col-sm-2 col-md-2 col-lg-2" style="padding:0.5%">
+            <div class="col-sm-2 col-md-2 col-lg-2" style="margin-top:0.75%">
               <div class="btn-group btn-group-toggle" data-toggle="buttons">
-                  <label class="btn btn-primary">
-                    <input type="radio" name="Is_Clone" id="option1" autocomplete="off" value="clone"> Yes
-                  </label>
-                  <label class="btn btn-primary">
-                    <input type="radio" name="Not_Clone" id="option2" autocomplete="off" value="not_clone"> No
-                  </label>
+                  <!-- <label class="btn btn-primary"> -->
+                    <input type="radio" name="Clone_result" id="option1" value="clone" onclick="text_val()"> Yes
+                  <!-- </label> -->
+                  <!-- <label class="btn btn-primary"> -->
+                    <input type="radio" name="Clone_result" id="option2" value="not_clone" onclick="text_val()"> No
+                  <!-- </label> -->
                 </div>
+            </div>
+
+            <div class="col-sm-2 col-md-2 col-lg-2" style="padding: 0.25%">
+              <h4 align="center" style="padding:0.5%"> You have selected : </h4>
+            </div>
+            <div class="col-sm-1 col-md-1 col-lg-1" style="padding: 0.4%">
+                <input class="form-control" id="result" type="text" name="result" value="{{result}}" disabled>
             </div>
         </div>
       </form>
@@ -91,7 +113,8 @@
       </div>  
 
     </div>
-    <script src="static/prism.js"></script>
+    <script src="static/prism.js">
+    </script>
   </body>
 
 </html>
