@@ -100,7 +100,7 @@ def logout():
     session.pop('userid', None)
     session.pop('current_clone_no', None)
     session.pop('clone_pairs', None)
-    return redirect(url_for('login'))
+    return render_template("logout.html")
 
 
 def connect_db():
