@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Clone-Survey</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+    <style>
+      body {
+          background: url("{{ url_for('static', filename='survey.jpg') }}");
+          background-size: 100%;
+          margin-top: 3%;
+      }
+
+      @font-face {
+        font-family: custom-font;
+        src: url("{{ url_for('static', filename='KGBlankSpaceSketch.ttf') }}") format('opentype');
+      }
+  </style>
+  </head>
+
+  <body>
+    <div class="container">
+        <h3 align='center' style="color: aliceblue; font-family: 'custom-font','Times New Roman', Times, serif; 
+        font-size: 400%; padding: 2%">
+            Thank You!
+          </h3>
+
+      {% if error %}
+        <p class="error"><strong>Error:</strong> {{ error }}</p>
+      {% endif %}
+    </div>
+  </body>
+</html>
