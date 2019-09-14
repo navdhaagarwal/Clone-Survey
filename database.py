@@ -18,12 +18,14 @@ def java_content(current_clone_no, clone_pairs):
     code_file_2 = row[5]
     info = [code_file_1,code_file_2,functionality_id]
     print(code_file_1)
-    dir_path = "C:/Users/navdh/Desktop/project/bcb_reduced/" + str(functionality_id)
-    folders = ["/default","/selected","/sample"]
+    dataset_path = os.path.abspath('..')
+    dataset_path = os.path.join(dataset_path,'bcb_reduced')
+    dir_path = os.path.join(dataset_path,str(functionality_id))
+    folders = ["default","selected","sample"]
     contents = ""
     contents1 = ""
     for folder in folders:
-        dir_path1 = dir_path + folder
+        dir_path1 = os.path.join(dir_path,folder)
         files = os.listdir(dir_path1)
         for f in files:
             if (f == code_file_1):
