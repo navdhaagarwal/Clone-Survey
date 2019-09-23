@@ -40,7 +40,7 @@ def java_content(current_clone_no, clone_pairs):
 
 
 
-def update(current_userid, current_clone_no, users, result):
+def update(current_userid, current_clone_no, users, result, time):
     connection = sqlite3.connect("clones_db.db")
     c = connection.cursor()
     index = users[current_userid] + current_clone_no - 1

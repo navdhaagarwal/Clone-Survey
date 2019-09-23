@@ -1,6 +1,7 @@
 from flask import Flask, render_template, redirect, url_for, request, session, flash, g
 from functools import wraps
 import sqlite3
+import time
 from database import clone_pairs, java_content, update
 from functions import users
 
@@ -32,9 +33,11 @@ def home():
     current_clone_pair = clone_pairs[current_clone_no-1]
     r = session['result'][current_clone_no-1]
     if(r == 0):
-        result = "No"
+        result = "No!"
     elif(r == 1):
-        result = "Yes"
+        result = "Yes!"
+    elif(r == 2):
+        result = "Can't say!"
     else:
         result = "None"
 
@@ -51,7 +54,7 @@ def home():
     if (request.method == 'POST'):
         print(session['result'][current_clone_no-1])
         print(current_clone_no-1)
-        if( "Clone_result" not in request.form and session['result'][session['result'][current_clone_no-1]] == -1):
+        if( "Clone_result" not in request.form and session['result'][current_clone_no-1] == -1):
             flash('Kindly select an option')
             return redirect(url_for("home"))
         
@@ -61,7 +64,13 @@ def home():
                 session['result'][current_clone_no-1] = 1
             if (Clone_res_value == 'not_clone'):
                 session['result'][current_clone_no-1] = 0
-            update(current_userid, current_clone_no, app.users, session['result'][current_clone_no-1])
+            if (Clone_res_value == 'unknown'):
+                session['result'][current_clone_no-1] = 2
+            
+            current_time = time.time()
+            session['time'][current_clone_no-1] = current_time - session['start_time'] - sum(session['time'])
+
+            update(current_userid, current_clone_no, app.users, session['result'][current_clone_no-1], session['time'][current_clone_no-1])
 
         if ('Next' in request.form):
             if(current_clone_no < 82):
@@ -84,6 +93,8 @@ def login():
             session['userid'] = request.form['userid']
             session['current_clone_no'] = 1
             session['result'] = [-1]*82
+            session['time'] = [0]*82
+            session['start_time'] = time.time()
             g.db = connect_db()
             session['clone_pairs'] = clone_pairs(g.db, app.users, request.form['userid'])
             return redirect(url_for('home'))
