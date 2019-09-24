@@ -40,7 +40,7 @@ def java_content(current_clone_no, clone_pairs):
 
 
 
-def update(current_userid, current_clone_no, users, result, time):
+def update(current_userid, current_clone_no, users, result, time, reason):
     connection = sqlite3.connect("clones_db.db")
     c = connection.cursor()
     index = users[current_userid] + current_clone_no - 1
@@ -56,6 +56,10 @@ def update(current_userid, current_clone_no, users, result, time):
 
     time = round(time,2)
     query = 'UPDATE CLONES SET time_'+p+ '= '+str(time)+' WHERE id = ' + str(index)
+    c.execute(query)
+    connection.commit()
+
+    query = 'UPDATE CLONES SET message_'+p+ '= "'+ reason +'" WHERE id = ' + str(index)
     c.execute(query)
     connection.commit()
 
