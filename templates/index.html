@@ -18,6 +18,10 @@
           {
             text_value = "No";
           }
+          else if(document.getElementsByName("Clone_result")[2].checked)
+          {
+            text_value = "Can't say";
+          }
           document.getElementsByName("result")[0].value = text_value;
         }
         
@@ -56,19 +60,18 @@
             <div class="col-sm-2 col-md-2 col-lg-2" style="padding:0.25%">
               <h4 align="center"  style="color: aliceblue" > Is it a clone ? </h4>
             </div>
-            <div class="col-sm-2 col-md-2 col-lg-2" style="margin-top:0.75%">
+            <div class="col-sm-2 col-md-2 col-lg-2" style="margin-top:0.95%">
               <div class="btn-group btn-group-toggle" data-toggle="buttons">
-                  <!-- <label class="btn btn-primary"> -->
                     <input type="radio" name="Clone_result" id="option1" value="clone" onclick="text_val()"> 
-                    <font color="white">Yes</font>
-                  <!-- </label> -->
-                  <!-- <label class="btn btn-primary"> -->
+                    <font color="white">&nbsp Yes &nbsp</font>
                     <input type="radio" name="Clone_result" id="option2" value="not_clone" onclick="text_val()"> 
-                    <font color="white">No</font>
-                  <!-- </label> -->
+                    <font color="white">&nbsp No &nbsp</font>
+                    <input type="radio" name="Clone_result" id="option3" value="unknown" onclick="text_val()"> 
+                    <font color="white">&nbsp Can't say &nbsp</font>
                 </div>
             </div>
-
+            <div class="col-sm-1 col-md-1 col-lg-1">
+            </div>
             <div class="col-sm-2 col-md-2 col-lg-2" style="padding: 0.25%">
               <h4 align="center" style="padding:0.5%; color: aliceblue"> You have selected : </h4>
             </div>
