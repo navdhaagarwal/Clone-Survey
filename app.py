@@ -32,12 +32,13 @@ def home():
     clone_pairs = session['clone_pairs']
     current_clone_pair = clone_pairs[current_clone_no-1]
     r = session['result'][current_clone_no-1]
+    Clone_reason = session['reason'][current_clone_no-1]
     if(r == 0):
-        result = "No!"
+        result = "No"
     elif(r == 1):
-        result = "Yes!"
+        result = "Yes"
     elif(r == 2):
-        result = "Can't say!"
+        result = "Can't say"
     else:
         result = "None"
 
@@ -53,7 +54,7 @@ def home():
 
     if (request.method == 'POST'):
         print(session['result'][current_clone_no-1])
-        print(current_clone_no-1)
+        print(request.form)
         if( "Clone_result" not in request.form and session['result'][current_clone_no-1] == -1):
             flash('Kindly select an option')
             return redirect(url_for("home"))
@@ -70,7 +71,10 @@ def home():
             current_time = time.time()
             session['time'][current_clone_no-1] = current_time - session['start_time'] - sum(session['time'])
 
-            update(current_userid, current_clone_no, app.users, session['result'][current_clone_no-1], session['time'][current_clone_no-1])
+            Clone_reason = request.form['reason']
+            session['reason'][current_clone_no-1] = Clone_reason
+
+            update(current_userid, current_clone_no, app.users, session['result'][current_clone_no-1], session['time'][current_clone_no-1], Clone_reason)
 
         if ('Next' in request.form):
             if(current_clone_no < 82):
@@ -80,7 +84,7 @@ def home():
 
         print(current_clone_no)
         
-    return render_template("index.html", contents = contents, contents1 = contents1, clone_pair = str(current_clone_no), lines = lines, info=info, result=result)
+    return render_template("index.html", contents = contents, contents1 = contents1, clone_pair = str(current_clone_no), lines = lines, info=info, result=result, reason=Clone_reason)
 
 @app.route('/login', methods=['GET','POST'])
 def login():
@@ -95,6 +99,7 @@ def login():
             session['result'] = [-1]*82
             session['time'] = [0]*82
             session['start_time'] = time.time()
+            session['reason'] = ['']*82
             g.db = connect_db()
             session['clone_pairs'] = clone_pairs(g.db, app.users, request.form['userid'])
             return redirect(url_for('home'))
@@ -114,6 +119,7 @@ def logout():
     session.pop('result',None)
     session.pop('time',None)
     session.pop('start_time',None)
+    session.pop('reason',None)
     return render_template("logout.html")
 
 
