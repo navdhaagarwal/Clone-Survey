@@ -111,6 +111,9 @@ def logout():
     session.pop('userid', None)
     session.pop('current_clone_no', None)
     session.pop('clone_pairs', None)
+    session.pop('result',None)
+    session.pop('time',None)
+    session.pop('start_time',None)
     return render_template("logout.html")
 
 

@@ -22,10 +22,13 @@
 
   <body>
     <div class="container">
-        <h3 align='center' style="color: aliceblue; font-family: 'custom-font','Times New Roman', Times, serif; 
-        font-size: 400%; padding: 2%">
-            Thank You!
-          </h3>
+        <h3 style="color: aliceblue; font-family: 'custom-font','Times New Roman', Times, serif; 
+        font-size: 400%; padding: 2%; margin-left: 29%">
+          Thank You!
+        </h3>
+        <div style="margin-left: 37%; padding: 1%">
+            <input type="button" class="btn btn-success btn-lg " id="fat-btn" name = "Login" value="Login Again!" onclick="window.location.href = '/login'">
+        </div>
 
       {% if error %}
         <p class="error"><strong>Error:</strong> {{ error }}</p>

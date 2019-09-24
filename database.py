@@ -54,4 +54,9 @@ def update(current_userid, current_clone_no, users, result, time):
     c.execute(query)
     connection.commit()
 
+    time = round(time,2)
+    query = 'UPDATE CLONES SET time_'+p+ '= '+str(time)+' WHERE id = ' + str(index)
+    c.execute(query)
+    connection.commit()
+
 
