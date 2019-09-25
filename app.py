@@ -3,13 +3,14 @@ from functools import wraps
 import sqlite3
 import time
 from database import clone_pairs, java_content, update, update_time
-from functions import users
+from functions import users, functionality
 
 app = Flask(__name__)
 
 app.secret_key = "random"
 app.database = "clones_db.db"
 app.users = users()
+app.functionality = functionality()
 
 start_time = 0
 
@@ -94,7 +95,7 @@ def home():
 
         print(current_clone_no)
         
-    return render_template("index.html", contents = contents, contents1 = contents1, clone_pair = str(current_clone_no), lines = lines, info=info, result=result, reason=Clone_reason)
+    return render_template("index.html", contents = contents, contents1 = contents1, clone_pair = str(current_clone_no), lines = lines, info=info, functionality = app.functionality, result=result, reason=Clone_reason)
 
 @app.route('/login', methods=['GET','POST'])
 def login():
@@ -127,13 +128,6 @@ def check_user(user_id):
 def logout():
     update_time( session['userid'] , session['time'], app.users)
     session.pop('logged_in', None)
-    # session.pop('userid', None)
-    # session.pop('current_clone_no', None)
-    # session.pop('clone_pairs', None)
-    # session.pop('result',None)
-    # session.pop('time',None)
-    # session.pop('start_time',None)
-    # session.pop('reason',None)
     return render_template("logout.html")
 
 
