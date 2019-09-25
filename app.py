@@ -2,7 +2,7 @@ from flask import Flask, render_template, redirect, url_for, request, session, f
 from functools import wraps
 import sqlite3
 import time
-from database import clone_pairs, java_content, update
+from database import clone_pairs, java_content, update, update_time
 from functions import users
 
 app = Flask(__name__)
@@ -10,6 +10,8 @@ app = Flask(__name__)
 app.secret_key = "random"
 app.database = "clones_db.db"
 app.users = users()
+
+start_time = 0
 
 # login required decorator
 def login_required(f):
@@ -27,6 +29,7 @@ def login_required(f):
 @login_required
 def home():
 
+    global start_time
     current_userid = session['userid']
     current_clone_no = session['current_clone_no']
     clone_pairs = session['clone_pairs']
@@ -48,9 +51,14 @@ def home():
 
     if ('Prev' in request.form):
         if(current_clone_no > 1):
+
+            current_time = time.time()
+            session['time'][current_clone_no-1] += current_time - start_time
+            start_time = time.time()
+
             current_clone_no -= 1
             session['current_clone_no'] = current_clone_no
-        return redirect(url_for("home"))
+            return redirect(url_for("home"))
 
     if (request.method == 'POST'):
         print(session['result'][current_clone_no-1])
@@ -67,17 +75,19 @@ def home():
                 session['result'][current_clone_no-1] = 0
             if (Clone_res_value == 'unknown'):
                 session['result'][current_clone_no-1] = 2
-            
-            current_time = time.time()
-            session['time'][current_clone_no-1] = current_time - session['start_time'] - sum(session['time'])
 
             Clone_reason = request.form['reason']
             session['reason'][current_clone_no-1] = Clone_reason
 
-            update(current_userid, current_clone_no, app.users, session['result'][current_clone_no-1], session['time'][current_clone_no-1], Clone_reason)
+            update(current_userid, current_clone_no, app.users, session['result'][current_clone_no-1], Clone_reason)
 
         if ('Next' in request.form):
             if(current_clone_no < 82):
+
+                current_time = time.time()
+                session['time'][current_clone_no-1] += current_time - start_time
+                start_time = time.time()
+
                 current_clone_no += 1
                 session['current_clone_no'] = current_clone_no
                 return redirect(url_for("home"))
@@ -89,19 +99,22 @@ def home():
 @app.route('/login', methods=['GET','POST'])
 def login():
     error = None
+    global start_time
     if (request.method == 'POST'):
         if ( check_user(request.form['userid']) == False):
             error = 'Invalid userID. Please try again.'
         else:
             session['logged_in'] = True
-            session['userid'] = request.form['userid']
-            session['current_clone_no'] = 1
-            session['result'] = [-1]*82
-            session['time'] = [0]*82
-            session['start_time'] = time.time()
-            session['reason'] = ['']*82
-            g.db = connect_db()
-            session['clone_pairs'] = clone_pairs(g.db, app.users, request.form['userid'])
+            start_time = time.time()
+            if('first_login' not in session):
+                session['userid'] = request.form['userid']
+                session['current_clone_no'] = 1
+                session['result'] = [-1]*82
+                session['time'] = [0]*82
+                session['reason'] = ['']*82
+                session['first_login'] = True
+                g.db = connect_db()
+                session['clone_pairs'] = clone_pairs(g.db, app.users, request.form['userid'])
             return redirect(url_for('home'))
 
     return render_template('login.html',error=error)
@@ -112,14 +125,15 @@ def check_user(user_id):
 @app.route('/logout')
 @login_required
 def logout():
+    update_time( session['userid'] , session['time'], app.users)
     session.pop('logged_in', None)
-    session.pop('userid', None)
-    session.pop('current_clone_no', None)
-    session.pop('clone_pairs', None)
-    session.pop('result',None)
-    session.pop('time',None)
-    session.pop('start_time',None)
-    session.pop('reason',None)
+    # session.pop('userid', None)
+    # session.pop('current_clone_no', None)
+    # session.pop('clone_pairs', None)
+    # session.pop('result',None)
+    # session.pop('time',None)
+    # session.pop('start_time',None)
+    # session.pop('reason',None)
     return render_template("logout.html")
 
 
