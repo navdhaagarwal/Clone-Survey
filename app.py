@@ -50,22 +50,26 @@ def home():
     lines = [str(current_clone_pair[3]+1), str(current_clone_pair[4]+1), str(current_clone_pair[6]+1), str(current_clone_pair[7]+1)]
     contents, contents1 , info= java_content(current_clone_no, clone_pairs)
 
-    if ('Prev' in request.form):
-        if(current_clone_no > 1):
-
-            current_time = time.time()
-            session['time'][current_clone_no-1] += current_time - start_time
-            start_time = time.time()
-
-            current_clone_no -= 1
-            session['current_clone_no'] = current_clone_no
-            return redirect(url_for("home"))
+    if (current_clone_no == 82):
+        flash('Please press "Next" option before logout to register your last choice')
 
     if (request.method == 'POST'):
         print(session['result'][current_clone_no-1])
         print(request.form)
+
+        if ('Prev' in request.form):
+            if(current_clone_no > 1):
+
+                current_time = time.time()
+                session['time'][current_clone_no-1] += current_time - start_time
+                start_time = time.time()
+
+                current_clone_no -= 1
+                session['current_clone_no'] = current_clone_no
+                return redirect(url_for("home"))
+
         if( "Clone_result" not in request.form and session['result'][current_clone_no-1] == -1):
-            flash('Kindly select an option')
+            flash('Please make the choice first.')
             return redirect(url_for("home"))
         
         if("Clone_result" in request.form):

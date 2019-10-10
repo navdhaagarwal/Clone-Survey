@@ -82,12 +82,12 @@
       </form>
     </div>
 
-    {% for messaged in get_flashed_messages() %}
+    {% for messages in get_flashed_messages() %}
 
       <div class="container">
         <div class="alert alert-warning alert-dismissible fade in">
           <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
-          <strong>Warning!</strong> Please make the choice first
+          <strong>Warning!</strong> {{messages}}
         </div>
       </div>
     {% endfor %}
