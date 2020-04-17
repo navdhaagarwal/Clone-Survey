@@ -1,0 +1,157 @@
+<?xml version='1.0' encoding='UTF-8'?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<bean
+		class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+		<property name="targetClass">
+			<value>com.nucleus.logging.JULToSlf4jSetupFacade</value>
+		</property>
+		<property name="targetMethod">
+			<value>setup</value>
+		</property>
+	</bean>
+
+	<bean id="environmentEncryptionConfiguration"
+		class="org.jasypt.encryption.pbe.config.EnvironmentStringPBEConfig" depends-on="neutrinoSpringAppContextUtil">
+		<property name="algorithm">
+			<bean
+				class="com.nucleus.config.EnvironmentConfigurationFallbackFactoryBean">
+				<property name="fallbackProperty" value="encryption.algorithm" />
+				<property name="defaultValue" value="PBEWITHMD5ANDDES" />
+			</bean>
+		</property>
+		<property name="password">
+			<bean
+				class="com.nucleus.config.EnvironmentConfigurationFallbackFactoryBean">
+				<property name="fallbackProperty" value="encryption.password" />
+				<property name="defaultValue" value="this rocks!" />
+			</bean>
+		</property>
+		<property name="saltGenerator" ref="saltGenerator" />
+		<property name="poolSize" value="100" />
+	</bean>
+
+<bean id="neutrinoSpringAppContextUtil" class="com.nucleus.core.NeutrinoSpringAppContextUtil"></bean>
+	
+	<bean id="rootConfigResourceLoader" class="com.nucleus.core.initialization.NeutrinoResourceLoader"
+		abstract="true">
+		<constructor-arg index="0" value="neutrino-product-suite-config"></constructor-arg>
+		<constructor-arg index="1" value="common-config"></constructor-arg>
+	</bean>
+
+	<bean id="frameworkConfigResourceLoader" parent="rootConfigResourceLoader">
+		<property name="moduleName" value="core-framework-config" />
+	</bean>
+
+	<bean id="frameworkConfigResourceFactoryBean"
+		class="com.nucleus.core.initialization.NeutrinoResourceFactoryBean"
+		abstract="true">
+		<property name="resourceLoader" ref="frameworkConfigResourceLoader" />
+	</bean>
+		
+	
+	<bean id="frameworkPropertyPlaceholderConfigurer"
+		class="org.jasypt.spring31.properties.EncryptablePropertySourcesPlaceholderConfigurer">
+		<constructor-arg ref="stringEncryptor" />
+		<property name="ignoreUnresolvablePlaceholders" value="true" />
+		<property name="locations">
+			<list>
+				<bean parent="frameworkConfigResourceFactoryBean">
+					<property name="resourceName" value="framework-config.properties" />
+				</bean>
+				<bean parent="frameworkConfigResourceFactoryBean">
+					<property name="resourceName" value="framework-ldap-config.properties" />
+				</bean>
+				<bean parent="frameworkConfigResourceFactoryBean">
+					<property name="resourceName" value="oauth-security-config.properties" />
+				</bean> 
+				<bean parent="frameworkConfigResourceFactoryBean">
+					<property name="resourceName" value="database-config.properties" />
+				</bean>
+				
+				<bean parent="frameworkConfigResourceFactoryBean">
+					<property name="resourceName" value="database-seed-file-config.properties" />
+				</bean>
+				<bean parent="frameworkConfigResourceFactoryBean">
+					<property name="resourceName" value="database-seed-operation-config.properties" />
+				</bean>
+				<bean parent="frameworkConfigResourceFactoryBean">
+					<property name="resourceName" value="redis-config.properties" />
+				</bean>
+				<bean parent="frameworkConfigResourceFactoryBean">
+					<property name="resourceName" value="whatsapp-config.properties" />
+				</bean>
+
+<!-- MOVED TO COMMON MASTERS
+				<bean parent="frameworkConfigResourceFactoryBean">
+					<property name="resourceName" value="financial-details-xls.properties" />
+				</bean>
+				<bean parent="frameworkConfigResourceFactoryBean">
+					<property name="resourceName" value="bank-details-xls.properties" />
+				</bean>
+				<bean parent="frameworkConfigResourceFactoryBean">
+					<property name="resourceName" value="financial-detail-headers.properties" />
+				</bean>
+				<bean parent="frameworkConfigResourceFactoryBean">
+					<property name="resourceName" value="bank-detail-headers.properties" />
+				</bean> -->
+				
+				<bean id="couchdbResourceFactoryBean" parent="frameworkConfigResourceFactoryBean">
+					<property name="resourceName" value="couchDb-ektrop-config.properties" />
+				</bean>
+				<bean parent="frameworkConfigResourceFactoryBean">
+					<property name="resourceName" value="spring-integration-config.properties" />
+				</bean>
+			</list>
+		</property>
+	</bean>
+
+	<bean id ="neutrinoPropertiesBeanPostProcessor" class="com.nucleus.core.annotations.NeutrinoAnnotationsBeanPostProcessor" >
+	   <constructor-arg value="com.nucleus"></constructor-arg>
+	</bean>
+
+	<!-- This will initialize Money class with Base currency and precision defined 
+		in framework-config.properties -->
+	<bean id="moneyInitializer"
+		class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+		<property name="staticMethod"
+			value="com.nucleus.core.money.entity.Money.initializeWithDefaultValues" />
+		<property name="arguments">
+			<list>
+				<value>${system.money.base.currency}</value>
+				<value>${system.money.storage.precision}</value>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="saltGenerator" class="org.jasypt.salt.RandomSaltGenerator" />
+
+	<bean id="stringEncryptor" class="org.jasypt.encryption.pbe.StandardPBEStringEncryptor">
+		<property name="config" ref="environmentEncryptionConfiguration" />
+	</bean>
+
+	<bean id="bigDecimalEncryptor"
+		class="org.jasypt.encryption.pbe.StandardPBEBigDecimalEncryptor">
+		<property name="config" ref="environmentEncryptionConfiguration" />
+	</bean>
+
+	<bean id="integerEncryptor"
+		class="org.jasypt.encryption.pbe.StandardPBEBigIntegerEncryptor">
+		<property name="config" ref="environmentEncryptionConfiguration" />
+	</bean>
+
+	<bean id="byteEncryptor" class="org.jasypt.encryption.pbe.StandardPBEByteEncryptor">
+		<property name="config" ref="environmentEncryptionConfiguration" />
+	</bean>
+
+
+
+
+
+
+
+</beans>

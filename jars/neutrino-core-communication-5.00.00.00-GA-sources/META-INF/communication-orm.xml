@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-mappings version="2.0"
+	xmlns="http://java.sun.com/xml/ns/persistence/orm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm http://java.sun.com/xml/ns/persistence/orm_2_0.xsd">
+
+	<!-- <named-query name="CommunicationEventRequestSchedulerMapping.getUnmappedEventCodes">
+		<query>
+              SELECT ec from EventCode ec where ec.id not in (SELECT cersm.eventCode from CommunicationEventRequestSchedulerMapping cersm) 
+        </query>
+	</named-query> -->
+	
+	<named-query name="CommunicationEventRequestSchedulerMapping.getUnMappedEventCodesBasedOnModule">
+		<query>
+              SELECT ec from EventCode ec where ec.id not in (SELECT cersm.eventCode from CommunicationEventRequestSchedulerMapping cersm ,CommunicationEventRequestScheduler cers where cers.id=cersm.communicationEventRequestSchedulerId and cers.masterLifeCycleData.approvalStatus not in (:approvalStatusList) and cersm.sourceProduct =:sourceProduct) order by lower(ec.name) 
+        </query>
+	</named-query>
+	
+	<!-- <named-query name="CommunicationGenerationSchedulerMapping.getUnmappedCommunications">
+		<query>
+              SELECT cn from CommunicationName cn where cn.id not in (SELECT cgsm.communication from CommunicationGenerationSchedulerMapping cgsm) 
+        </query>
+	</named-query> -->
+	
+	<named-query name="CommunicationGenerationSchedulerMapping.getUnMappedCommunicationsBasedOnModule">
+		<query>
+              SELECT cn from CommunicationName cn where cn.id not in (SELECT cgsm.communication from CommunicationGenerationSchedulerMapping cgsm ,CommunicationGenerationScheduler cgs where cgs.id=cgsm.communicationGenerationSchedulerId and cgs.masterLifeCycleData.approvalStatus not in 
+              (:approvalStatusList))and cn.sourceProduct =:sourceProduct order by lower(cn.communicationName)
+        </query>
+	</named-query>	
+	
+	<named-query name="CommunicationEventRequestScheduler.getEventCodeListFromIds">
+		<query>
+              select ec from EventCode ec where ec.id in (:ids) order by lower(ec.name)
+        </query>
+	</named-query>
+
+	<named-query name="CommunicationGenerationScheduler.getCommunicationListFromIds">
+		<query>
+              select cn from CommunicationName cn where cn.id in (:ids) order by lower(cn.communicationName)
+        </query>
+	</named-query>
+	
+	<named-query name="AdHocEventLogSchedule.getEventCodeListBasedOnModule">
+		<query>
+             SELECT ec from EventCode ec where ec.id not in (SELECT aelsm.eventCode from AdHocEventLogScheduleMapping aelsm ,AdHocEventLogSchedule aels where aels.id=aelsm.adHocEventLogScheduleId and aels.masterLifeCycleData.approvalStatus not in (:approvalStatusList) and aelsm.sourceProduct =:sourceProduct) and ec.parentCode =:adhocEventParentCode order by lower(ec.name)
+        </query>
+	</named-query>
+	
+	<named-query name="CommunicationParameter.getCommunicationParametersForAdHocBasedOnModule">
+		<query>
+             SELECT cp from CommunicationParameter cp where cp.masterLifeCycleData.approvalStatus not in (:approvalStatusList) and cp.adHocParameter = true and cp.sourceProduct =:sourceProduct
+        </query>
+	</named-query>
+	<named-query name="AdHocEventLogSchedule.getEventCodesBasedOnModuleAndEventCodeType">
+		<query>
+             SELECT ec from EventCode ec where ec.id not in (SELECT aelsm.eventCode from AdHocEventLogScheduleMapping aelsm ,AdHocEventLogSchedule aels where aels.id=aelsm.adHocEventLogScheduleId and aels.masterLifeCycleData.approvalStatus not in (:approvalStatusList) and aelsm.sourceProduct =:sourceProduct) and ec.parentCode =:adhocEventParentCode order by lower(ec.name)
+        </query>
+	</named-query>
+	
+	 
+	<named-query name="CommunicationGenerationMergedFile.getDistinctRequestReferenceIds">
+		<query>
+             select distinct (cgs.requestReferenceId) from CommunicationRequestDetail cgs where cgs.sourceProduct =:sourceProduct and cgs.communicationCode =:communicationCode and cgs.generateMergedFile=:generateMergedFile and cgs.parentCommunicationRequestDetail is null
+        </query>
+	</named-query>
+	
+		<named-query name="CommunicationRequestDetail.getEmailAttachments">
+		<query>
+             select crd from CommunicationRequestDetail crd where crd.parentCommunicationRequestDetailId =:parentId
+        </query>
+	</named-query>
+	
+	<named-query name="Communication.getCommunicationFromCommunicationCode">
+		<query>
+             select cn from CommunicationName cn where cn.communicationCode =:communicationCode
+        </query>
+	</named-query>
+	
+	<named-query name="CommunicationName.getCommunicationNamesBasedOnCommunicationType">
+		<query>
+             SELECT n from CommunicationName n where  n.masterLifeCycleData.approvalStatus IN :approvalStatus and n.communicationType.code = :communicationTypeCode and n.sourceProduct =:sourceProduct
+        </query>
+	</named-query>	
+
+	<named-query name="CommunicationRequestDetail.getCommunicationGenerationDetailForCommunication">
+		<query>
+             SELECT crd.id from CommunicationRequestDetail crd where  crd.status =:status and crd.communicationCode=:communicationCode  and crd.sourceProduct =:sourceProduct and crd.generateMergedFile =:generateMergedFile and crd.parentCommunicationRequestDetail is null and (crd.schedularInstanceId !=:schedularInstanceId or crd.schedularInstanceId is null)  
+        </query>
+	</named-query>
+	
+	<named-query name="CommunicationRequestDetail.getCommunicationGenerationDetailObjForCommunication">
+		<query>
+             SELECT crd from CommunicationRequestDetail crd left outer join fetch crd.additionalData where  crd.status =:status and crd.communicationCode=:communicationCode
+               and crd.sourceProduct =:sourceProduct and crd.generateMergedFile =:generateMergedFile and 
+               crd.parentCommunicationRequestDetail is null and (crd.schedularInstanceId !=:schedularInstanceId or
+               crd.schedularInstanceId is null)
+        </query>
+	</named-query>
+	
+	<named-query name="CommunicationRequestDetail.getCommunicationGenerationDetailsForInitiatedStatus">
+		<query>
+             SELECT crd from CommunicationRequestDetail crd left outer join fetch crd.additionalData where  crd.status =:status
+               and crd.sourceProduct =:sourceProduct and crd.generateMergedFile =:generateMergedFile and 
+               crd.parentCommunicationRequestDetail is null and (crd.schedularInstanceId !=:schedularInstanceId or
+               crd.schedularInstanceId is null) order by crd.id desc
+        </query>
+	</named-query>		
+	
+	<named-query name="CommunicationRequestDetail.getCommunicationGenerationDetailObjForCommunicationByRefId">
+		<query>
+             SELECT crd from CommunicationRequestDetail crd where  crd.status =:status and crd.communicationCode=:communicationCode
+               and crd.sourceProduct =:sourceProduct and crd.generateMergedFile =:generateMergedFile and 
+               crd.parentCommunicationRequestDetail is null and (crd.schedularInstanceId !=:schedularInstanceId or
+               crd.schedularInstanceId is null) and crd.requestReferenceId =:requestReferenceId  
+        </query>
+	</named-query>
+	
+	
+	
+	<named-query name = "CommunicationGenerationDetail.getCommunicationGenerationDetailByUniqueId">
+		<query>
+			SELECT crd from CommunicationRequestDetail crd where crd.uniqueRequestId=:uniqueRequestId
+		</query>
+	</named-query>		
+	<named-query name= "CommunicationGenerationDetailHistory.getCommunicationGenerationDetailHistoryByParentId">
+		<query>
+			SELECT cgdh from CommunicationGenerationDetailHistory cgdh where cgdh.parentCommunicationGenerationDetailHistoryId=:parentId
+		</query>
+	</named-query>
+	
+	<named-query name = "MessageExchangeRecord.getMessageExchangeRecordByUniqueId">
+		<query> 
+			SELECT  mer from  MessageExchangeRecord mer where mer.uniqueRequestId =:uniqueId
+		</query>
+	</named-query>
+	<named-query name = "MessageExchangeRecord.getUndeliveredMessageRecord">
+		<query>
+			FROM MessageExchangeRecord mer where mer.deliveryStatus in (:deliveryStatus) and mer.id &gt; :id order by id asc 
+		</query>
+	</named-query>
+	
+	<named-query name = "MessageExchangeRecord.deleteMessageRecord">
+		<query>
+		 	delete from MessageExchangeRecord mer where mer.id=:id
+		</query>
+	</named-query>
+	
+	<named-query name="MessageExchangeRecord.RetryAttemptExceededMessages">
+		<query>
+			FROM MessageExchangeRecord mer where mer.retriedAttemptsDone &gt; :maxRetryAttempts
+		</query>
+	</named-query>
+	
+	<named-query name="MessageExchangeRecord.CountUnsentMessages">
+		<query>
+			select count(*) from MessageExchangeRecord mer where mer.deliveryStatus in (:deliveryStatus)
+		</query>
+	</named-query>
+	
+	<named-query name="CommunicationTemplate.getCommunicationTemplatesUsingId">
+		<query>
+             SELECT t from CommunicationTemplate t where t.communication.id = :id AND t.masterLifeCycleData.approvalStatus NOT IN :approvalStatus 
+             ORDER BY CASE WHEN (t.masterLifeCycleData.approvalStatus='0') THEN 1 
+	           				WHEN (t.masterLifeCycleData.approvalStatus='3') THEN 2
+	            			WHEN (t.masterLifeCycleData.approvalStatus='2') THEN 3
+	            			WHEN (t.masterLifeCycleData.approvalStatus='7') THEN 4 ELSE 5 END, t.id
+        </query> 
+	</named-query>
+	<named-query name="CommunicationName.getCommunicationNames">
+		<query>
+             SELECT n from CommunicationName n where  n.masterLifeCycleData.approvalStatus IN :approvalStatus 
+        </query>
+	</named-query>
+	<named-query name="getCommunicationRequestListForDeletion">
+		<query>
+             SELECT crd from CommunicationRequestDetail crd where  crd.status in (:status) 
+        </query>
+	</named-query>
+	<named-query name="CommunicationGenerationDetailHistory.getCommunicationGenerationDetailHistoryByBarcodeReferenceNumber">
+		<query>
+             SELECT cgdh from CommunicationGenerationDetailHistory cgdh where cgdh.barcodeReferenceNumber =:barcodeReferenceNumber
+        </query>
+	</named-query>
+	
+	<named-query name="Approved.Active.Parameters.IdAndCode">
+	<query>
+			Select new Map(param.id as id,param.parameterCode as code) FROM CommunicationParameter param WHERE param.activeFlag = true AND param.masterLifeCycleData.approvalStatus in (:approvalStatus)  AND  (param.entityLifeCycleData.snapshotRecord IS NULL OR param.entityLifeCycleData.snapshotRecord = false) ORDER BY param.parameterCode ASC
+		</query>
+</named-query>
+
+	
+</entity-mappings>
+

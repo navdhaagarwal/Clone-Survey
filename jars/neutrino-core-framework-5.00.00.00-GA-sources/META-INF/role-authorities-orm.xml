@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-mappings version="2.0"
+	xmlns="http://java.sun.com/xml/ns/persistence/orm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm http://java.sun.com/xml/ns/persistence/orm_2_0.xsd">
+
+	<named-query name="role.getRolesByAuthority">
+		<query>
+           select r from Role r inner join r.authorities auth  WHERE auth.id = :authorityId and r.masterLifeCycleData.approvalStatus=0 AND r.activeFlag = true
+        </query>
+	</named-query>
+	
+	<named-query name="authority.getByCode">
+		<query>
+           select auth from Authority auth where auth.authCode = :authorityCode AND (auth.entityLifeCycleData.snapshotRecord IS NULL OR auth.entityLifeCycleData.snapshotRecord = false)
+        </query>
+	</named-query>
+	
+	<named-query name="role.getAllApprovedAndActiveRoles">
+		<query>
+           select ro.id,ro.name from Role ro where ro.masterLifeCycleData.approvalStatus in :approvalStatusList and activeFlag = true
+        </query>
+	</named-query>
+	
+
+</entity-mappings>

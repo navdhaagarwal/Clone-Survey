@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-mappings version="2.0"
+	xmlns="http://java.sun.com/xml/ns/persistence/orm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm http://java.sun.com/xml/ns/persistence/orm_2_0.xsd">
+
+	<named-query name="Task.getAllTasksForUserAndTaskStatus">
+		<query> from Task t where t.assignee.id = :userId and t.taskStatus = :taskStatus order by t.priority desc, t.createDate desc </query>
+	</named-query>
+	
+	<named-query name="Task.getAllTasksForUser">
+		<query> from Task t where t.assignee.id = :userId order by t.priority desc, t.createDate desc </query>
+	</named-query>
+	
+	<named-query name="Task.getPendingTasksForWorklow">
+		<query> from Task t where t.approvalFlowReference = :approvalFlowReference and t.taskStatus= :taskStatus order by t.priority desc, t.createDate desc </query>
+	</named-query>
+	
+	<named-query name="Task.getLastChangeTrailFromWorkflowForUserTask">
+		<query> select MAX(trail) ,at FROM ApprovalTask at join at.approvalFlowReference as wf inner join wf.changeTrail as trail WHERE at.assignee.id = :userId and at.taskStatus= :taskStatus GROUP BY  at.id </query>
+	</named-query>
+
+</entity-mappings>

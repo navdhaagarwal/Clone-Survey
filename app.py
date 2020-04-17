@@ -50,7 +50,7 @@ def home():
     lines = [str(current_clone_pair[3]+1), str(current_clone_pair[4]+1), str(current_clone_pair[6]+1), str(current_clone_pair[7]+1)]
     contents, contents1 , info= java_content(current_clone_no, clone_pairs)
 
-    if (current_clone_no == 82):
+    if (current_clone_no == 150):
         flash('Please press "Next" option before logout to register your last choice')
 
     if (request.method == 'POST'):
@@ -109,23 +109,24 @@ def login():
         if ( check_user(request.form['userid']) == False):
             error = 'Invalid userID. Please try again.'
         else:
+            print("Session", session)
             session['logged_in'] = True
             start_time = time.time()
             if('first_login' not in session):
                 session['userid'] = request.form['userid']
                 session['current_clone_no'] = 1
-                session['result'] = [-1]*82
-                session['time'] = [0]*82
-                session['reason'] = ['']*82
+                session['result'] = [-1]*150
+                session['time'] = [0]*150
+                session['reason'] = ['']*150
                 session['first_login'] = True
                 g.db = connect_db()
-                session['clone_pairs'] = clone_pairs(g.db, app.users, request.form['userid'])
+                # session['clone_pairs'] = clone_pairs(g.db, app.users, request.form['userid'])
             return redirect(url_for('home'))
 
     return render_template('login.html',error=error)
 
 def check_user(user_id):
-    return (user_id in app.users)
+    return (user_id in app.users.keys())
 
 @app.route('/logout')
 @login_required

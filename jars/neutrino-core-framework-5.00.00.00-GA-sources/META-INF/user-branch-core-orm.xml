@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-mappings version="2.0"
+	xmlns="http://java.sun.com/xml/ns/persistence/orm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm http://java.sun.com/xml/ns/persistence/orm_2_0.xsd">
+	
+	<!-- NAMED QUERIES for Business Partner Branch operations-->
+	
+	<named-query name="User.primaryOrganizationBranchFromBusinessPartnerbyUserId">
+		<query>
+       select bp.organizationBranch from BPOrgBranchMapping bp where bp.associatedBusinessPartnerId=( select up.businessPartnerId from UserBPMapping up where up.associatedUser.id=:associatedUserId) and bp.isPrimaryBranch=true        
+        </query>
+	</named-query>
+	<!-- NAMED QUERIES for user branch operations -->
+
+	<named-query name="User.primaryOrganizationBranchbyUserId">
+		<query>
+          SELECT u.organizationBranch FROM UserOrgBranchMapping u where u.associatedUser.id=:associatedUserId and u.isPrimaryBranch=true
+        </query>
+	</named-query>
+
+	<named-query name="UserManagement.getUserOrgBranches">
+		<query>
+            FROM UserOrgBranchMapping ubm where ubm.associatedUser.id = :userID
+        </query>
+	</named-query>
+	<named-query name="UserManagement.getUserBranches">
+		<query>
+            Select new MAP(ubm.organizationBranch.id as id, ubm.organizationBranch.name as name )FROM UserOrgBranchMapping ubm where ubm.associatedUser.id = :userID AND ubm.organizationBranch.organizationType.code = :orgType
+        </query>
+	</named-query>
+
+	<named-query name="UserManagement.getUserBranchesObject">
+		<query>
+			Select ubm.organizationBranch as branch FROM UserOrgBranchMapping ubm where ubm.associatedUser.id = :userID AND ubm.organizationBranch.organizationType.code = :orgType
+		</query>
+	</named-query>
+
+	<named-query name="UserManagement.getApprovedUserOrgBranches">
+		<query>
+            Select NEW com.nucleus.businessmapping.entity.UserOrgBranchMapping(ubm.organizationBranch,ubm.includesSubBranches, ubm.id, ubm.operationType) FROM UserOrgBranchMapping ubm where ubm.associatedUser.id = :userID order by ubm.id DESC
+        </query>
+	</named-query>
+
+
+
+	<!-- for team -->
+	<named-query name="UserManagement.getUserOrgBranchesList">
+		<query>
+			SELECT ob FROM UserOrgBranchMapping ubm inner join ubm.organizationBranch ob where ubm.associatedUser.id like :userID
+		</query>
+	</named-query>
+
+	<named-query name="Team.getAllEligibleUsersForThisTeam">
+		<query>
+		  SELECT distinct(u) FROM UserOrgBranchMapping ub inner join ub.associatedUser u  where ub.organizationBranch.id = :branchId and (u.masterLifeCycleData.approvalStatus in (:approvalStatusList))
+        </query>
+	</named-query>
+
+	<named-query name="BPOrgBranchMapping.getBPIdByOrgBranch">
+		<query>
+			select bpom.associatedBusinessPartnerId from BPOrgBranchMapping bpom  where bpom.organizationBranch.id = :branchId)
+		</query>
+	</named-query>
+
+
+	<named-query
+		name="Team.getAllTeamsOfThoseBranchesWhichContainsTeamsOfThisUser">
+		<query>
+		  
+		     SELECT t FROM Team t, UserOrgBranchMapping u inner join u.organizationBranch o 
+		      where u.associatedUser.id =:userId AND t.teamBranch.id = o.id AND t.masterLifeCycleData.approvalStatus IN (0,3,4,6)
+			and (t.entityLifeCycleData.snapshotRecord IS NULL OR t.entityLifeCycleData.snapshotRecord = false) and t.activeFlag = true
+
+        </query>
+	</named-query>
+
+	<named-query
+		name="Team.getAllTeamIdsOfThoseBranchesWhichContainsTeamsOfThisUser">
+		<query>
+		  
+		     SELECT t.id FROM Team t, UserOrgBranchMapping u inner join u.organizationBranch o 
+		      where u.associatedUser.id =:userId AND t.teamBranch.id = o.id AND t.masterLifeCycleData.approvalStatus IN (0,3,4,6)
+			and (t.entityLifeCycleData.snapshotRecord IS NULL OR t.entityLifeCycleData.snapshotRecord = false) and t.activeFlag = true
+
+        </query>
+	</named-query>
+	
+	<named-query name="UserManagement.getUserOrgBranchesProductByUserOrgBranchId">
+		<query>
+            SELECT ubm FROM UserOrgBranchProdMapping ubm where ubm.userOrgBranchMappingId =:userOrgBranchMappingId
+        </query>
+	</named-query>
+	
+	
+	<named-query name="Users.userInBranch">
+		<query>
+          SELECT u FROM UserOrgBranchMapping u where u.organizationBranch.id = :organizationBranch
+        </query>
+	</named-query>
+
+
+	
+	<named-query name="Organization.getOrgBranchesWhereUserIsBranchAdmin">
+		<query>
+        	SELECT ub.organizationBranch FROM UserOrgBranchMapping ub WHERE ub.associatedUser.id = :userId AND ub.isBranchAdmin = :isBranchAdmin AND (ub.entityLifeCycleData.snapshotRecord is null OR ub.entityLifeCycleData.snapshotRecord = false)
+        </query>
+	</named-query>
+	<named-query name="Organization.getOrgBranchesUnderCurrentUser">
+		<query>
+           SELECT NEW MAP(ubm.organizationBranch as orgBranch, (SELECT COUNT(organizationBranch) FROM OrganizationBranch organizationBranch inner join organizationBranch.parentBranchMapping pbm WHERE pbm.parentBranch.id=ubm.organizationBranch.id and pbm.moduleName.code = :systemName AND organizationBranch.activeFlag = true) as childCount) FROM UserOrgBranchMapping ubm where ubm.associatedUser.id = :userID AND ubm.isBranchAdmin=true
+        </query>
+	</named-query>
+	
+	<named-query name="Organization.getOrgBranchesUnderCurrentUserByOrganizationType">
+		<query>
+           SELECT NEW MAP(ubm.organizationBranch as orgBranch, 
+           (SELECT COUNT(organizationBranch) FROM OrganizationBranch organizationBranch inner join organizationBranch.parentBranchMapping pbm WHERE pbm.parentBranch.id=ubm.organizationBranch.id and pbm.moduleName.code = :systemName AND organizationBranch.activeFlag = true) as childCount)
+           FROM UserOrgBranchMapping ubm 
+           where ubm.associatedUser.id = :userID 
+           AND ubm.isBranchAdmin=true 
+           AND ubm.organizationBranch.organizationType.code = :orgType
+        </query>
+	</named-query>
+	
+	
+	<named-query name="Organization.getOrgBranchesUnderCurrentUserByOrganizationTypeWithState">
+		<query>
+           SELECT NEW MAP(ubm.organizationBranch as orgBranch, 
+           (SELECT COUNT(organizationBranch) FROM OrganizationBranch organizationBranch inner join organizationBranch.parentBranchMapping pbm WHERE pbm.parentBranch.id=ubm.organizationBranch.id and pbm.moduleName.code = :systemName) as childCount) 
+           FROM UserOrgBranchMapping ubm inner join OrganizationBranch ob on ubm.organizationBranch = ob.id 
+    		inner join SimpleContactInfo sci on ob.contactInfo = sci.id 
+    		inner join Address ad on sci.address=ad.id 
+    		inner join State st on st.id=ad.state
+    		where ubm.associatedUser.id = :userID 
+           AND ubm.isBranchAdmin=true 
+           AND ubm.organizationBranch.organizationType.code = :orgType
+           AND st.stateName=:stateName
+        </query>
+	</named-query>
+	
+	
+
+	<named-query name="UserManagement.getUserOrgBranchByBranchIdsAndUserId">
+		<query>
+            FROM UserOrgBranchMapping ubm where ubm.associatedUser.id = :userID AND ubm.organizationBranch.id IN :branchIDs
+        </query>
+	</named-query>
+	<named-query name="UserBPMapping.getUserByBPId">
+		<query>
+          SELECT u.associatedUser FROM UserBPMapping u where u.businessPartnerId=:bpId
+        </query>
+	</named-query>
+
+	<named-query name="Organization.getOrgBranchesOfUser">
+		<query>
+        	SELECT ub.organizationBranch FROM UserOrgBranchMapping ub WHERE ub.associatedUser.id = :userId  AND ub.masterLifeCycleData.approvalStatus = :approvalStatus  AND ub.activeFlag = true AND (ub.entityLifeCycleData.snapshotRecord is null OR ub.entityLifeCycleData.snapshotRecord = false)
+        </query>
+	</named-query>
+	<named-query name="UserOrgBranchMapping.getBranchAdmin">
+		<query>
+        	SELECT ub.isBranchAdmin FROM UserOrgBranchMapping ub WHERE ub.associatedUser.id = :userId AND ub.isBranchAdmin = :isBranchAdmin AND ub.masterLifeCycleData.approvalStatus = :approvalStatus  AND ub.activeFlag = :activeFlag AND (ub.entityLifeCycleData.snapshotRecord is null OR ub.entityLifeCycleData.snapshotRecord = false)
+        </query>
+	</named-query>
+	<named-query name="Organization.getOrgBranchesCodeOfUser">
+		<query>
+        	SELECT ub.organizationBranch.branchCode FROM UserOrgBranchMapping ub WHERE ub.associatedUser.id = :userId  AND ub.masterLifeCycleData.approvalStatus = :approvalStatus  AND ub.activeFlag = :activeFlag AND (ub.entityLifeCycleData.snapshotRecord is null OR ub.entityLifeCycleData.snapshotRecord = false)
+        </query>
+	</named-query>
+	<named-query name="Organization.getOrgBranchesCodeWhereUserIsBranchAdmin">
+		<query>
+        	SELECT ub.organizationBranch.branchCode FROM UserOrgBranchMapping ub WHERE ub.associatedUser.id = :userId AND ub.isBranchAdmin = :isBranchAdmin AND ub.masterLifeCycleData.approvalStatus = :approvalStatus  AND ub.activeFlag = :activeFlag AND (ub.entityLifeCycleData.snapshotRecord is null OR ub.entityLifeCycleData.snapshotRecord = false)
+        </query>
+	</named-query>
+
+	
+	<named-query name="UserBPMapping.getUserIds">
+		<query>
+          SELECT u.associatedUser.id FROM UserBPMapping u 
+        </query>
+	</named-query>
+	
+	<named-query name="UserManagement.getAllProductSchemeMappingListByUserId">
+		<query>
+          SELECT upsm from UserOrgBranchProdSchemeMapping upsm where upsm.userId= :userId
+        </query>
+	</named-query>
+
+	<named-query name="UserManagement.getUserOrgBranchFromParentBranchChilds">
+		<query>
+			select NEW MAP(uob.associatedUser as user,uob.organizationBranch.id as branchId) from UserOrgBranchMapping uob INNER JOIN User u on uob.associatedUser.id=u.id INNER JOIN Organization o on o.id=uob.organizationBranch.id where uob.organizationBranchId in :childBranchIds AND u.sysName.code=:systemName AND o.organizationType.code='branch'
+		</query>
+	</named-query>
+	<named-query name="UserManagement.getChildIdsFromParentBranchId">
+		<query>
+			SELECT o FROM OrganizationBranch o inner join o.parentBranchMapping opbm where o.masterLifeCycleData.approvalStatus IN :approvalStatus AND opbm.parentBranch.id =:parentOrgId AND opbm.moduleName.code = :systemName  AND (o.entityLifeCycleData.snapshotRecord IS NULL OR o.entityLifeCycleData.snapshotRecord = false) AND o.activeFlag = true
+		</query>
+	</named-query>
+
+	<named-query name="Organization.getOrgBranchesUnderCurrentUserByOrganizationTypeList">
+		<query>
+			SELECT distinct ubm.organizationBranch.id
+			FROM UserOrgBranchMapping ubm
+			where ubm.associatedUser.id = :userID
+			AND ubm.isBranchAdmin=true
+			AND ubm.organizationBranch.organizationType.code = :orgType
+		</query>
+	</named-query>
+<named-query name="UserManagement.getUserOrgBranchByBranchAndUserId">
+		<query>
+            FROM UserOrgBranchMapping ubm where ubm.associatedUser.id = :userID AND ubm.organizationBranch.id = :branchID
+        </query>
+	</named-query>
+	
+</entity-mappings>

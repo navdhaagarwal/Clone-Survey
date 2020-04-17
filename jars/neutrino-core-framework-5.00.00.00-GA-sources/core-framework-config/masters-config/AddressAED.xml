@@ -1,0 +1,104 @@
+<com.nucleus.makerchecker.GridConfiguration>
+<entityClass>com.nucleus.address.Address</entityClass>
+<jspName>masterDatatable</jspName>
+<recordUrl>/app/AdditionalEmployerDetails/Address/view/</recordUrl>
+<entityNameMRKey>Address</entityNameMRKey>
+<masterEntityConfiguration>
+	<autoApproval>false</autoApproval>
+	<entityUpdateInfoList>
+	</entityUpdateInfoList>
+</masterEntityConfiguration>
+<springBeanName>addressService</springBeanName>
+<key>Address</key>
+	<initializingPath></initializingPath>
+	<columnConfigurationList>
+		<com.nucleus.makerchecker.ColumnConfiguration>
+			<titleKey>label.addressType</titleKey>
+			<width>125</width>
+			<sortable>true</sortable>
+			<hidden>false</hidden>
+			<dataField>addressTypeAED.name</dataField>
+			<columnType>string</columnType>
+		</com.nucleus.makerchecker.ColumnConfiguration>
+		
+		<com.nucleus.makerchecker.ColumnConfiguration>
+			<titleKey>label.ownershipStatus</titleKey>
+			<width>125</width>
+			<sortable>true</sortable>
+			<hidden>false</hidden>
+			<dataField>ownershipStatus.name</dataField>
+			<columnType>string</columnType>			
+		</com.nucleus.makerchecker.ColumnConfiguration>
+		
+		<com.nucleus.makerchecker.ColumnConfiguration>
+			<titleKey>label.countryname</titleKey>
+			<width>125</width>
+			<sortable>true</sortable>
+			<hidden>false</hidden>
+			<dataField>country.countryName</dataField>
+			<columnType>string</columnType>	
+		</com.nucleus.makerchecker.ColumnConfiguration>
+		
+		<com.nucleus.makerchecker.ColumnConfiguration>
+			<titleKey>label.cityname</titleKey>
+			<width>125</width>
+			<sortable>true</sortable>
+			<hidden>false</hidden>
+			<dataField>city.cityName</dataField>
+			<columnType>string</columnType>	
+		</com.nucleus.makerchecker.ColumnConfiguration>
+		
+		<com.nucleus.makerchecker.ColumnConfiguration>
+			<titleKey>key.viewId</titleKey>
+			<width>125</width>
+			<sortable>false</sortable>
+			<hidden>true</hidden>
+			<dataField>viewProperties.viewId</dataField>
+			<columnType>string</columnType>
+		</com.nucleus.makerchecker.ColumnConfiguration>
+		<com.nucleus.makerchecker.ColumnConfiguration>
+			<titleKey>key.id</titleKey>
+			<width>125</width>
+			<sortable>false</sortable>
+			<hidden>true</hidden>
+			<dataField>id</dataField>
+			<columnType>link</columnType>
+		</com.nucleus.makerchecker.ColumnConfiguration>
+		<com.nucleus.makerchecker.ColumnConfiguration>
+			<titleKey>key.actions</titleKey>
+			<width>125</width>
+			<sortable>false</sortable>
+			<hidden>false</hidden>
+			<dataField>viewProperties.actions</dataField>
+			<columnType>string</columnType>
+		</com.nucleus.makerchecker.ColumnConfiguration>
+	</columnConfigurationList>
+	<actionConfigurationList>
+			<com.nucleus.makerchecker.ActionConfiguration>
+				<action>Edit</action>
+				<imagePath>/images/Edit.png</imagePath>
+				<actionUrl>/app/AdditionalEmployerDetails/Address/edit/</actionUrl>
+				<text>false</text>
+			</com.nucleus.makerchecker.ActionConfiguration>
+			<com.nucleus.makerchecker.ActionConfiguration>
+				<action>Delete</action>
+				<imagePath>/images/Delete.png</imagePath>
+				<actionUrl>/app/AdditionalEmployerDetails/Address/delete/</actionUrl>
+				<text>false</text>
+			</com.nucleus.makerchecker.ActionConfiguration>
+			
+	</actionConfigurationList>
+</com.nucleus.makerchecker.GridConfiguration>
+
+
+
+
+
+
+
+
+
+
+
+
+

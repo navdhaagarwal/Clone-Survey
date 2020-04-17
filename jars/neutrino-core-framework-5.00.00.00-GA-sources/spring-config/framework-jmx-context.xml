@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<bean id="mbeanServer" class="org.springframework.jmx.support.MBeanServerFactoryBean">
+		<property name="locateExistingServerIfPossible" value="true" />
+	</bean>
+
+	<bean id="metadataJmxExporter" class="org.springframework.jmx.export.MBeanExporter">
+		<property name="server" ref="mbeanServer" />
+		<property name="assembler" ref="assembler" />
+		<property name="namingStrategy" ref="namingStrategy" />
+		<property name="autodetect" value="true" />
+		<property name="registrationPolicy" value="IGNORE_EXISTING">
+		</property>
+		<property name="beans">
+			<map>
+			</map>
+		</property>
+	</bean>
+	
+	<bean id="simpleJmxExporter" class="org.springframework.jmx.export.MBeanExporter">
+		<property name="server" ref="mbeanServer" />
+		<property name="registrationPolicy" value="IGNORE_EXISTING" />
+		<property name="beans">
+			<map>
+				<entry key="HibernateStatistics:name=HibernateStatistics" value-ref="hibernateStatisticsBean" />
+			</map>
+		</property>
+	</bean>
+
+	<bean id="hibernateStatisticsBean" class="com.nucleus.core.database.hibernate.HibernateStatisticsFactoryBean">
+		<property name="statisticsEnabled" value="${hibernate.generate.second.level.cache.stats}" />
+		<property name="sessionFactory" value="#{entityManagerFactory.sessionFactory}" />
+	</bean>
+
+	<!-- will create management interface using annotation metadata -->
+	<bean id="assembler"
+		class="org.springframework.jmx.export.assembler.MetadataMBeanInfoAssembler">
+		<property name="attributeSource" ref="jmxAttributeSource" />
+	</bean>
+
+	<bean id="jmxAttributeSource"
+		class="org.springframework.jmx.export.annotation.AnnotationJmxAttributeSource" />
+
+	<!-- will pick up the ObjectName from the annotation -->
+	<bean id="namingStrategy"
+		class="org.springframework.jmx.export.naming.MetadataNamingStrategy">
+		<property name="attributeSource" ref="jmxAttributeSource" />
+	</bean>
+
+</beans>

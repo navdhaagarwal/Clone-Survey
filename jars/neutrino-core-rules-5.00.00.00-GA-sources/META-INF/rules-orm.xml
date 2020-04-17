@@ -1,0 +1,768 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-mappings version="2.0"
+				 xmlns="http://java.sun.com/xml/ns/persistence/orm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				 xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm http://java.sun.com/xml/ns/persistence/orm_2_0.xsd">
+
+	<named-query name="Rules.RuleByName">
+		<query>
+			Select ru FROM Rule ru WHERE ru.name = :name AND ru.criteriaRuleFlag = false AND (ru.entityLifeCycleData.snapshotRecord IS NULL OR ru.entityLifeCycleData.snapshotRecord = false) AND (ru.scriptCodeType != 2 or ru.scriptCodeType IS NULL) AND ru.activeFlag = true AND ru.masterLifeCycleData.approvalStatus in :approvalStatus
+		</query>
+	</named-query>
+
+	<named-query name="Rules.ConditionByName">
+		<query>
+			Select con FROM Condition con WHERE con.name = :name AND con.sourceProduct= :productId AND con.masterLifeCycleData.approvalStatus in :approvalStatus AND (con.entityLifeCycleData.snapshotRecord IS NULL OR con.entityLifeCycleData.snapshotRecord = false) AND con.activeFlag = true
+		</query>
+	</named-query>
+
+	<named-query name="Rules.ParameterByName">
+		<query>
+			Select par FROM Parameter par WHERE par.name = :name AND par.sourceProduct= :productId AND par.masterLifeCycleData.approvalStatus in :approvalStatus AND (par.entityLifeCycleData.snapshotRecord IS NULL OR par.entityLifeCycleData.snapshotRecord = false) AND par.activeFlag = true
+		</query>
+	</named-query>
+
+	<named-query name="Rules.ApprovedRuleByName">
+		<query>
+			Select ru FROM Rule ru WHERE ru.name like :name AND ru.criteriaRuleFlag = false AND ru.masterLifeCycleData.approvalStatus in :approvalStatus AND (ru.entityLifeCycleData.snapshotRecord IS NULL OR ru.entityLifeCycleData.snapshotRecord = false) AND (ru.scriptCodeType != 2 or ru.scriptCodeType IS NULL) AND ru.activeFlag = true
+		</query>
+	</named-query>
+
+	<named-query name="Rules.ApprovedConditionByName">
+		<query>
+			Select con FROM Condition con WHERE con.name like :name AND con.masterLifeCycleData.approvalStatus in :approvalStatus AND (con.entityLifeCycleData.snapshotRecord IS NULL OR con.entityLifeCycleData.snapshotRecord = false) AND con.activeFlag = true
+		</query>
+	</named-query>
+
+	<named-query name="Rules.ApprovedParameterByName">
+		<query>
+			Select par FROM Parameter par WHERE par.name like :name AND par.masterLifeCycleData.approvalStatus = :approvalStatus AND (par.entityLifeCycleData.snapshotRecord IS NULL OR par.entityLifeCycleData.snapshotRecord = false) AND par.activeFlag = true
+		</query>
+	</named-query>
+
+	<named-query name="Rules.ObjectGraphTypeByObjectGraph">
+		<query>
+			Select ogt FROM ObjectGraphTypes ogt WHERE ogt.objectGraph = :objectGraph AND ogt.masterLifeCycleData.approvalStatus in :approvalStatus AND (ogt.entityLifeCycleData.snapshotRecord IS NULL OR ogt.entityLifeCycleData.snapshotRecord = false)
+		</query>
+	</named-query>
+
+	<named-query name="Rules.ApprovedNumericParameters">
+		<query>
+			Select par FROM Parameter par WHERE par.dataType IN :dataType AND par.masterLifeCycleData.approvalStatus in :approvalStatus AND (par.entityLifeCycleData.snapshotRecord IS NULL OR par.entityLifeCycleData.snapshotRecord = false) AND (par.collectionBased IS NULL OR par.collectionBased = false) AND par.activeFlag = true ORDER BY par.name
+		</query>
+	</named-query>
+
+	<named-query name="Rules.ApprovedConditions.BasedOnProductSelected">
+		<query>
+			Select con FROM Condition con WHERE lower(con.name) like :name AND con.sourceProduct= :productId AND con.masterLifeCycleData.approvalStatus in :approvalStatus AND (con.entityLifeCycleData.snapshotRecord IS NULL OR con.entityLifeCycleData.snapshotRecord = false) AND con.activeFlag = true
+		</query>
+	</named-query>
+
+	<named-query name="Rules.ApprovedParameters.BasedOnProductSelected">
+		<query>
+			Select par FROM Parameter par WHERE par.name like :name AND par.sourceProduct= :productId AND par.masterLifeCycleData.approvalStatus in :approvalStatus AND (par.entityLifeCycleData.snapshotRecord IS NULL OR par.entityLifeCycleData.snapshotRecord = false) AND par.id NOT IN( Select nullParam.id FROM NullParameter nullParam ) AND (par.collectionBased IS NULL OR par.collectionBased = false) AND par.activeFlag = true ORDER BY par.name
+		</query>
+	</named-query>
+
+	<named-query name="Rules.ApprovedObjectGraph.BasedOnProductSelected">
+		<query>
+          Select ogt FROM ObjectGraphTypes ogt WHERE ogt.sourceProduct= :productId AND (ogt.entityLifeCycleData.snapshotRecord IS NULL OR ogt.entityLifeCycleData.snapshotRecord = false) AND ogt.masterLifeCycleData.approvalStatus IN :statusList AND ogt.activeFlag = true ORDER BY ogt.displayName
+		</query>
+	</named-query>
+
+	<named-query name="Rule.getApprovedObjectGraphBySourceProductAndModuleName">
+		<query>
+          Select ogt FROM ObjectGraphTypes ogt WHERE ogt.sourceProduct= :productId AND ogt.moduleName.name= :moduleName AND ogt.masterLifeCycleData.approvalStatus IN :statusList AND ogt.activeFlag = true
+		</query>
+	</named-query>
+	<named-query name="Rule.getApprovedObjectGraphforSpecificModuleName">
+		<query>
+			Select ogt
+			FROM ObjectGraphTypes ogt
+			WHERE ogt.sourceProduct= :productId
+			AND ogt.moduleName.name= :moduleName
+			AND ogt.masterLifeCycleData.approvalStatus IN :statusList AND ogt.activeFlag = true
+			AND ogt.id in (select ogcm.objectGraphType.id from ObjectGraphClassMapping ogcm where (ogcm.entityLifeCycleData.snapshotRecord IS NULL OR ogcm.entityLifeCycleData.snapshotRecord = false)
+			 AND ogcm.masterLifeCycleData.approvalStatus IN :statusList AND ogcm.activeFlag = true AND
+			(ogcm.entityLifeCycleData.persistenceStatus = 0 OR ogcm.entityLifeCycleData.persistenceStatus IS NULL))
+
+		</query>
+	</named-query>
+	<named-query name="Rule.getApprovedObjectGraphMappingforSpecificModuleName">
+		<query>
+			Select new map(ogt.id as id,ogt.displayName as displayName,ogt.objectGraph as objectGraph,ogcm.code as code)
+			FROM ObjectGraphTypes ogt , ObjectGraphClassMapping ogcm
+			WHERE ogt.id= ogcm.objectGraphType.id
+			and ogt.sourceProduct= :productId
+			AND ogt.moduleName.name= :moduleName
+			AND ogt.masterLifeCycleData.approvalStatus IN :statusList AND ogt.activeFlag = true
+			AND ogt.id in (select ogcm.objectGraphType.id from ObjectGraphClassMapping ogcm where (ogcm.entityLifeCycleData.snapshotRecord IS NULL OR ogcm.entityLifeCycleData.snapshotRecord = false)
+			AND ogcm.masterLifeCycleData.approvalStatus IN :statusList AND ogcm.activeFlag = true AND
+			(ogcm.entityLifeCycleData.persistenceStatus = 0 OR ogcm.entityLifeCycleData.persistenceStatus IS NULL))
+
+		</query>
+	</named-query>
+
+	<named-query name="Rules.ApprovedParameters.BasedOnDataTypeProductSelected">
+		<query>
+			Select par FROM Parameter par WHERE lower(par.name) like :name AND par.sourceProduct= :productId AND  par.dataType in :dataType  AND par.masterLifeCycleData.approvalStatus in :approvalStatus  AND (par.entityLifeCycleData.snapshotRecord IS NULL OR par.entityLifeCycleData.snapshotRecord = false) AND (par.collectionBased IS NULL OR par.collectionBased = false) AND par.activeFlag = true
+		</query>
+	</named-query>
+
+	<named-query name="Rules.ApprovedParameters.BasedOnDataTypeModuleSelected">
+		<query>
+			Select par FROM Parameter par WHERE lower(par.name) like :name AND par.sourceProduct= :productId AND (par.moduleName.id= :moduleName OR par.moduleName.id IS NULL) AND par.dataType in :dataType  AND par.masterLifeCycleData.approvalStatus = :approvalStatus  AND (par.entityLifeCycleData.snapshotRecord IS NULL OR par.entityLifeCycleData.snapshotRecord = false) AND (par.collectionBased IS NULL OR par.collectionBased = false) AND par.activeFlag = true
+		</query>
+	</named-query>
+
+	<named-query name="Rules.ApprovedRules.BasedOnProductSelected">
+		<query>
+			Select rule FROM Rule rule WHERE lower(rule.name) like :name AND rule.sourceProduct= :productId AND rule.criteriaRuleFlag = false AND rule.masterLifeCycleData.approvalStatus in :approvalStatus AND (rule.entityLifeCycleData.snapshotRecord IS NULL OR rule.entityLifeCycleData.snapshotRecord = false) AND (rule.scriptCodeType != 2 or rule.scriptCodeType IS NULL) AND rule.activeFlag = true
+		</query>
+	</named-query>
+
+	<named-query name="Rules.EntityType">
+		<query>
+			Select eType.fields FROM EntityType eType WHERE eType.className = :className
+		</query>
+	</named-query>
+
+	<named-query name="Rules.canHandleEntityType">
+		<query>
+			Select count(*) FROM EntityType eType WHERE eType.className = :className
+		</query>
+	</named-query>
+
+	<named-query name="RuleInvocationMapping.getRuleMappingByInvocationPoint">
+		<query>
+			Select rim FROM RuleInvocationMapping rim WHERE rim.invocationPoint = :invocationPoint AND rim.masterLifeCycleData.approvalStatus = :approvalStatus AND rim.activeFlag = true
+		</query>
+	</named-query>
+
+	<named-query name="Rules.ApprovedObjectGraph.BasedOnObjectGraphSelected">
+		<query>
+          Select ogt FROM ObjectGraphTypes ogt WHERE ogt.objectGraph= :objectGraph AND (ogt.entityLifeCycleData.snapshotRecord IS NULL OR ogt.entityLifeCycleData.snapshotRecord = false) AND ogt.masterLifeCycleData.approvalStatus IN :statusList AND ogt.activeFlag = true
+		</query>
+	</named-query>
+
+	<named-query name="Rules.AllApprovedRule">
+		<query>
+			Select ru FROM Rule ru left outer join ru.runtimeRuleMapping rtrm   WHERE (rtrm is null or(rtrm is not null and rtrm.compiledNullSafeExpression is null)) AND ru.masterLifeCycleData.approvalStatus in :approvalStatus AND ru.criteriaRuleFlag = false AND (ru.entityLifeCycleData.snapshotRecord IS NULL OR ru.entityLifeCycleData.snapshotRecord = false) AND ru.activeFlag = true
+		</query>
+	</named-query>
+
+	<named-query name="RuleInvocationMapping.getNotApprovedRuleInvocationPoint">
+		<query>
+			Select rInvoke FROM RuleInvocationPoint rInvoke WHERE (rInvoke.code NOT IN (Select rim.invocationPoint from RuleInvocationMapping rim WHERE rim.masterLifeCycleData.approvalStatus  NOT IN :statusList AND rim.activeFlag = true) AND (rInvoke.entityLifeCycleData.persistenceStatus = 0 OR rInvoke.entityLifeCycleData.persistenceStatus IS NULL)) ORDER BY rInvoke.name
+		</query>
+	</named-query>
+
+	<named-query
+			name="Rules.ApprovedParameters.BasedOnDataTypeProductSelected.Count">
+
+		<query>
+			Select count(par) FROM Parameter par WHERE lower(par.name) like :name AND par.sourceProduct= :productId AND  par.dataType in :dataType  AND par.masterLifeCycleData.approvalStatus = :approvalStatus AND (par.entityLifeCycleData.snapshotRecord IS NULL OR par.entityLifeCycleData.snapshotRecord = false)  AND (par.collectionBased IS NULL OR par.collectionBased = false) AND par.activeFlag = true
+		</query>
+	</named-query>
+
+	<named-query
+			name="Rules.ApprovedParameters.BasedOnDataTypeProductModuleSelected.Count">
+		<query>
+			Select count(par) FROM Parameter par WHERE lower(par.name) like :name AND par.sourceProduct= :productId AND (par.moduleName.id= :moduleName OR par.moduleName.id IS NULL) AND  par.dataType in :dataType  AND par.masterLifeCycleData.approvalStatus = :approvalStatus AND (par.entityLifeCycleData.snapshotRecord IS NULL OR par.entityLifeCycleData.snapshotRecord = false)  AND (par.collectionBased IS NULL OR par.collectionBased = false) AND par.activeFlag = true
+		</query>
+	</named-query>
+
+	<named-query name="Rules.ApprovedParameters.BasedOnProductSelected.Count">
+		<query>
+			Select count(par) FROM Parameter par WHERE par.name like :name AND par.sourceProduct= :productId AND par.masterLifeCycleData.approvalStatus = :approvalStatus AND (par.entityLifeCycleData.snapshotRecord IS NULL OR par.entityLifeCycleData.snapshotRecord = false) AND par.id NOT IN( Select nullParam.id FROM NullParameter nullParam ) AND (par.collectionBased IS NULL OR par.collectionBased = false) AND par.activeFlag = true
+		</query>
+	</named-query>
+
+	<named-query name="Rules.ApprovedConditions.BasedOnProductSelected.Count">
+		<query>
+			Select count(con) FROM Condition con WHERE lower(con.name) like :name AND con.sourceProduct= :productId AND con.masterLifeCycleData.approvalStatus = :approvalStatus AND (con.entityLifeCycleData.snapshotRecord IS NULL OR con.entityLifeCycleData.snapshotRecord = false) AND con.activeFlag = true
+		</query>
+	</named-query>
+
+	<named-query name="Rules.ApprovedRules.BasedOnProductSelected.Count">
+		<query>
+			Select count(rule) FROM Rule rule WHERE lower(rule.name) like :name AND rule.sourceProduct= :productId AND rule.criteriaRuleFlag = false AND rule.masterLifeCycleData.approvalStatus = :approvalStatus AND (rule.entityLifeCycleData.snapshotRecord IS NULL OR rule.entityLifeCycleData.snapshotRecord = false) AND (rule.scriptCodeType != 2 or rule.scriptCodeType IS NULL) AND rule.activeFlag = true
+		</query>
+	</named-query>
+
+	<named-query name="Rules.ApprovedCriteriaRules.BasedOnProductSelected">
+		<query>
+			Select rule FROM Rule rule WHERE rule.name like :name AND rule.sourceProduct= :productId AND rule.masterLifeCycleData.approvalStatus in :approvalStatus AND (rule.entityLifeCycleData.snapshotRecord IS NULL OR rule.entityLifeCycleData.snapshotRecord = false) AND (rule.scriptCodeType != 2 or rule.scriptCodeType IS NULL) AND rule.activeFlag = true
+		</query>
+	</named-query>
+
+	<named-query name="Rules.ApprovedCriteriaRules.BasedOnProductSelected.Count">
+		<query>
+			Select count(rule) FROM Rule rule WHERE rule.name like :name AND rule.sourceProduct= :productId AND rule.masterLifeCycleData.approvalStatus = :approvalStatus AND (rule.entityLifeCycleData.snapshotRecord IS NULL OR rule.entityLifeCycleData.snapshotRecord = false) AND (rule.scriptCodeType != 2 or rule.scriptCodeType IS NULL) AND rule.activeFlag = true
+		</query>
+	</named-query>
+
+	<named-query name="Rules.AllRulesByName">
+		<query>
+			Select ru FROM Rule ru WHERE ru.name = :name AND ru.masterLifeCycleData.approvalStatus in :approvalStatus AND (ru.entityLifeCycleData.snapshotRecord IS NULL OR ru.entityLifeCycleData.snapshotRecord = false) AND (ru.scriptCodeType != 2 or ru.scriptCodeType IS NULL) AND ru.activeFlag = true
+		</query>
+	</named-query>
+
+	<named-query name="Rules.NonCriteriaRules">
+		<query>
+			Select ru FROM Rule ru WHERE ru.criteriaRuleFlag = false AND ru.masterLifeCycleData.approvalStatus in :approvalStatus AND (ru.entityLifeCycleData.snapshotRecord IS NULL OR ru.entityLifeCycleData.snapshotRecord = false) and (ru.scriptCodeType != 2 or ru.scriptCodeType IS NULL) AND ru.activeFlag = true ORDER BY ru.name
+		</query>
+	</named-query>
+
+	<named-query name="Rules.RuleByNameAndTagName">
+		<query>
+			Select ru FROM Rule ru inner join ru.ruleTagNames rt_name WHERE ru.name = :name AND ru.masterLifeCycleData.approvalStatus in :approvalStatus AND rt_name in :tagNameList AND ru.criteriaRuleFlag = false AND (ru.entityLifeCycleData.snapshotRecord IS NULL OR ru.entityLifeCycleData.snapshotRecord = false) AND (ru.scriptCodeType != 2 or ru.scriptCodeType IS NULL) AND ru.activeFlag = true
+		</query>
+	</named-query>
+
+	<named-query name="Rules.RuleTagByTagName">
+		<query>
+			Select ruleTag FROM RuleTagType ruleTag WHERE ruleTag.tagName = :tagName AND (ruleTag.entityLifeCycleData.snapshotRecord IS NULL OR ruleTag.entityLifeCycleData.snapshotRecord = false)
+		</query>
+	</named-query>
+
+	<named-query name="Rules.loadParamDataTypes">
+		<query>
+			Select paramDataType FROM ParameterDataType paramDataType WHERE paramDataType.code in (:code) ORDER BY name
+		</query>
+	</named-query>
+
+	<named-query name="Rules.loadParamDataTypesForBinder">
+		<query>
+			Select new Map(paramDataType.id as id,paramDataType.code as code,paramDataType.name as name) FROM ParameterDataType paramDataType WHERE paramDataType.code in (:code) ORDER BY name
+		</query>
+	</named-query>
+
+	<named-query name="RulesAudit.Rules.getParameterValues">
+		<query>
+			Select rulesParamValues.id, rulesParamValues.parameterId.id FROM RulesAuditLog rulesAuditLog , IN (rulesAuditLog.rulesParametersValues) as rulesParamValues WHERE rulesAuditLog.ruleInvocationUUID = :ruleInvocationUUID and rulesAuditLog.ruleId = :ruleId  GROUP BY rulesParamValues.id, rulesParamValues.parameterId.id
+		</query>
+	</named-query>
+
+	<named-query name="RulesAudit.Rules.getRuleInvocationPoints">
+		<query>
+			Select rInvoke.code FROM RuleInvocationPoint rInvoke ORDER BY rInvoke.code
+		</query>
+	</named-query>
+
+	<named-query name="RulesAudit.Rules.getRuleInvocationPointsNameFromUUID">
+		<query>
+			Select rAudit.ruleInvocationPoint FROM RulesAuditLog rAudit where  rAudit.ruleInvocationUUID = :invocationUUID
+		</query>
+	</named-query>
+
+	<named-query name="Rules.id.ParameterByName">
+		<query>
+			Select par.id FROM Parameter par WHERE par.name = :name AND (par.entityLifeCycleData.snapshotRecord IS NULL OR par.entityLifeCycleData.snapshotRecord = false) AND par.activeFlag = true
+		</query>
+	</named-query>
+
+	<named-query name="Rules.id.ConditionByName">
+		<query>
+			Select con.id FROM Condition con WHERE con.name = :name  AND con.masterLifeCycleData.approvalStatus = :approvalStatus AND (con.entityLifeCycleData.snapshotRecord IS NULL OR con.entityLifeCycleData.snapshotRecord = false) AND con.activeFlag = true
+		</query>
+	</named-query>
+
+	<named-query name="Rule.getModuleNameFromName">
+		<query>
+			Select mod FROM ModuleName mod WHERE mod.name = :name
+		</query>
+	</named-query>
+
+	<named-query name="Approved.Active.Rules">
+		<query>
+			Select ru FROM Rule ru WHERE ru.activeFlag = true AND ru.masterLifeCycleData.approvalStatus in :approvalStatus  AND  (ru.entityLifeCycleData.snapshotRecord IS NULL OR ru.entityLifeCycleData.snapshotRecord = false) AND (ru.scriptCodeType != 2 or ru.scriptCodeType IS NULL) ORDER BY ru.name ASC
+		</query>
+	</named-query>
+
+	<named-query name="Rules.entityTypeData">
+		<query>
+			Select eType FROM EntityType eType WHERE eType.className = :className
+		</query>
+	</named-query>
+
+	<named-query name="Rules.AllSciptParameterMvelBased">
+		<query>
+			Select par FROM ScriptParameter par WHERE  par.scriptCodeType = :scriptCodeType   AND par.masterLifeCycleData.approvalStatus in :approvalStatus  AND (par.entityLifeCycleData.snapshotRecord IS NULL OR par.entityLifeCycleData.snapshotRecord = false) AND par.activeFlag = true
+		</query>
+	</named-query>
+
+	<named-query name="Rules.getObjectGraphTypesWithDisplayName">
+		<query>
+                 Select ogt FROM ObjectGraphTypes ogt WHERE lower(ogt.displayName) = lower(:displayName) AND (ogt.entityLifeCycleData.snapshotRecord IS NULL OR ogt.entityLifeCycleData.snapshotRecord = false) AND ogt.masterLifeCycleData.approvalStatus IN :statusList
+		</query>
+	</named-query>
+
+	<named-query name="Rules.ObjectGraphParamOfCollectionTypeByDataType">
+		<query>
+			Select ogt FROM ObjectGraphParameter ogt WHERE ogt.objectGraph like :objectGraph AND ogt.dataType =:dataType AND ogt.masterLifeCycleData.approvalStatus in :approvalStatus AND (ogt.entityLifeCycleData.snapshotRecord IS NULL OR ogt.entityLifeCycleData.snapshotRecord = false) AND ogt.activeFlag = true
+		</query>
+	</named-query>
+
+	<named-query name="Rules.ObjectGraphParamOfCollectionType.allAttribute">
+		<query>
+			Select ogt FROM ObjectGraphParameter ogt WHERE ogt.objectGraph like :objectGraph AND ogt.masterLifeCycleData.approvalStatus in :approvalStatus AND (ogt.entityLifeCycleData.snapshotRecord IS NULL OR ogt.entityLifeCycleData.snapshotRecord = false) AND ogt.activeFlag = true
+		</query>
+	</named-query>
+
+	<named-query
+			name="Rules.ApprovedParameter.BasedOnProductDataParamType.Count">
+		<query>
+			Select count(par) FROM Parameter par WHERE par.sourceProduct= :productId AND par.name like :name AND par.dataType IN (:dataType) AND par.paramType IN (:paramType) AND par.masterLifeCycleData.approvalStatus = :approvalStatus AND (par.entityLifeCycleData.snapshotRecord IS NULL OR par.entityLifeCycleData.snapshotRecord = false) AND par.activeFlag = true
+		</query>
+	</named-query>
+
+	<named-query name="Rules.id.RulesByName">
+		<query>
+			Select rule.id FROM Rule rule WHERE rule.name = :name  AND rule.masterLifeCycleData.approvalStatus = :approvalStatus AND (rule.entityLifeCycleData.snapshotRecord IS NULL OR rule.entityLifeCycleData.snapshotRecord = false) AND (rule.scriptCodeType != 2 or rule.scriptCodeType IS NULL) AND rule.activeFlag = true
+		</query>
+	</named-query>
+
+	<named-query name="parameter.GetParameterFromName">
+		<query>
+			Select par FROM Parameter par WHERE par.name like (:name) AND par.activeFlag = true
+		</query>
+	</named-query>
+
+	<named-query
+			name="Rules.ApprovedCollectionParameter.BasedOnProductDataParamType.Count">
+		<query>
+			Select count(par) FROM ObjectGraphParameter par WHERE par.objectGraph like :objectGraph AND par.name like :name AND par.masterLifeCycleData.approvalStatus = :approvalStatus AND par.sourceProduct= :productId AND par.dataType IN (:dataType) AND par.masterLifeCycleData.approvalStatus = :approvalStatus AND (par.entityLifeCycleData.snapshotRecord IS NULL OR par.entityLifeCycleData.snapshotRecord = false) AND par.activeFlag = true
+		</query>
+	</named-query>
+
+	<named-query name="Rules.AuditLog.getRuleFromRuleAudit">
+		<query>
+			select ru from Rule ru where ru.id= :ruleId and (ru.entityLifeCycleData.snapshotRecord IS NULL OR ru.entityLifeCycleData.snapshotRecord = false) and ru.masterLifeCycleData.approvalStatus = :approvalStatus AND (ru.scriptCodeType != 2 or ru.scriptCodeType IS NULL) AND ru.activeFlag = true
+		</query>
+	</named-query>
+
+	<named-query name="Rules.AuditLog.getOriginalRule">
+		<query>
+			Select uaed.originalEntityUri from UnapprovedEntityData uaed where uaed.timestamp > :timeStamp and uaed.refUUId = :uuid order by (uaed.timestamp) asc
+		</query>
+	</named-query>
+
+	<named-query name="Rules.AuditLog.getRuleChangeState">
+		<query>
+			Select uaed from UnapprovedEntityData uaed where uaed.refUUId = :uuid order by (uaed.timestamp) asc
+		</query>
+	</named-query>
+
+	<named-query name="Rules.ApprovedNumericParametersForBinder">
+		<query>
+			Select new Map(par.id as id,par.name as name) FROM Parameter par WHERE par.dataType IN :dataType AND par.masterLifeCycleData.approvalStatus in :approvalStatus AND (par.entityLifeCycleData.snapshotRecord IS NULL OR par.entityLifeCycleData.snapshotRecord = false) AND (par.collectionBased IS NULL OR par.collectionBased = false) AND par.activeFlag = true ORDER BY par.name
+		</query>
+	</named-query>
+
+	<named-query name="Rules.getAllParametersWthNoExpression">
+		<query>
+			SELECT param FROM CompoundParameter param where param.parameterExpression IS NULL AND param.masterLifeCycleData.approvalStatus = 0 AND (param.entityLifeCycleData.snapshotRecord IS NULL OR param.entityLifeCycleData.snapshotRecord = false) AND param.activeFlag = true
+		</query>
+	</named-query>
+
+	<named-query name="Rules.getAllConditionsWthNoExpression">
+		<query>
+			SELECT con FROM Condition con where con.conditionExpression IS NULL AND con.masterLifeCycleData.approvalStatus = 0 AND (con.entityLifeCycleData.snapshotRecord IS NULL OR con.entityLifeCycleData.snapshotRecord = false) AND con.activeFlag = true
+		</query>
+	</named-query>
+
+	<named-query name="Rules.getAllRulesWthNoExpression">
+		<query>
+			SELECT ru FROM Rule ru where ru.ruleExpression IS NULL AND ru.masterLifeCycleData.approvalStatus = 0 AND (ru.entityLifeCycleData.snapshotRecord IS NULL OR ru.entityLifeCycleData.snapshotRecord = false) AND (ru.scriptCodeType != 2 or ru.scriptCodeType IS NULL) AND ru.activeFlag = true
+		</query>
+	</named-query>
+
+	<named-query name="Rules.getAllRuleGroupsWthNoExpression">
+		<query>
+			SELECT rg FROM RuleGroup rg where rg.ruleGroupExpression IS NULL AND (rg.entityLifeCycleData.snapshotRecord IS NULL OR rg.entityLifeCycleData.snapshotRecord = false)
+		</query>
+	</named-query>
+
+	<named-query name="Rules.AllApprovedRuleGroup">
+		<query>
+			SELECT rg FROM RuleGroup rg WHERE rg.ruleLevelCompiledExpr IS NULL AND (rg.entityLifeCycleData.snapshotRecord IS NULL OR rg.entityLifeCycleData.snapshotRecord = false)
+		</query>
+	</named-query>
+
+	<named-query name="Rules.AllAssignmentAction">
+		<query>
+			SELECT aa FROM AssignmentAction aa WHERE aa.compiledExpression IS NULL AND (aa.entityLifeCycleData.snapshotRecord IS NULL OR aa.entityLifeCycleData.snapshotRecord = false)
+		</query>
+	</named-query>
+
+	<named-query name="RuleUsage.getEventMapping">
+		<query>
+			Select r FROM RuleInvocationMapping r WHERE r.id in (Select r1.id FROM RuleInvocationMapping r1 ,IN (r1.ruleMapping) as ruleMapping WHERE  ruleMapping.rule.id = :rule AND r1.activeFlag = true) or r.id in (Select r2.id FROM RuleInvocationMapping r2 ,IN(r2.rulesetMapping) as rulesetMapping WHERE rulesetMapping.ruleSet in (Select rs2.id FROM RuleSet rs2 ,IN(rs2.rules) as rsr2 WHERE rsr2.id =:rule AND rs2.activeFlag = true) AND r2.activeFlag = true) or r.id in (Select r3.id  FROM RuleInvocationMapping r3  WHERE  r3.ruleGroup in (Select rg.id FROM RuleGroup rg WHERE rg.id in (Select rs3.id FROM RuleSet rs3 ,IN(rs3.rules) as rsr3 WHERE rsr3.id =:rule AND rs3.activeFlag = true) AND r3.activeFlag = true)) or r.id in (Select r4.id  FROM RuleInvocationMapping r4  WHERE r4.criteriaRules in (Select cr.id FROM CriteriaRules cr WHERE cr.ruleGroup in (Select rg2.id  FROM RuleGroup rg2 WHERE rg2 in(Select rs4.id FROM RuleSet rs4 ,IN(rs4.rules) as rsr4 WHERE rsr4.id =:rule AND rs4.activeFlag = true)) AND r4.activeFlag = true) AND r.activeFlag = true)
+		</query>
+	</named-query>
+
+	<named-query name="Rule.getApprovedObjectGraphBySourceProductAndModule">
+		<query>
+          Select ogt FROM ObjectGraphTypes ogt WHERE ogt.sourceProduct= :productId AND ogt.moduleName.id= :moduleName AND ogt.masterLifeCycleData.approvalStatus IN :statusList AND ogt.activeFlag = true
+		</query>
+	</named-query>
+
+	<named-query name="Rules.ObjectGraphParamOfCollectionTypeByDataTypeModule">
+		<query>
+			Select ogt FROM ObjectGraphParameter ogt WHERE ogt.objectGraph like :objectGraph AND ogt.dataType =:dataType AND ogt.moduleName.id= :moduleName AND ogt.masterLifeCycleData.approvalStatus = :approvalStatus AND (ogt.entityLifeCycleData.snapshotRecord IS NULL OR ogt.entityLifeCycleData.snapshotRecord = false) AND ogt.activeFlag = true
+		</query>
+	</named-query>
+
+	<named-query name="Rules.ApprovedConditions.BasedOnProductSelectedModule">
+		<query>
+			Select con FROM Condition con WHERE lower(con.name) like :name AND con.sourceProduct= :productId AND (con.moduleName.id= :moduleName OR con.moduleName.id IS NULL) AND con.masterLifeCycleData.approvalStatus = :approvalStatus AND (con.entityLifeCycleData.snapshotRecord IS NULL OR con.entityLifeCycleData.snapshotRecord = false) AND con.activeFlag = true
+		</query>
+	</named-query>
+
+	<named-query
+			name="Rules.ApprovedConditions.BasedOnProductSelectedModule.Count">
+		<query>
+			Select count(con) FROM Condition con WHERE lower(con.name) like :name AND (con.moduleName.id= :moduleName OR con.moduleName.id IS NULL) AND con.sourceProduct= :productId AND con.masterLifeCycleData.approvalStatus = :approvalStatus AND (con.entityLifeCycleData.snapshotRecord IS NULL OR con.entityLifeCycleData.snapshotRecord = false) AND con.activeFlag = true
+		</query>
+	</named-query>
+
+	<named-query name="Rules.ApprovedRules.BasedOnProductSpecificModule">
+		<query>
+			Select rule FROM Rule rule WHERE rule.name like :name AND rule.sourceProduct= :productId AND rule.moduleName.id= :moduleName AND rule.masterLifeCycleData.approvalStatus in :approvalStatus AND (rule.entityLifeCycleData.snapshotRecord IS NULL OR rule.entityLifeCycleData.snapshotRecord = false) AND (rule.scriptCodeType != 2 or rule.scriptCodeType IS NULL) AND rule.activeFlag = true
+		</query>
+	</named-query>
+
+	<named-query name="Rules.ApprovedConditions.BasedOnProductSpecificModule">
+		<query>
+			Select con FROM Condition con WHERE con.name like :name AND con.moduleName.id= :moduleName AND con.sourceProduct= :productId AND con.masterLifeCycleData.approvalStatus in :approvalStatus AND (con.entityLifeCycleData.snapshotRecord IS NULL OR con.entityLifeCycleData.snapshotRecord = false) AND con.activeFlag = true
+		</query>
+	</named-query>
+
+	<named-query name="Rules.ApprovedParameters.BasedOnProductSpecificModule">
+		<query>
+			Select par FROM Parameter par WHERE par.name = :name AND par.sourceProduct= :productId AND par.moduleName.id= :moduleName AND par.masterLifeCycleData.approvalStatus in :approvalStatus AND (par.entityLifeCycleData.snapshotRecord IS NULL OR par.entityLifeCycleData.snapshotRecord = false) AND par.activeFlag = true
+		</query>
+	</named-query>
+
+	<named-query name="Rules.ParametersUsage.InCompoundParameter">
+		<query>
+			SELECT param FROM CompoundParameter param where param.sourceProduct= :productId AND param.masterLifeCycleData.approvalStatus in :approvalStatus AND param.parameterExpression like :paramId AND (param.entityLifeCycleData.snapshotRecord IS NULL OR param.entityLifeCycleData.snapshotRecord = false) AND param.activeFlag = true
+		</query>
+	</named-query>
+
+	<named-query name="Rules.ParametersUsage.InCondition">
+		<query>
+			SELECT con FROM Condition con where con.sourceProduct= :productId AND con.conditionExpression like :paramId AND con.masterLifeCycleData.approvalStatus in :approvalStatus AND (con.entityLifeCycleData.snapshotRecord IS NULL OR con.entityLifeCycleData.snapshotRecord = false) AND con.activeFlag = true
+		</query>
+	</named-query>
+
+	<named-query name="Rules.ConditionsUsage.InRule">
+		<query>
+			SELECT rule FROM Rule rule WHERE rule.sourceProduct= :productId AND rule.ruleExpression like :condId AND rule.masterLifeCycleData.approvalStatus in :approvalStatus AND (rule.entityLifeCycleData.snapshotRecord IS NULL OR rule.entityLifeCycleData.snapshotRecord = false) AND (rule.scriptCodeType != 2 or rule.scriptCodeType IS NULL) AND rule.activeFlag = true
+		</query>
+	</named-query>
+
+	<named-query name="Approved.Active.Rules.IdAndName">
+		<query>
+			Select new Map(ru.id as id,ru.name as name) FROM Rule ru WHERE ru.activeFlag = true AND ru.masterLifeCycleData.approvalStatus in :approvalStatus  AND  (ru.entityLifeCycleData.snapshotRecord IS NULL OR ru.entityLifeCycleData.snapshotRecord = false) AND (ru.scriptCodeType != 2 or ru.scriptCodeType IS NULL) ORDER BY ru.name ASC
+		</query>
+	</named-query>
+
+	<named-query
+			name="Rules.ApprovedParameters.BasedOnDataTypeModuleSelectedWithoutName">
+		<query>
+			Select new map(par.id as id,par.name as parameterName,par.description as description) FROM Parameter par WHERE par.sourceProduct= :productId AND (par.moduleName.id= :moduleName OR par.moduleName.id IS NULL) AND par.dataType in :dataType  AND par.masterLifeCycleData.approvalStatus in :approvalStatus  AND (par.entityLifeCycleData.snapshotRecord IS NULL OR par.entityLifeCycleData.snapshotRecord = false) AND (par.collectionBased IS NULL OR par.collectionBased = false) AND par.activeFlag = true
+		</query>
+	</named-query>
+
+	<named-query
+			name="Rules.ApprovedParameters.BasedOnDataTypeProductSelectedWithoutName">
+		<query>
+			Select new map(par.id as id,par.name as parameterName,par.description as description) FROM Parameter par WHERE par.sourceProduct= :productId  AND par.dataType in :dataType  AND par.masterLifeCycleData.approvalStatus in :approvalStatus  AND (par.entityLifeCycleData.snapshotRecord IS NULL OR par.entityLifeCycleData.snapshotRecord = false) AND (par.collectionBased IS NULL OR par.collectionBased = false) AND par.activeFlag = true
+		</query>
+	</named-query>
+	<named-query name="Rules.AllApprovedRuleMap">
+		<query>
+			Select new map(ru.id as id,ru.name as name,ru.description as description) FROM Rule ru WHERE  ru.criteriaRuleFlag = false AND ru.masterLifeCycleData.approvalStatus in :approvalStatus AND (ru.entityLifeCycleData.snapshotRecord IS NULL OR ru.entityLifeCycleData.snapshotRecord = false) AND (ru.scriptCodeType != 2 or ru.scriptCodeType IS NULL) AND ru.activeFlag = true
+		</query>
+	</named-query>
+
+	<named-query name="Parameters.AllApprovedObjectGraphParameter">
+		<query>
+			Select new map(ogt.id as id,ogt.name as name,ogt.description as description) FROM ObjectGraphParameter ogt WHERE ogt.masterLifeCycleData.approvalStatus in :approvalStatus AND (ogt.entityLifeCycleData.snapshotRecord IS NULL OR ogt.entityLifeCycleData.snapshotRecord = false) AND ogt.activeFlag = true
+		</query>
+	</named-query>
+
+	<named-query name="Rules.getObjectGraphTypesDescWithDisplayName">
+		<query>
+                 Select ogt.description FROM ObjectGraphTypes ogt WHERE ogt.displayName = :displayName AND (ogt.entityLifeCycleData.snapshotRecord IS NULL OR ogt.entityLifeCycleData.snapshotRecord = false) AND ogt.masterLifeCycleData.approvalStatus IN :statusList AND ogt.activeFlag = true
+		</query>
+	</named-query>
+
+	<named-query name="Rules.getParameterDescWithDisplayName">
+		<query>
+			Select par.description FROM Parameter par WHERE par.name like :name AND par.masterLifeCycleData.approvalStatus = :approvalStatus AND (par.entityLifeCycleData.snapshotRecord IS NULL OR par.entityLifeCycleData.snapshotRecord = false) AND par.activeFlag = true
+		</query>
+	</named-query>
+
+	<named-query name="Rules.getParameterNameByObjectGraph">
+		<query>
+			Select par.name FROM ObjectGraphParameter par WHERE par.objectGraph like :objectGraph AND par.masterLifeCycleData.approvalStatus = :approvalStatus AND (par.entityLifeCycleData.snapshotRecord IS NULL OR par.entityLifeCycleData.snapshotRecord = false) AND par.activeFlag = true
+		</query>
+	</named-query>
+
+	<named-query name="Rules.getObjectGraphTypeNameByObjectGraph">
+		<query>
+          Select par.displayName FROM ObjectGraphTypes par WHERE par.objectGraph like :objectGraph AND (par.entityLifeCycleData.snapshotRecord IS NULL OR par.entityLifeCycleData.snapshotRecord = false) AND par.masterLifeCycleData.approvalStatus IN :statusList AND par.activeFlag = true
+		</query>
+	</named-query>
+	<named-query name="Rules.ApprovedParameterOgnlByName">
+		<query>
+			Select par.objectGraph FROM Parameter par WHERE par.name = :name AND par.masterLifeCycleData.approvalStatus = :approvalStatus AND (par.entityLifeCycleData.snapshotRecord IS NULL OR par.entityLifeCycleData.snapshotRecord = false) AND par.activeFlag = true
+		</query>
+	</named-query>
+
+	<named-query name="Parameters.getAllRequiredParameterForScoreCard">
+		<query>
+			Select new Map(param.id as id,param.name as name) FROM Parameter param WHERE param.paramType in (:paramList) AND param.masterLifeCycleData.approvalStatus in :approvalStatus AND (param.entityLifeCycleData.snapshotRecord IS NULL OR param.entityLifeCycleData.snapshotRecord = false) AND param.activeFlag = true order by param.name
+		</query>
+	</named-query>
+
+	<named-query name="Rules.ObjectGraph.BasedOnRuleMatrixType">
+		<query>
+			Select mapping.objectGraphType FROM RuleMatrixTypeOgnlMapping mapping WHERE mapping.ruleMatrixMasterType.id= :ruleMatrixTypeId AND mapping.ruleMatrixMasterType.masterLifeCycleData.approvalStatus in :approvalStatus AND (mapping.entityLifeCycleData.snapshotRecord IS NULL OR mapping.entityLifeCycleData.snapshotRecord = false) ORDER BY mapping.objectGraphType.displayName
+		</query>
+	</named-query>
+	<named-query name="EntityType.fetchEntityTypeFromClassName">
+		<query>
+			Select et from EntityType et where et.className =:className
+		</query>
+	</named-query>
+	<named-query name="Rules.fetchAllByDType">
+		<query>
+          Select scriptrule from ScriptRule scriptrule WHERE scriptrule.masterLifeCycleData.approvalStatus in :statusList AND (scriptrule.entityLifeCycleData.snapshotRecord IS NULL OR scriptrule.entityLifeCycleData.snapshotRecord = false) AND scriptrule.activeFlag = true
+		</query>
+	</named-query>
+	<named-query name="Rules.findRuleById">
+		<query>
+			select rule FROM Rule rule Where rule.masterLifeCycleData.approvalStatus in (:statusList) AND (rule.entityLifeCycleData.snapshotRecord IS NULL OR rule.entityLifeCycleData.snapshotRecord = false) AND rule.id = :ruleId AND rule.activeFlag = true
+		</query>
+	</named-query>
+	<named-query name="Rules.findAllParameters">
+		<query>
+			select par FROM Parameter par Where par.masterLifeCycleData.approvalStatus in (:statusList) AND (par.entityLifeCycleData.snapshotRecord IS NULL OR par.entityLifeCycleData.snapshotRecord = false) AND par.activeFlag = true
+		</query>
+	</named-query>
+	<named-query name="Rules.ObjectGraphsbyDataTypes">
+		<query>
+          Select ogt FROM ObjectGraphTypes ogt WHERE ogt.dataType.code IN :dataType AND (ogt.entityLifeCycleData.snapshotRecord IS NULL OR ogt.entityLifeCycleData.snapshotRecord = false) AND ogt.masterLifeCycleData.approvalStatus IN :statusList AND ogt.activeFlag = true
+		</query>
+	</named-query>
+	<named-query name="Rules.ApprovedRules.BasedOnSourceProduct">
+		<query>
+			Select rule FROM Rule rule WHERE rule.sourceProduct= :sourceProduct AND rule.criteriaRuleFlag = false AND rule.masterLifeCycleData.approvalStatus in :statusList AND (rule.entityLifeCycleData.snapshotRecord IS NULL OR rule.entityLifeCycleData.snapshotRecord = false) AND (rule.scriptCodeType != 2 or rule.scriptCodeType IS NULL) AND rule.activeFlag = true
+		</query>
+	</named-query>
+	<named-query name="Rules.findApprovedOGParameterByObjectGraph">
+		<query>
+			Select par FROM ObjectGraphParameter par WHERE par.objectGraph like :objectGraph AND par.masterLifeCycleData.approvalStatus in (:approvalStatus) AND (par.entityLifeCycleData.snapshotRecord IS NULL OR par.entityLifeCycleData.snapshotRecord = false) AND par.activeFlag = true
+		</query>
+	</named-query>
+<named-query name="Parameter.parameterUsageInCondition">
+		<query>
+			Select con.id FROM Condition con WHERE con.conditionExpression like (:paramId) AND con.masterLifeCycleData.approvalStatus in :statusList AND (con.entityLifeCycleData.snapshotRecord IS NULL OR con.entityLifeCycleData.snapshotRecord = false) AND con.activeFlag = true
+		</query>
+	</named-query>
+	<named-query name="RuleMatrix.getDataTypeForObjectGraphType">
+   <query>
+      SELECT ogt.dataType.code FROM ObjectGraphTypes ogt
+      WHERE ogt.id = :id
+   </query>
+</named-query>
+
+<named-query name="RuleMatrix.getParametersBasedOnDataTypeModule">
+   <query>
+      Select par FROM Parameter par WHERE par.sourceProduct= :sourceProduct AND (par.moduleName.id= :moduleId OR par.moduleName.id IS NULL) AND par.dataType = :dataType  AND par.masterLifeCycleData.approvalStatus = 0  AND (par.entityLifeCycleData.snapshotRecord IS NULL OR par.entityLifeCycleData.snapshotRecord = false) AND (par.collectionBased IS NULL OR par.collectionBased = false) AND par.activeFlag = true
+   </query>
+</named-query>
+
+
+<named-query name="ObjectGraphTypesMaster.findObjectGraphByDisplayName">
+	<query>
+		Select obj from ObjectGraphTypes obj WHERE obj.displayName=:displayName AND obj.masterLifeCycleData.approvalStatus NOT IN :approvalStatus
+	</query>
+</named-query>
+
+<named-query name="ConditionMaster.findConditionByConditionCode">
+	<query>
+		Select con from Condition con WHERE con.code=:conditionCode AND con.masterLifeCycleData.approvalStatus NOT IN :approvalStatus
+	</query>
+</named-query>
+<named-query name="ConditionMaster.getRecordsByMasterIdsforDownload">
+	<query>
+		Select condition From Condition condition where condition.id IN (:conditionChildIdsList)
+	</query>
+</named-query>
+
+<named-query name="ParameterMaster.findParameterByParameterCode">
+	<query>
+		Select param from Parameter param WHERE param.code=:parameterCode AND param.masterLifeCycleData.approvalStatus NOT IN :approvalStatus
+	</query>
+</named-query>
+
+<named-query name="RuleMaster.findRuleByRuleCode">
+	<query>
+		Select rule from Rule rule WHERE rule.code=:ruleCode AND rule.masterLifeCycleData.approvalStatus NOT IN :approvalStatus
+	</query>
+</named-query>
+
+<named-query name="ParameterMaster.getRecordsByMasterIdsforDownload">
+	<query>
+		Select parameter From Parameter parameter LEFT OUTER JOIN fetch parameter.queryParameterAttributes where parameter.id IN (:parameterChildIdsList)
+	</query>
+</named-query>
+
+<named-query name="RuleMaster.getRecordsByMasterIdsforDownload">
+	<query>
+		Select rule From Rule rule where rule.id IN (:ruleChildIdsList)
+	</query>
+</named-query>
+
+<named-query name="ParameterDerivedMaster.getRecordsByMasterIdsforDownload">
+	<query>
+		Select parameter From Parameter parameter LEFT OUTER JOIN fetch parameter.filterCriterias where parameter.id IN (:parameterChildIdsList)
+	</query>
+</named-query>
+
+<named-query name="RuleSQLMaster.getRecordsByMasterIdsforDownload">
+	<query>
+		Select DISTINCT rule From Rule rule LEFT OUTER JOIN FETCH rule.paramMapping where rule.id IN (:ruleChildIdsList)
+	</query>
+</named-query>
+<named-query name="Rule.getApprovedRulesforSpecificModuleName">
+		<query>
+			Select r
+			FROM Rule r
+			WHERE r.sourceProduct= :productId
+			AND r.moduleName.name= :moduleName
+			AND r.masterLifeCycleData.approvalStatus IN :statusList AND r.activeFlag = true order by lower(r.code)
+		</query>
+	</named-query>
+
+<named-query name="ParameterMaster.findConstantParameter">
+	<query>
+		Select cp FROM ConstantParameter cp WHERE cp.dataType = :dataType AND cp.literal =:literal AND cp.masterLifeCycleData.approvalStatus IN :approvalStatus AND (cp.entityLifeCycleData.snapshotRecord IS NULL OR cp.entityLifeCycleData.snapshotRecord = false) AND cp.activeFlag = true
+	</query>
+</named-query>
+
+<named-query name="ParameterMaster.findObjectGraphParameter">
+	<query>
+		Select og FROM ObjectGraphParameter og WHERE og.objectGraph = :objectGraph AND og.masterLifeCycleData.approvalStatus IN :approvalStatus AND (og.entityLifeCycleData.snapshotRecord IS NULL OR og.entityLifeCycleData.snapshotRecord = false) AND og.activeFlag = true
+	</query>
+</named-query>
+
+<named-query name="ParameterMaster.findPlaceHolderParameter">
+	<query>
+		Select pp FROM PlaceHolderParameter pp WHERE pp.contextName = :contextName AND pp.masterLifeCycleData.approvalStatus IN :approvalStatus AND (pp.entityLifeCycleData.snapshotRecord IS NULL OR pp.entityLifeCycleData.snapshotRecord = false) AND pp.activeFlag = true
+	</query>
+</named-query>
+<named-query name="ParameterMaster.findPlaceHolderObjectGraphParameter">
+	<query>
+		Select pp FROM PlaceHolderParameter pp WHERE pp.objectGraph = :objectGraph AND pp.masterLifeCycleData.approvalStatus IN :approvalStatus AND (pp.entityLifeCycleData.snapshotRecord IS NULL OR pp.entityLifeCycleData.snapshotRecord = false) AND pp.activeFlag = true
+	</query>
+</named-query>
+
+<named-query name="ParameterMaster.findReferenceParameter">
+	<query>
+		Select rp FROM ReferenceParameter rp WHERE rp.referenceURI = :referenceURI AND rp.masterLifeCycleData.approvalStatus IN :approvalStatus AND (rp.entityLifeCycleData.snapshotRecord IS NULL OR rp.entityLifeCycleData.snapshotRecord = false) AND rp.activeFlag = true
+	</query>
+</named-query>
+
+<named-query name="ParameterMaster.findCompoundParameter">
+	<query>
+		Select cp FROM CompoundParameter cp WHERE str(cp.parameterExpression) = :parameterExpression AND cp.masterLifeCycleData.approvalStatus IN :approvalStatus AND (cp.entityLifeCycleData.snapshotRecord IS NULL OR cp.entityLifeCycleData.snapshotRecord = false) AND cp.activeFlag = true
+	</query>
+</named-query>
+
+<named-query name="ParameterMaster.findQueryParameter">
+	<query>
+		Select qp FROM QueryParameter qp WHERE qp.query =:query AND qp.masterLifeCycleData.approvalStatus IN :approvalStatus AND (qp.entityLifeCycleData.snapshotRecord IS NULL OR qp.entityLifeCycleData.snapshotRecord = false) AND qp.activeFlag = true
+	</query>
+</named-query>
+
+<named-query name="ParameterMaster.findSQLParameter">
+	<query>
+		Select sqlp FROM SQLParameter sqlp WHERE sqlp.masterLifeCycleData.approvalStatus IN :approvalStatus AND (sqlp.entityLifeCycleData.snapshotRecord IS NULL OR sqlp.entityLifeCycleData.snapshotRecord = false) AND sqlp.activeFlag = true
+	</query>
+</named-query>
+
+<named-query name="Rule.allRuleExpressions">
+		<query>select id,code,ruleExpression from Rule rule where rule.masterLifeCycleData.approvalStatus IN :statusList</query>
+	</named-query>
+
+	<named-query name="Rule.allSQLRules">
+		<query>from SQLRule rule where rule.masterLifeCycleData.approvalStatus IN :statusList</query>
+	</named-query>
+
+<named-query name="parameter.findParametersByApprovalCodes">
+	<query>
+		Select parameter from Parameter parameter WHERE parameter.masterLifeCycleData.approvalStatus IN (0,12,6,7,8) AND (parameter.entityLifeCycleData.persistenceStatus = 0 OR parameter.entityLifeCycleData.persistenceStatus IS NULL)
+	</query>
+</named-query>
+
+
+<named-query name="rule.findRulesByApprovalCodes">
+	<query>
+		Select rule from Rule rule WHERE rule.masterLifeCycleData.approvalStatus IN (0,12,6,7,8) AND (rule.entityLifeCycleData.persistenceStatus = 0 OR rule.entityLifeCycleData.persistenceStatus IS NULL)
+	</query>
+</named-query>
+
+<named-query name="condition.findConditionsByApprovalCodes">
+	<query>
+		Select condition from Condition condition WHERE condition.masterLifeCycleData.approvalStatus IN (0,12,6,7,8) AND (condition.entityLifeCycleData.persistenceStatus = 0 OR condition.entityLifeCycleData.persistenceStatus IS NULL)
+	</query>
+</named-query>
+<named-query name="ruleExceptionTypeCode.byUUID">
+	<query>
+		Select rl.typeCode from RuleExceptionLogging rl where rl.ruleInvocationUUID like :inclausevar
+	</query>
+</named-query>
+
+	<named-query name="ruleExceptionUUID.byListUUID">
+		<query>
+			Select new Map (rl.ruleInvocationUUID as UUID) from RuleExceptionLogging rl where rl.ruleInvocationUUID in
+			(:inclausevar)
+		</query>
+	</named-query>
+    <named-query name="ruleExceptionUUID.byListUUIDandRuleCode">
+        <query>
+            Select new Map ( rl.exception as except) from RuleExceptionLogging rl where rl.ruleInvocationUUID =:UUID and rl.typeCode like :typeCode
+
+        </query>
+    </named-query>
+     <named-query name="Rules.ObjectGraphMapping.objectGraph">
+		<query>
+			Select ogcm FROM ObjectGraphTypes ogcm WHERE ogcm.sourceProduct= :source and ogcm.moduleName.id= :moduleName
+			 and (lower(ogcm.displayName) like lower(:input) or lower(ogcm.objectGraph) like lower(:input)) AND
+			(ogcm.entityLifeCycleData.snapshotRecord IS NULL OR ogcm.entityLifeCycleData.snapshotRecord = false) AND ogcm.masterLifeCycleData.approvalStatus IN :approvalStatus AND ogcm.activeFlag = true AND
+			(ogcm.entityLifeCycleData.persistenceStatus = 0 OR ogcm.entityLifeCycleData.persistenceStatus IS NULL)
+		</query>
+	</named-query> 
+	<named-query name="Rules.ObjectGraphMapping.SouProObj">
+		<query>
+			Select ogcm FROM ObjectGraphClassMapping ogcm WHERE ogcm.sourceProduct= :source and ogcm.module.id= :mod
+			 and ogcm.objectGraphType.id = :objectGraph AND ogcm.id not in (:id) and
+			(ogcm.entityLifeCycleData.snapshotRecord IS NULL OR ogcm.entityLifeCycleData.snapshotRecord = false) AND ogcm.masterLifeCycleData.approvalStatus NOT IN :approvalStatus AND ogcm.activeFlag = true AND
+			(ogcm.entityLifeCycleData.persistenceStatus = 0 OR ogcm.entityLifeCycleData.persistenceStatus IS NULL)
+		</query>
+	</named-query>
+	<named-query name="Rules.ObjectGraphMapping.SouProdObj">
+		<query>
+			Select ogcm FROM ObjectGraphClassMapping ogcm WHERE ogcm.sourceProduct= :source and ogcm.module.id= :mod
+			and ogcm.objectGraphType.id = :objectGraph AND
+			(ogcm.entityLifeCycleData.snapshotRecord IS NULL OR ogcm.entityLifeCycleData.snapshotRecord = false) AND ogcm.masterLifeCycleData.approvalStatus NOT IN :approvalStatus AND ogcm.activeFlag = true AND
+			(ogcm.entityLifeCycleData.persistenceStatus = 0 OR ogcm.entityLifeCycleData.persistenceStatus IS NULL)
+		</query>
+	</named-query>
+ 
+ </entity-mappings>

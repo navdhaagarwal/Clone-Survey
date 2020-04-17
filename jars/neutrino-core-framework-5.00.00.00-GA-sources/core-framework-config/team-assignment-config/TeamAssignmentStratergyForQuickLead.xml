@@ -1,0 +1,26 @@
+<java.util.List>
+		<com.nucleus.core.team.assignment.SingleMappingOfProductTypeAndTeam>
+			<teamName>North Sales Team</teamName>
+			<productTypeShortName>MAL</productTypeShortName> 
+		</com.nucleus.core.team.assignment.SingleMappingOfProductTypeAndTeam>
+		
+		<com.nucleus.core.team.assignment.SingleMappingOfProductTypeAndTeam>
+			<teamName>North Sales Team</teamName>
+			<productTypeShortName>PL</productTypeShortName> 
+		</com.nucleus.core.team.assignment.SingleMappingOfProductTypeAndTeam>
+		
+		<com.nucleus.core.team.assignment.SingleMappingOfProductTypeAndTeam>
+			<teamName>South Sales Team</teamName>
+			<productTypeShortName>ML</productTypeShortName> 
+		</com.nucleus.core.team.assignment.SingleMappingOfProductTypeAndTeam>
+		
+		<com.nucleus.core.team.assignment.SingleMappingOfProductTypeAndTeam>
+			<teamName>South Sales Team</teamName>
+			<productTypeShortName>CL</productTypeShortName> 
+		</com.nucleus.core.team.assignment.SingleMappingOfProductTypeAndTeam>
+		
+		<com.nucleus.core.team.assignment.SingleMappingOfProductTypeAndTeam>
+			<teamName>North Sales Team</teamName>
+			<productTypeShortName>CC</productTypeShortName> 
+		</com.nucleus.core.team.assignment.SingleMappingOfProductTypeAndTeam>
+</java.util.List>

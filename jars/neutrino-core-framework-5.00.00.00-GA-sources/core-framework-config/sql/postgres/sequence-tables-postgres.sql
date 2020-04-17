@@ -1,0 +1,2 @@
+create sequence activiti_sequence_generator INCREMENT  BY  1 minvalue  1 maxvalue 999999999999999999 START WITH 1 CACHE 20 NO CYCLE OWNED BY NONE ;
+create sequence ACCESS_LOG_SEQ INCREMENT  BY  1 minvalue  1 maxvalue 999999999999999999 START WITH 1 CACHE 20 NO CYCLE OWNED BY NONE ;

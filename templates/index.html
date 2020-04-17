@@ -24,7 +24,6 @@
           }
           document.getElementsByName("result")[0].value = text_value;
         }
-        
       </script>
       <style>
       body {
@@ -46,7 +45,7 @@
                   </div>
                   
                   <div class="col-sm-4 col-md-4 col-lg-4">
-                      <input class="form-control" id="clone-pair" type="text" name="clone_pair" value="{{clone_pair+' / 82'}}" disabled>
+                      <input class="form-control" id="clone-pair" type="text" name="clone_pair" value="{{Clonepair.pairno+' / 150'}}" disabled>
                   </div>
                    
                   <div class="col-sm-3 col-md-3 col-lg-3">
@@ -61,22 +60,23 @@
             <div class="col-sm-2 col-md-2 col-lg-2" style="margin-top:0.95%">
               <div class="btn-group btn-group-toggle" data-toggle="buttons">
                     <input type="radio" name="Clone_result" id="option1" value="clone" onclick="text_val()"> 
-                    <font color="white">&nbsp Yes &nbsp</font>
+                    <font color="white">Yes &nbsp</font>
                     <input type="radio" name="Clone_result" id="option2" value="not_clone" onclick="text_val()"> 
-                    <font color="white">&nbsp No &nbsp</font>
+                    <font color="white">No &nbsp</font>
                     <input type="radio" name="Clone_result" id="option3" value="unknown" onclick="text_val()"> 
-                    <font color="white">&nbsp Can't say &nbsp</font>
+                    <font color="white">Can't say &nbsp</font>
                 </div>
             </div>
             <div class="col-sm-2 col-md-2 col-lg-2" style="padding:0.5%; padding-right: 2%">
+              <font color="white">&nbsp &nbspReason (optional)</font>
               <input class="form-control" id="reason" type="text" name="reason" placeholder="Reason (optional)"
-              value="{{reason}}">
+              value="{{Clonepair.reason}}">
             </div>
             <div class="col-sm-2 col-md-2 col-lg-2" style="padding: 0.25%; padding-left: 3%">
               <h4 align="center" style="padding:0.5%; color: aliceblue"> You have selected : </h4>
             </div>
             <div class="col-sm-1 col-md-1 col-lg-1" style="padding: 0.5%; padding-right: 1%">
-                <input class="form-control" id="result" type="text" name="result" value="{{result}}" disabled>
+                <input class="form-control" id="result" type="text" name="result" value="{{Clonepair.result}}" disabled>
             </div>
         </div>
       </form>
@@ -95,13 +95,13 @@
     <div class="container" style="margin: 1%; width: 98%; height: 10%;">
         
       <div style="height:620px; width:49%; float:left; margin-right: 2%; overflow-y:scroll; overflow-x: scroll">
-        <pre class="line-numbers" data-line="{{lines[0]}}-{{lines[1]}}" style="width: 350%; font-size: 12.5px"><code class="language-java">
-            {{contents}}
+        <pre class="line-numbers" style="width: 350%; font-size: 12.5px"><code class="language-java">
+            {{Clonepair.source_code1}}
           </code></pre>
       </div>
       <div style="height:620px; width:49%; float:left; overflow-y:scroll; overflow-x: scroll">
-          <pre class="line-numbers" data-line="{{lines[2]}}-{{lines[3]}}" style="width: 350%; font-size: 12.5px"><code class="language-java">
-              {{contents1}}
+          <pre class="line-numbers" style="width: 350%; font-size: 12.5px"><code class="language-java">
+              {{Clonepair.source_code2}}
             </code></pre>
       </div>
 
@@ -109,16 +109,13 @@
 
     <div class="container" style="border-radius: 5px;  width:96%; background-color: hsla(24, 20%, 100%,.3)">
       <div class="row" style="padding: 0.5%">
-          <div class="col-sm-3 col-md-3 col-lg-3" align = "center">
-            <h6 style="color: aliceblue; font-size: 100%">File 1 = {{info[0]}}</h6>
+          <div class="col-sm-5 col-md-3 col-lg-5" align = "center">
+            <h6 style="color: aliceblue; font-size: 100%">File 1 = {{Clonepair.file1}}</h6>
           </div>
-          <div class="col-sm-3 col-md-3 col-lg-3" align = "center">
-            <h6 style="color: aliceblue; font-size: 100%" >Functionality Name = {{functionality[info[2]]}}</h6>
+          <div class="col-sm-5 col-md-3 col-lg-5" align = "center">
+            <h6  style="color: aliceblue; font-size: 100%">File 2 = {{Clonepair.file2}}</h6>
           </div>
-          <div class="col-sm-3 col-md-3 col-lg-3" align = "center">
-            <h6  style="color: aliceblue; font-size: 100%">File 2 = {{info[1]}}</h6>
-          </div>
-          <div class="col-sm-3 col-md-3 col-lg-3" align = "center">
+          <div class="col-sm-2 col-md-2 col-lg-2" align = "center">
               <input type="button" class="btn btn-danger " id="fat-btn" name = "Logout" value="Logout" onclick="window.location.href = '/logout'">
           </div>
       </div>  

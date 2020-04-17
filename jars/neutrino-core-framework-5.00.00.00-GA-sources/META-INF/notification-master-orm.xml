@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-mappings version="2.0"
+	xmlns="http://java.sun.com/xml/ns/persistence/orm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm http://java.sun.com/xml/ns/persistence/orm_2_0.xsd">
+
+	<named-query name="notification.users.getEmail">
+		<query>
+		Select distinct(u.mailId) FROM User u WHERE u.id IN :userIds AND u.mailId IS NOT NULL
+        </query>
+	</named-query>
+
+	<named-query
+		name="NotificationMaster.getNotificationMasterByNotificationType">
+		<query>
+		 select new Map(nm.id as id,nm.notificationName as name,nm.customerCommunication as isCustomerCommunication) FROM NotificationMaster nm inner join nm.notificationMasterType nmt WHERE nmt.code = :notificationType and nm.masterLifeCycleData.approvalStatus IN :statusList AND nm.activeFlag=true AND (nm.entityLifeCycleData.snapshotRecord IS NULL OR nm.entityLifeCycleData.snapshotRecord = false)
+        </query>
+	</named-query>
+	
+		<named-query
+		name="NotificationMaster.getAttachmentEncryptionPolicyBySourceProduct">
+		<query>
+          Select aep FROM AttachmentEncryptionPolicy aep WHERE aep.sysName=:sourceProduct order by aep.name asc
+		 </query>
+	</named-query>
+	
+	<named-query name="notification.users.getSmsPhoneNumbers">
+		<query>
+		SELECT sci.mobileNumber FROM UserProfile up JOIN up.simpleContactInfo sci WHERE up.associatedUser.id IN :userIds AND sci.mobileNumber IS NOT NULL
+        </query>
+	</named-query>
+
+	<named-query name="notification.users.getFCMId">
+		<query>
+		Select distinct(rdl.deviceId) FROM User u INNER JOIN u.userMobileInfo umi INNER JOIN umi.registeredDeviceList rdl 
+		WHERE u.id IN :userIds AND rdl.deviceType.code= 'FCMID' 
+        </query>
+	</named-query> 
+</entity-mappings>
+

@@ -1,0 +1,152 @@
+<com.nucleus.makerchecker.GridConfiguration>
+	<key>nestedUserFormatDetail</key>
+	<initializingPath></initializingPath>
+	<columnConfigurationList>
+		<com.nucleus.makerchecker.ColumnConfiguration>
+			<titleKey>baseFormatId</titleKey>
+			<width>125</width>
+			<sortable>false</sortable>
+			<searchable>false</searchable>
+			<hidden>true</hidden>
+			<dataField>baseFormatId</dataField>
+			<columnType>text</columnType>
+		</com.nucleus.makerchecker.ColumnConfiguration>
+		<com.nucleus.makerchecker.ColumnConfiguration>
+			<titleKey>userFormatId</titleKey>
+			<width>125</width>
+			<sortable>false</sortable>
+			<searchable>false</searchable>
+			<hidden>true</hidden>
+			<dataField>userFormatId</dataField>
+			<columnType>text</columnType>
+		</com.nucleus.makerchecker.ColumnConfiguration>
+		<com.nucleus.makerchecker.ColumnConfiguration>
+			<titleKey>formatDetailId</titleKey>
+			<width>125</width>
+			<sortable>false</sortable>
+			<searchable>false</searchable>
+			<hidden>true</hidden>
+			<dataField>formatDetailId</dataField>
+			<columnType>text</columnType>
+		</com.nucleus.makerchecker.ColumnConfiguration>
+		<com.nucleus.makerchecker.ColumnConfiguration>
+			<titleKey>Actions</titleKey>
+			<width>125</width>
+			<sortable>false</sortable>
+			<searchable>false</searchable>
+			<hidden>false</hidden>
+			<dataField>formatDetailId</dataField>
+			<columnType>action</columnType>
+		</com.nucleus.makerchecker.ColumnConfiguration>
+		<com.nucleus.makerchecker.ColumnConfiguration>
+			<titleKey>Field Order</titleKey>
+			<width>125</width>
+			<sortable>true</sortable>
+			<searchable>false</searchable>
+			<hidden>false</hidden>
+			<dataField>fieldOrder</dataField>
+			<columnType>text</columnType>
+		</com.nucleus.makerchecker.ColumnConfiguration>
+		<com.nucleus.makerchecker.ColumnConfiguration>
+			<titleKey>Identifier</titleKey>
+			<width>125</width>
+			<sortable>false</sortable>
+			<searchable>false</searchable>
+			<hidden>false</hidden>
+			<dataField>recordIdentifierCode</dataField>
+			<columnType>text</columnType>
+		</com.nucleus.makerchecker.ColumnConfiguration>
+		<com.nucleus.makerchecker.ColumnConfiguration>
+			<titleKey>Field Name</titleKey>
+			<width>125</width>
+			<sortable>false</sortable>
+			<searchable>false</searchable>
+			<hidden>false</hidden>
+			<dataField>fieldName</dataField>
+			<columnType>text</columnType>
+		</com.nucleus.makerchecker.ColumnConfiguration>
+		<com.nucleus.makerchecker.ColumnConfiguration>
+			<titleKey>Field Description</titleKey>
+			<width>125</width>
+			<sortable>false</sortable>
+			<searchable>false</searchable>
+			<hidden>false</hidden>
+			<dataField>fieldDescription</dataField>
+			<columnType>text</columnType>
+		</com.nucleus.makerchecker.ColumnConfiguration>
+
+		<com.nucleus.makerchecker.ColumnConfiguration>
+			<titleKey>baseMandatoryFlag</titleKey>
+			<width>125</width>
+			<sortable>false</sortable>
+			<searchable>false</searchable>
+			<hidden>true</hidden>
+			<dataField>baseMandatoryFlag</dataField>
+			<columnType>text</columnType>
+		</com.nucleus.makerchecker.ColumnConfiguration>
+		<com.nucleus.makerchecker.ColumnConfiguration>
+			<titleKey>baseMandatory</titleKey>
+			<width>125</width>
+			<sortable>false</sortable>
+			<searchable>false</searchable>
+			<hidden>true</hidden>
+			<dataField>baseMandatory</dataField>
+			<columnType>text</columnType>
+		</com.nucleus.makerchecker.ColumnConfiguration>
+		<com.nucleus.makerchecker.ColumnConfiguration>
+			<titleKey>compositeMandatoryFlag</titleKey>
+			<width>125</width>
+			<sortable>false</sortable>
+			<searchable>false</searchable>
+			<hidden>true</hidden>
+			<dataField>compositeMandatoryFlag</dataField>
+			<columnType>text</columnType>
+		</com.nucleus.makerchecker.ColumnConfiguration>
+
+
+		<com.nucleus.makerchecker.ColumnConfiguration>
+			<titleKey>Data Type</titleKey>
+			<width>125</width>
+			<sortable>false</sortable>
+			<searchable>false</searchable>
+			<hidden>false</hidden>
+			<dataField>dataType</dataField>
+			<columnType>text</columnType>
+		</com.nucleus.makerchecker.ColumnConfiguration>
+		<com.nucleus.makerchecker.ColumnConfiguration>
+			<titleKey>Field Type</titleKey>
+			<width>125</width>
+			<sortable>false</sortable>
+			<searchable>false</searchable>
+			<hidden>false</hidden>
+			<dataField>fieldTypeSelectOptions</dataField>
+			<columnType>select</columnType>
+		</com.nucleus.makerchecker.ColumnConfiguration>
+		<com.nucleus.makerchecker.ColumnConfiguration>
+			<titleKey>Tracking Field Flag</titleKey>
+			<width>125</width>
+			<sortable>false</sortable>
+			<searchable>false</searchable>
+			<hidden>false</hidden>
+			<dataField>trackingFieldFlag</dataField>
+			<columnType>dataToggle</columnType>
+		</com.nucleus.makerchecker.ColumnConfiguration>
+		<com.nucleus.makerchecker.ColumnConfiguration>
+			<titleKey>Tracking Field Order</titleKey>
+			<width>125</width>
+			<sortable>false</sortable>
+			<searchable>false</searchable>
+			<hidden>false</hidden>
+			<dataField>trackingFieldOrder</dataField>
+			<columnType>textBox</columnType>
+		</com.nucleus.makerchecker.ColumnConfiguration>
+	</columnConfigurationList>
+
+	<actionConfigurationList>
+		<com.nucleus.makerchecker.ActionConfiguration>
+			<action>addUserFormatDetailFromGrid(this)</action>
+			<imagePath>grid/details_open.png</imagePath>
+		</com.nucleus.makerchecker.ActionConfiguration>
+	</actionConfigurationList>
+
+</com.nucleus.makerchecker.GridConfiguration>

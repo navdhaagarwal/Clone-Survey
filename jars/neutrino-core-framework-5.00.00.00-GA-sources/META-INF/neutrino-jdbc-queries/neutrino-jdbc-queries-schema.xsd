@@ -1,0 +1,46 @@
+<xs:schema attributeFormDefault="unqualified"
+	elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+	<xs:element name="neutrino-jdbc-queries">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="named-sql-query" 
+					maxOccurs="unbounded" minOccurs="0">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="default-query" type="xs:string" maxOccurs="1"
+								minOccurs="1"></xs:element>
+							<xs:element name="query" maxOccurs="unbounded"
+								minOccurs="0">
+								<xs:complexType>
+									<xs:simpleContent>
+										<xs:extension base="xs:string">
+											<xs:attribute type="targetDatabase" name="targetDatabase"
+												use="required" />
+										</xs:extension>
+									</xs:simpleContent>
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+						<xs:attribute type="xs:string" name="name" use="required" />
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+
+	<xs:simpleType name="targetDatabase">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="MYSQL" />
+			<xs:enumeration value="ORACLE" />
+			<xs:enumeration value="SQL_SERVER" />
+			<xs:enumeration value="SYBASE" />
+			<xs:enumeration value="DB2" />
+			<xs:enumeration value="HSQL" />
+			<xs:enumeration value="H2" />
+			<xs:enumeration value="POSTGRES" />
+		</xs:restriction>
+	</xs:simpleType>
+
+</xs:schema>
+

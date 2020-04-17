@@ -1,0 +1,14 @@
+<html>
+	<body>
+		<div>
+			Dear ${userName},<br>
+		</div>
+		<div>
+			<br>
+			 Your OTP(One Time Password) is: ${otp}, valid till next ${otp_validity_minites} Minutes. Please DO NOT disclose it to anyone.
+		</div>
+		<div>
+			<b>Note: </b>Please do not reply to this e-mail as it is system generated. 
+		</div>
+	</body>
+</html>

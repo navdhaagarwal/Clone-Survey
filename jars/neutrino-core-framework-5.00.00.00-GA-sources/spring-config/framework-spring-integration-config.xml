@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:couchdb="http://www.ektorp.org/schema/couchdb"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans 
+		http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/util
+    	http://www.springframework.org/schema/util/spring-util.xsd
+    	http://www.ektorp.org/schema/couchdb 
+    	http://www.ektorp.org/schema/couchdb/couchdb.xsd">
+
+	<!-- Couch DB Connection Properties -->
+	<util:properties id="couchDBConnectionProperies">
+		<prop key="url">${ektrop.couchdb.url}</prop>
+		<prop key="port">${ektrop.couchdb.port}</prop>
+		<prop key="maxConnections">${ektrop.couchdb.maxConnections}</prop>
+		<prop key="connectionTimeout">${ektrop.couchdb.connectionTimeout}</prop>
+		<prop key="socketTimeout">${ektrop.couchdb.socketTimeout}</prop>
+		<prop key="username">${ektrop.couchdb.username}</prop>
+		<prop key="password">${ektrop.couchdb.password}</prop>
+		<prop key="accessLogCouchDbName">${access.log.ektrop.couchdb.dbName}</prop>
+	</util:properties>
+	<!-- <couchdb:instance id="accessLogCouchDbInstance" properties="couchDbProperties" 
+		/> <couchdb:database id="accessLogCouchDbConnector" name="${access.log.ektrop.couchdb.dbName}" 
+		instance-ref="accessLogCouchDbInstance" /> -->
+
+	<!-- JMS Connection Properties -->
+	<util:properties id="jmsConnectionFactoryProperties">
+		<prop key="brokerUrl">${jmsConnectionFactory.brokerUrl}</prop>
+		<prop key="connectionUsername">${jmsConnectionFactory.username}</prop>
+		<prop key="connectionPassword">${jmsConnectionFactory.password}</prop>
+		<prop key="maxConnections">${access.log.activemq.tcp.max.connections}</prop>
+		<prop key="maxActiveSessionPerConnection">${access.log.activemq.tcp.max.sessions.per.connections}</prop>		
+	</util:properties>
+
+	<bean id="resourceConnectionProperties"
+		class="com.nucleus.integration.resource.connection.factory.ResourceConnectionProperties">
+		<constructor-arg index="0"
+			ref="jmsConnectionFactoryProperties" />
+		<constructor-arg index="1" ref="couchDBConnectionProperies" />
+	</bean>
+
+	<!-- Access Log database connection -->
+	
+	<beans profile="app-server-provided">
+		<bean id="accessLogDataSource" class="org.springframework.jndi.JndiObjectFactoryBean">
+			<property name="jndiName" value="${access.log.database.dataSource.name}" />
+			<property name="proxyInterface" value="javax.sql.DataSource" />
+		</bean>
+	</beans>
+	
+	<beans profile="app-server-cluster-provided">
+		<bean id="accessLogDataSource" class="org.springframework.jndi.JndiObjectFactoryBean">
+			<property name="jndiName" value="${access.log.database.dataSource.name}" />
+			<property name="proxyInterface" value="javax.sql.DataSource" />
+		</bean>
+	</beans>
+		
+	<!-- Data Source Connection -->
+
+	<beans profile="!app-server-provided">
+		<beans profile="!app-server-cluster-provided">
+			<bean id="accessLogDataSource" class="org.apache.tomcat.dbcp.dbcp.BasicDataSource"
+				destroy-method="close">
+				<property name="driverClassName" value="${acess.log.database.driver.class}" />
+				<property name="url" value="${acess.log.database.connection.url}" />
+				<property name="username" value="${acess.log.database.username}" />
+				<property name="password" value="${acess.log.database.password}" />
+				<!-- Max number of connections that can remain idle in pool, without extra 
+					conns being released -->
+				<property name="maxIdle"
+					value="${acess.log.database.connection.pool.maxIdle}" />
+				<!-- Max number of active connections in the pool -->
+				<property name="maxActive"
+					value="${acess.log.database.connection.pool.maxActive}" />
+				<!-- In milliseconds - wait no longer for a connection to be returned 
+					(when no conns available in pool) -->
+				<property name="maxWait"
+					value="${acess.log.database.connection.pool.maxWait}" />
+				<property name="removeAbandoned"
+					value="${acess.log.database.connection.pool.removeAbandoned}" />
+				<property name="testWhileIdle"
+					value="${acess.log.database.connection.pool.testWhileIdle}" />
+				<property name="validationQuery"
+					value="${acess.log.database.connection.pool.validationQuery}" />
+				<property name="testOnBorrow"
+					value="${acess.log.database.connection.pool.testOnBorrow}" />
+			</bean>
+		</beans>
+	</beans>
+
+</beans>

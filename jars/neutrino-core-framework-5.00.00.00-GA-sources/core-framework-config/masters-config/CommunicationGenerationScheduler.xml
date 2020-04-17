@@ -1,0 +1,169 @@
+
+<com.nucleus.makerchecker.GridConfiguration>
+<entityClass>com.nucleus.finnone.pro.communicationgenerator.domainobject.CommunicationGenerationScheduler</entityClass>
+<jspName>masterDatatable</jspName>
+<processingType>true</processingType>
+<recordUrl>/app/CommunicationGenerationScheduler/view/</recordUrl>
+<entityNameMRKey>CommunicationGenerationScheduler</entityNameMRKey>
+
+<masterEntityConfiguration>
+	<autoApproval>false</autoApproval>
+	<entityUpdateInfoList>
+	</entityUpdateInfoList>
+</masterEntityConfiguration>
+
+<springBeanName>masterGridService</springBeanName>
+
+<key>CommunicationGenerationScheduler</key>
+	<initializingPath></initializingPath>
+	<columnConfigurationList>
+	
+			<com.nucleus.makerchecker.ColumnConfiguration>
+				<titleKey>key.uuid</titleKey>
+				<width>125</width>
+				<sortable>false</sortable>
+				<searchable>false</searchable>
+				<hidden>true</hidden>
+				<dataField>viewProperties.uuid</dataField>
+				<columnType>string</columnType>
+			</com.nucleus.makerchecker.ColumnConfiguration>
+			
+			<com.nucleus.makerchecker.ColumnConfiguration>
+				<titleKey>key.id</titleKey>
+				<width>125</width>
+				<sortable>false</sortable>
+				<searchable>false</searchable>
+				<hidden>true</hidden>
+				<dataField>id</dataField>
+				<columnType>link</columnType>
+			</com.nucleus.makerchecker.ColumnConfiguration>
+			
+				<com.nucleus.makerchecker.ColumnConfiguration>
+				<titleKey>key.task.id</titleKey>
+				<width>125</width>
+				<sortable>false</sortable>
+				<searchable>false</searchable>
+				<hidden>true</hidden>
+				<dataField>viewProperties.taskId</dataField>
+				<columnType>string</columnType>
+			</com.nucleus.makerchecker.ColumnConfiguration>
+			
+			<!--Custom Field ID -->		
+			<com.nucleus.makerchecker.ColumnConfiguration>
+				<titleKey>label.schedulerName</titleKey>
+				<width>80</width>
+				<sortable>true</sortable>
+				<searchable>true</searchable>
+				<hidden>false</hidden>
+				<dataField>schedulerName</dataField>
+				<columnType>string</columnType>
+			</com.nucleus.makerchecker.ColumnConfiguration>
+			
+			<com.nucleus.makerchecker.ColumnConfiguration>
+				<titleKey>label.sourceProduct</titleKey>
+				<width>80</width>
+				<sortable>true</sortable>
+				<searchable>true</searchable>
+				<hidden>false</hidden>
+				<dataField>sourceProduct.code</dataField>
+				<columnType>string</columnType>
+			</com.nucleus.makerchecker.ColumnConfiguration>
+			
+			<com.nucleus.makerchecker.ColumnConfiguration>
+				<titleKey>label.cronExpression</titleKey>
+				<width>100</width>
+				<sortable>true</sortable>
+				<searchable>true</searchable>
+				<hidden>false</hidden>
+				<dataField>cronExpression</dataField>
+				<columnType>string</columnType>
+			</com.nucleus.makerchecker.ColumnConfiguration>
+			
+		<!-- 	<com.nucleus.makerchecker.ColumnConfiguration>
+				<titleKey>label.communicationName</titleKey>
+				<width>100</width>
+				<sortable>true</sortable>
+				<searchable>true</searchable>
+				<hidden>false</hidden>
+				<dataField>CommunicationName.communicationName</dataField>
+				<columnType>string</columnType>
+			</com.nucleus.makerchecker.ColumnConfiguration> -->
+			
+		<com.nucleus.makerchecker.ColumnConfiguration>
+			<titleKey>key.created.by</titleKey>
+			<width>125</width>
+			<sortable>false</sortable>
+			<searchable>false</searchable>
+			<hidden>false</hidden>
+			<dataField>viewProperties.createdBy</dataField>
+			<columnType>string</columnType>
+		</com.nucleus.makerchecker.ColumnConfiguration>
+		
+		<com.nucleus.makerchecker.ColumnConfiguration>
+			<titleKey>key.reviewed.by</titleKey>
+			<width>125</width>
+			<sortable>false</sortable>
+			<searchable>false</searchable>
+			<hidden>false</hidden>
+			<dataField>viewProperties.reviewedBy</dataField>
+			<columnType>string</columnType>
+		</com.nucleus.makerchecker.ColumnConfiguration>
+		
+		<com.nucleus.makerchecker.ColumnConfiguration>
+			<titleKey>key.status</titleKey>
+			<width>125</width>
+			<sortable>true</sortable>
+			<searchable>true</searchable>
+			<hidden>false</hidden>
+			<dataField>viewProperties.approvalStatus</dataField>
+			<columnType>string</columnType>
+		</com.nucleus.makerchecker.ColumnConfiguration>
+		
+		<com.nucleus.makerchecker.ColumnConfiguration>
+			<titleKey>key.activeStatus</titleKey>
+			<width>125</width>
+			<sortable>true</sortable>
+			<searchable>false</searchable>
+			<hidden>false</hidden>
+			<dataField>activeFlag</dataField>
+			<columnType>string</columnType>
+		</com.nucleus.makerchecker.ColumnConfiguration>
+		
+		<com.nucleus.makerchecker.ColumnConfiguration>
+			<titleKey>key.actions</titleKey>
+			<width>90</width>
+			<sortable>false</sortable>
+			<searchable>false</searchable>
+			<hidden>false</hidden>
+			<dataField>viewProperties.actions</dataField>
+			<columnType>string</columnType>
+		</com.nucleus.makerchecker.ColumnConfiguration>
+		
+	</columnConfigurationList>
+
+		
+   	  <actionConfigurationList>
+		<com.nucleus.makerchecker.ActionConfiguration>
+			<action>Edit</action>
+			<imagePath>/images/Edit.png</imagePath>
+			<actionUrl>/app/CommunicationGenerationScheduler/edit/</actionUrl>
+			<text>false</text>
+			<applicableForApprovedRecord>true</applicableForApprovedRecord>
+		</com.nucleus.makerchecker.ActionConfiguration>
+		<com.nucleus.makerchecker.ActionConfiguration>
+			<action>Delete</action>
+			<imagePath>/images/Delete.png</imagePath>
+			<actionUrl>/app/master/CommunicationGenerationScheduler/CommunicationGenerationScheduler/delete</actionUrl>
+			<text>false</text>
+			<applicableForApprovedRecord>true</applicableForApprovedRecord>
+		</com.nucleus.makerchecker.ActionConfiguration>
+		<com.nucleus.makerchecker.ActionConfiguration>
+			<action>SendForApproval</action>
+			<imagePath>/images/Request_Approval.png</imagePath>
+			<actionUrl>/app/master/CommunicationGenerationScheduler/CommunicationGenerationScheduler/approval</actionUrl>
+			<text>false</text>
+			<applicableForApprovedRecord>false</applicableForApprovedRecord>
+		</com.nucleus.makerchecker.ActionConfiguration>
+		
+	</actionConfigurationList>
+</com.nucleus.makerchecker.GridConfiguration>

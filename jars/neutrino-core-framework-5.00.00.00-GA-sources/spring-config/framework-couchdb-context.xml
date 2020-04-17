@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:couchdb="http://www.ektorp.org/schema/couchdb" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/util
+    http://www.springframework.org/schema/util/spring-util.xsd
+    http://www.ektorp.org/schema/couchdb 
+    http://www.ektorp.org/schema/couchdb/couchdb.xsd">
+	
+	<beans profile="CouchBasedStorage">
+		<util:properties id="myProps">
+			<prop key="url">${ektrop.couchdb.url}</prop>
+			<prop key="port">${ektrop.couchdb.port}</prop>
+			<prop key="maxConnections">${ektrop.couchdb.maxConnections}</prop>
+			<prop key="connectionTimeout">${ektrop.couchdb.connectionTimeout}</prop>
+			<prop key="socketTimeout">${ektrop.couchdb.socketTimeout}</prop>
+			<prop key="username">${ektrop.couchdb.username}</prop>
+			<prop key="password">${ektrop.couchdb.password}</prop>
+		</util:properties>
+	
+	
+		<couchdb:instance id="localCouchDB" properties="myProps" />
+	<!-- 	<couchdb:database id="couchDbConnectorImages" name="fo_image"
+			instance-ref="localCouchDB" /> -->
+		<couchdb:database id="couchDbConnectorException" name="fo_exception"
+			instance-ref="localCouchDB" />
+		<couchdb:database id="couchDbConnectorDocument" name="fo_documents"
+			instance-ref="localCouchDB" />
+		<couchdb:database id="couchDbConnectorSnapshot" name="fo_snapshot"
+			instance-ref="localCouchDB" />
+		
+		<bean id="couchDataStoreExceptionService" class="com.nucleus.core.datastore.service.CouchDatastoreServiceImpl">
+	      		<constructor-arg ref="couchDbConnectorException"></constructor-arg>
+	    </bean>
+	    <bean id="couchDataStoreDocumentService" class="com.nucleus.core.datastore.service.CouchDatastoreServiceImpl">
+	      		<constructor-arg ref="couchDbConnectorDocument"></constructor-arg>
+	    </bean>
+	    <bean id="couchDataStoreSnapshotService" class="com.nucleus.core.datastore.service.CouchDatastoreServiceImpl">
+	      		<constructor-arg ref="couchDbConnectorSnapshot"></constructor-arg>
+	    </bean>
+	    <bean id="exceptionVORepository" class="com.nucleus.exceptionLogging.CouchBasedExceptionVORepositoryImpl">
+			<constructor-arg ref="couchDbConnectorException"></constructor-arg>
+		</bean>
+		<bean id="tika" class = "org.apache.tika.Tika">
+		</bean>
+	</beans>
+	
+	<beans profile="DBBasedStorage">
+		<bean id="couchDataStoreExceptionService" class="com.nucleus.core.datastore.service.OracleDatastoreServiceImpl">
+		</bean>
+		<bean id="couchDataStoreDocumentService" class="com.nucleus.core.datastore.service.OracleDatastoreServiceImpl">
+		</bean>
+		<bean id="couchDataStoreSnapshotService" class="com.nucleus.core.datastore.service.OracleDatastoreServiceImpl">
+		</bean>
+		<bean id="exceptionVORepository" class="com.nucleus.exceptionLogging.OracleDBBasedExceptinVORepositoryImpl">
+		</bean>
+		<bean id="tika" class = "org.apache.tika.Tika">
+		</bean>
+	</beans>
+
+</beans>

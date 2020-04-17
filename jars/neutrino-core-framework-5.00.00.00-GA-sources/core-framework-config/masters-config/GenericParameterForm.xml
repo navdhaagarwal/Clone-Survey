@@ -1,0 +1,35 @@
+<com.nucleus.makerchecker.MasterEntityConfiguration>
+	<entityClass>com.nucleus.web.genericParameter.GenericParameterForm</entityClass>
+	<autoApproval>NO</autoApproval>
+	<initializingPath>
+	</initializingPath>
+	<entityNameMRKey>GenericParameterForm</entityNameMRKey>
+	<columnConfigurationList>
+		<com.nucleus.makerchecker.ColumnConfiguration>
+			<titleKey>label.generic.code</titleKey>
+			<width>125</width>
+			<sortable>true</sortable>
+			<hidden>false</hidden>
+			<dataField>code</dataField>
+			<columnType>string</columnType>
+		</com.nucleus.makerchecker.ColumnConfiguration>
+		<com.nucleus.makerchecker.ColumnConfiguration>
+			<titleKey>label.generic.name</titleKey>
+			<width>125</width>
+			<sortable>true</sortable>
+			<hidden>false</hidden>
+			<dataField>name</dataField>
+			<columnType>string</columnType>
+		</com.nucleus.makerchecker.ColumnConfiguration>
+		<com.nucleus.makerchecker.ColumnConfiguration>
+			<titleKey>label.generic.description</titleKey>
+			<width>125</width>
+			<sortable>true</sortable>
+			<hidden>false</hidden>
+			<dataField>description</dataField>
+			<columnType>string</columnType>
+		</com.nucleus.makerchecker.ColumnConfiguration>
+	</columnConfigurationList>
+	<entityUpdateInfoList>
+	</entityUpdateInfoList>
+</com.nucleus.makerchecker.MasterEntityConfiguration>

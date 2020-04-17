@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:util="http://www.springframework.org/schema/util" xmlns:task="http://www.springframework.org/schema/task"
+	xsi:schemaLocation="
+	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd 
+	http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
+	http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd
+	">
+
+	<bean id="neoCacheConfigPropertiesEnvInitializer"
+		class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+		<property name="targetObject" value="#{@systemProperties}" />
+		<property name="targetMethod" value="putAll" />
+		<property name="arguments" ref="neoCacheConfigProperties" />
+	</bean>
+	
+	<bean id="neoStartupJVMPropertiesEnvInitializer"
+		class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+		<property name="targetObject" value="#{@systemProperties}" />
+		<property name="targetMethod" value="putAll" />
+		<property name="arguments" ref="neoStartupJVMProperties" />
+	</bean>
+
+	<task:scheduler id="neutrinoCacheSpringMangedScheduler"
+		pool-size="2" />
+	<task:scheduled-tasks scheduler="neutrinoCacheSpringMangedScheduler">
+		<task:scheduled ref="cacheBuildWorker" method="work"
+			fixed-delay="#{cacheManagerService.schedulerIntervalInMilis}" />
+	</task:scheduled-tasks>
+
+
+	<beans profile="cache-mode-redis">
+		<import resource="framework-redis.xml" />
+
+		<bean id="FW_CACHE_REGION"
+			class="com.nucleus.finnone.pro.cache.common.NeutrinoCacheRegion"
+			depends-on="CACHE_MANAGER">
+			<constructor-arg ref="CACHE_MANAGER" />
+		</bean>
+
+	</beans>
+
+	<beans profile="!cache-mode-redis">
+		<bean id="CACHE_MANAGER"
+			class="com.nucleus.finnone.pro.cache.common.infinispan.CacheManagerInfinispanImpl" />
+
+		<bean id="FW_CACHE_REGION"
+			class="com.nucleus.finnone.pro.cache.common.infinispan.NeutrinoCacheRegionInfinispanImpl"
+			depends-on="CACHE_MANAGER">
+			<constructor-arg ref="CACHE_MANAGER" />
+			<constructor-arg value="neutrino-infinispan-fw-cache.xml" />
+		</bean>
+		
+		<bean id="pubSubService" class="com.nucleus.pubsub.local.PubSubServiceLocalImpl"/>
+
+
+
+	</beans>
+
+</beans>

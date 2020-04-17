@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns="http://schema.base.ws.pro.finnone.nucleus.com"
+            targetNamespace="http://schema.base.ws.pro.finnone.nucleus.com"
+            elementFormDefault="qualified">
+  <xsd:simpleType name="BooleanType">
+    <xsd:annotation>
+        <xsd:documentation xml:lang="en">Common Boolean Type</xsd:documentation>
+    </xsd:annotation>
+	<xsd:restriction base="xsd:boolean"/>
+    </xsd:simpleType>
+</xsd:schema>

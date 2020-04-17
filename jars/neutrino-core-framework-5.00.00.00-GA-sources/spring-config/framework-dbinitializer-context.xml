@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:sws="http://www.springframework.org/schema/web-services"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+  http://www.springframework.org/schema/web-services http://www.springframework.org/schema/web-services/web-services-2.0.xsd
+   http://www.springframework.org/schema/context
+    http://www.springframework.org/schema/context/spring-context.xsd
+	http://www.springframework.org/schema/util
+	http://www.springframework.org/schema/util/spring-util.xsd">
+
+
+
+	<bean id="abstractSqlInitializerBean"
+		class="com.nucleus.core.database.initializer.SpringDatabaseExecutorDelegate"
+		abstract="true">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+	
+	<bean id="abstractSqlInitializerBeanAccessLogging"
+		class="com.nucleus.core.database.initializer.SpringDatabaseExecutorDelegate"
+		abstract="true">
+		<property name="dataSource" ref="accessLogDataSource" />
+	</bean>
+
+	<bean id="abstractProcedureInitializerBean"
+		class="com.nucleus.core.database.initializer.SpringDatabaseExecutorDelegate"
+		abstract="true">
+		<property name="dataSource" ref="dataSource" />
+		<property name="statementSeparator" value="$$" />
+	</bean>
+	
+	<bean id="seedDataAuditProcessor"
+		class="com.nucleus.core.database.seed.audit.SeedDataAuditProcessor" >
+		<property name="resourceLocations">
+		<list>
+			<value>classpath*:lending-framework-config/db-init/core/*.xls</value>
+			<value>classpath*:lending-framework-config/db-init/*.xls</value>
+			<value>classpath*:core-framework-config/db-init/*.xls</value>
+			<value>classpath*:core-rules-config/db-init/*.xls</value>
+			<value>classpath*:cas-framework-config/db-init/core/*.xls</value>
+		</list>
+		</property>
+		<property name="isSeedCountRequired" value="${seed.auditing.enabled}" />
+		<property name="isMasterSeedOn" value="${masters.seed.operation.on}" />
+		<property name="isNonMasterSeedOn" value="${non.masters.seed.operation.on}" />
+		<property name="seedFolderLocation" value="${seed.folder.location}" />
+		<property name="consolidatedSeedOperation" value="${consolidated.seed.operation.on}" />
+	</bean>
+
+	<!-- Added dependency on entity manager factory so that seeding doesn't 
+		happen unless tables for all entities are added into database -->
+	<bean id="abstractDatabaseSeedBean"
+		class="com.nucleus.core.database.initializer.AbstractDatabaseInitializer"
+		abstract="true" depends-on="entityManagerFactory">
+		<property name="dataSource" ref="dataSource" />
+		<property name="datatypeFactory" ref="dbunitDataTypeFactory" />
+		<property name="synchronousExecution" value="${database.dbunit.sync.execution}" />
+		<property name="neutrinoThreadPoolExecutor" ref="neutrinoThreadPoolExecutor" />
+		<property name="customPrimaryKeyFilter" ref="customPrimaryKeyFilter" />
+	</bean>
+
+	<bean id="tableFilterSimple" lazy-init="true"
+		class="com.nucleus.core.database.initializer.TableFilterSimple"> 
+		<property name="defaultPattern" value="(^(act_ge|act_hi|act_id|act_re|act_ru|act_evt|act_pro|persistent_logins|QRTZ_))" />
+		<property name="additionalPatterns" value="${database.seed.ignoretable.pattern}" />
+	</bean>
+
+
+
+	<bean id="dbunitDataTypeFactory" class="${database.dbunit.datatype.factory.class}" />
+
+	<bean id="customPrimaryKeyFilter"
+		class="com.nucleus.core.database.dbunitFilter.CustomPrimaryKeyFilter">
+		<property name="resources">
+			<list>
+				<bean parent="frameworkConfigResourceFactoryBean">
+					<property name="resourceName" value="tablePrimaryKeyMap.xml" />
+				</bean>
+			</list>
+		</property>
+	</bean>
+
+
+
+
+	<bean id="excelDatabaseSeedBean"
+		class="com.nucleus.core.database.initializer.ExcelDatabaseInitializer"
+		abstract="true" parent="abstractDatabaseSeedBean">
+		<constructor-arg ref="seedDataAuditProcessor" />
+	</bean>
+	<bean id="consolidatedDatabaseSeed" parent="excelDatabaseSeedBean">
+		<property name="operation" value="${framework.seed.operation}" />
+		<property name="consolidatedSeedOperation" value="${consolidated.seed.operation.on}" />
+		<property name="turnSeedOperationsOn" value="${consolidated.seed.operation.on}" />
+	</bean>
+
+	<bean id="systemSetupService" class="com.nucleus.systemSetup.service.SystemSetupServiceImpl">
+		<property name="consolidatedSeedOperation" value="${consolidated.seed.operation.on}" />
+		<property name="seedLocation" value="${seed.folder.location}" />
+		<property name="defaultSchemaName" value="${database.app.schemaname}" />
+	</bean>
+
+	<bean id="mastersSeedDatabaseBean"
+		class="com.nucleus.core.database.initializer.ExcelDatabaseInitializer"
+		abstract="true" parent="abstractDatabaseSeedBean">
+		<constructor-arg ref="seedDataAuditProcessor" />
+		<property name="turnSeedOperationsOn" value="${masters.seed.operation.on}" />
+	</bean>
+	
+	<bean id="nonMastersSeedDatabaseBean"
+		class="com.nucleus.core.database.initializer.ExcelDatabaseInitializer"
+		abstract="true" parent="abstractDatabaseSeedBean" >
+		<constructor-arg ref="seedDataAuditProcessor" />
+		<property name="turnSeedOperationsOn" value="${non.masters.seed.operation.on}" />
+	</bean>
+	
+	
+	<!--<bean id="frameworkDatabaseSeed" parent="mastersSeedDatabaseBean">
+		<property name="resource">
+			<bean parent="frameworkConfigResourceFactoryBean">
+				<property name="resourceName" value="db-init/${framework.seed.xls}" />
+			</bean>
+		</property>
+		<property name="operation" value="${framework.seed.operation}" />
+	</bean>
+
+
+
+
+	<bean id="messageResourceDatabaseSeed" parent="mastersSeedDatabaseBean">
+		<property name="resource">
+			<bean parent="frameworkConfigResourceFactoryBean">
+				<property name="resourceName" value="db-init/${message.resource.seed.xls}" />
+			</bean>
+		</property>
+		<property name="operation" value="${message.resource.seed.operation}" />
+	</bean>
+
+	<bean id="seedConfiguration" parent="mastersSeedDatabaseBean"
+		depends-on="frameworkDatabaseSeed">
+		<property name="resource">
+			<bean parent="frameworkConfigResourceFactoryBean">
+				<property name="resourceName" value="db-init/${seed-configuration.xls}" />
+			</bean>
+		</property>
+		<property name="operation" value="${seed-configuration.operation}" />
+	</bean>-->
+
+	<!--sequence-tables-${database.type}.sql will be executed within bean : neutrinoDbIdGenerator
+		so commenting this bean -->
+		
+	<!-- <bean parent="abstractSqlInitializerBean">
+		<property name="resources">
+			<bean parent="frameworkConfigResourceFactoryBean">
+				<property name="resourceName"
+					value="sql/${database.type}/sequence-tables-${database.type}.sql" />
+			</bean>
+		</property>		
+		<property name="ignoreAllFailures" value="true" />		
+	</bean> -->
+
+	<bean parent="abstractProcedureInitializerBean">
+		<property name="resources">
+			<bean parent="frameworkConfigResourceFactoryBean">
+				<property name="resourceName"
+					value="sql/${database.type}/sequence-procedures-${database.type}.sql" />
+			</bean>
+		</property>
+
+	</bean>
+
+	<bean parent="abstractProcedureInitializerBean">
+		<property name="resources">
+			<bean parent="frameworkConfigResourceFactoryBean">
+				<property name="resourceName"
+					value="sql/${database.type}/hibernate-sequence-${database.type}.sql" />
+			</bean>
+		</property>
+
+	</bean>
+
+	<bean parent="abstractProcedureInitializerBean">
+		<property name="resources">
+			<bean parent="frameworkConfigResourceFactoryBean">
+				<property name="resourceName"
+					value="sql/${database.type}/core-view-scripts-${database.type}.sql" />
+			</bean>
+		</property>
+
+	</bean>
+
+	<bean parent="abstractSqlInitializerBean">
+		<property name="resources">
+			<bean parent="frameworkConfigResourceFactoryBean">
+				<property name="resourceName"
+					value="sql/${database.type}/core-oauth2-userClientDetails-${database.type}.sql" />
+			</bean>
+		</property>
+		<property name="ignoreAllFailures" value="true" />
+		<property name="enabled" value="${oauth2.tables.creation.enable}" />
+	</bean>
+
+
+
+	<bean parent="abstractSqlInitializerBean">
+		<property name="resources">
+			<bean parent="frameworkConfigResourceFactoryBean">
+				<property name="resourceName"
+					value="sql/${database.type}/quartz-${database.type}.sql" />
+			</bean>
+		</property>
+		<property name="ignoreAllFailures" value="true" />
+		<property name="enabled" value="${quartz.table.creation}" />
+	</bean>
+
+
+	<!--<bean id="dynamicFormConfiguration" parent="mastersSeedDatabaseBean">
+		<property name="resource">
+			<bean parent="frameworkConfigResourceFactoryBean">
+				<property name="resourceName" value="db-init/${dynamic.form.configuration.seed.xls}" />
+			</bean>
+		</property>
+		<property name="operation" value="${dynamic.form.configuration.seed.operation}" />
+	</bean>
+
+	<beans profile="fw-demo">
+		<bean id="frameworkDatabaseSeedTest" parent="mastersSeedDatabaseBean">
+			<property name="resource">
+				<bean parent="frameworkConfigResourceFactoryBean">
+					<property name="resourceName" value="db-init/${framework.seed.fw-demoSample.xls}" />
+				</bean>
+			</property>
+			<property name="operation" value="${framework.seed.operation}" />
+		</bean>
+	</beans>-->
+	<bean parent="abstractSqlInitializerBeanAccessLogging">
+		<property name="resources">
+			<bean parent="frameworkConfigResourceFactoryBean">
+				<property name="resourceName"
+					value="sql/${acess.log.database.type}/access-log-table-${acess.log.database.type}.sql" />
+			</bean>
+		</property>
+		<property name="ignoreAllFailures" value="true" />		
+	</bean>
+	
+</beans>

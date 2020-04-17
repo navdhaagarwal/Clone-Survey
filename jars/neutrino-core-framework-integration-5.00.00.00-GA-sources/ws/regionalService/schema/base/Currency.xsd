@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns="http://schema.base.ws.pro.finnone.nucleus.com" targetNamespace="http://schema.base.ws.pro.finnone.nucleus.com"
+	xmlns:base="http://schema.base.ws.pro.finnone.nucleus.com"
+	elementFormDefault="qualified">
+	
+	
+	<xsd:include schemaLocation="StringTypes.xsd" />
+	<xsd:include  schemaLocation="NumberTypes.xsd" />
+	<xsd:include  schemaLocation="CommonBaseTypes.xsd" />
+	
+		<xsd:complexType name="Currency">
+		<xsd:sequence>
+			<xsd:element ref="currencyId"  minOccurs="1" maxOccurs="1"/>	
+			<xsd:element ref="currencyISOCode" minOccurs="1" maxOccurs="1"/>	
+	 		<xsd:element ref="currencyDescription" minOccurs="1" maxOccurs="1"/>
+	 		
+	 	</xsd:sequence>
+	</xsd:complexType>
+	    <xsd:element name="currencyId" type="base:IDType" />	
+		<xsd:element name="currencyISOCode" type="base:String_0003Type"  />
+		<xsd:element name="currencyDescription" type="base:String_0255Type" />
+	 	
+	
+	
+	</xsd:schema>

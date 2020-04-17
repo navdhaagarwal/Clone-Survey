@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:util="http://www.springframework.org/schema/util" xmlns:jpa="http://www.springframework.org/schema/data/jpa"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:task="http://www.springframework.org/schema/task"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/context
+    http://www.springframework.org/schema/context/spring-context.xsd
+    http://www.springframework.org/schema/task 
+    http://www.springframework.org/schema/task/spring-task.xsd
+    ">
+
+
+
+	<bean id="quartzConfigLocation" parent="frameworkConfigResourceFactoryBean">
+		<property name="resourceName" value="quartz.properties" />
+	</bean>
+
+	<bean id="neutrinoScheduler"
+		class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+		<property name="schedulerContextAsMap">
+			<map merge="true">
+				<entry key="jobLocator" value-ref="jobRegistry" />
+				<entry key="jobLauncher" value-ref="jobLauncher" />
+			</map>
+		</property>
+		<property name="applicationContextSchedulerContextKey">
+			<value>applicationContext</value>
+		</property>
+		<property name="dataSource">
+			<ref bean="dataSource" />
+		</property>
+		<property name="overwriteExistingJobs" value="true" />
+		<property name="configLocation" ref="quartzConfigLocation" />
+		<property name="quartzProperties">
+			<props>
+				<prop key="org.quartz.jobStore.driverDelegateClass">${org.quartz.jobStore.driverDelegateClass:org.quartz.impl.jdbcjobstore.StdJDBCDelegate}</prop>
+			</props>
+		</property>
+	</bean>
+
+	<bean
+		class="org.springframework.batch.core.configuration.support.JobRegistryBeanPostProcessor">
+		<property name="jobRegistry" ref="jobRegistry" />
+	</bean>
+
+	<bean id="jobRegistry"
+		class="org.springframework.batch.core.configuration.support.MapJobRegistry" />
+
+	<bean id="jobRepository"
+		class="org.springframework.batch.core.repository.support.JobRepositoryFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="transactionManager" ref="transactionManager" />
+		<property name="databaseType" value="${database.type}" />
+		<property name="isolationLevelForCreate" value="ISOLATION_DEFAULT" />
+		<property name="validateTransactionState" value="false" />
+	</bean>
+
+	<bean id="jobLauncher"
+		class="org.springframework.batch.core.launch.support.SimpleJobLauncher">
+		<property name="jobRepository" ref="jobRepository" />
+	</bean>
+
+
+	<bean id="neutrinoSpringMangedScheduler" class="com.nucleus.spring.quartz.bridge.scheduler.QuartzBackedSpringSchedulerFactory">
+		<constructor-arg ref="neutrinoScheduler" />
+		<constructor-arg value="#{T(com.nucleus.core.initialization.ProductInformationLoader).getProductCode()}" />
+	</bean>
+
+	<bean id="scheduledTaskRegistrar"
+		class= "org.springframework.scheduling.config.ScheduledTaskRegistrar">
+		<property name="taskScheduler" ref="neutrinoSpringMangedScheduler" />
+	</bean> 
+
+</beans>
+
+
+

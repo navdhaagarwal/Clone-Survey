@@ -1,0 +1,444 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-mappings version="2.0"
+				 xmlns="http://java.sun.com/xml/ns/persistence/orm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				 xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm http://java.sun.com/xml/ns/persistence/orm_2_0.xsd">
+
+	<!-- NAMED QUERIES for generic operations -->
+
+	<named-query name="address.findCountryZipCodeByCountryIsoCode">
+		<query>
+			select DISTINCT pc.postalCode FROM PostalCode pc WHERE pc.countryCode = :countryIsoCode
+		</query>
+	</named-query>
+	<named-query name="DetailedContactInfo.fetchPhoneNumberForContactInfo">
+		<query>
+			select dci.phoneNumbers FROM DetailedContactInfo dci WHERE dci.id = :contactId AND (dci.entityLifeCycleData.snapshotRecord IS NULL OR dci.entityLifeCycleData.snapshotRecord = false)
+		</query>
+	</named-query>
+
+	<named-query name="address.findCountryByZipCode">
+		<query>
+			select zc FROM ZipCode zc WHERE zc.zipCode = :zipCode
+		</query>
+	</named-query>
+	<named-query name="address.findCountryByCityCode">
+		<query>
+			select ci FROM City ci WHERE ci.cityCode = :cityCode
+		</query>
+	</named-query>
+
+	<named-query name="address.findCountryCodeByISDCode">
+		<query>
+			select DISTINCT cn.countryISOCode FROM Country cn WHERE cn.countryISDCode = :isdCode AND cn.masterLifeCycleData.approvalStatus  IN (0,3,4,6) 
+		</query>
+	</named-query>
+
+	<named-query name="address.findCountryByStateCode">
+		<query>
+			select st FROM State st WHERE st.stateCode = :stateCode
+		</query>
+	</named-query>
+	<named-query name="address.findAreaByPostalCode">
+		<query>
+			select pc FROM PostalCode pc WHERE pc.countryCode = :countryIsoCode and pc.postalCode = :postalCode
+		</query>
+	</named-query>
+	<named-query name="address.findRemainingFields">
+		<query>
+			select pc FROM PostalCode pc WHERE pc.countryCode = :countryIsoCode and pc.postalCode = :postalCode and pc.placeName = :placeName
+		</query>
+	</named-query>
+	<named-query name="address.findCountryId">
+		<query>
+			select co FROM Country co WHERE co.countryISOCode = :countryIsoCode AND (co.entityLifeCycleData.snapshotRecord IS NULL OR co.entityLifeCycleData.snapshotRecord = false)
+		</query>
+	</named-query>
+	<named-query name="address.findStateId">
+		<query>
+			select st FROM State st WHERE st.stateName = :state AND (st.entityLifeCycleData.snapshotRecord IS NULL OR st.entityLifeCycleData.snapshotRecord = false)
+		</query>
+	</named-query>
+	<named-query name="address.findCityId">
+		<query>
+			select ci FROM City ci WHERE ci.cityName = :city AND (ci.entityLifeCycleData.snapshotRecord IS NULL OR ci.entityLifeCycleData.snapshotRecord = false)
+		</query>
+	</named-query>
+	<named-query name="address.findAreaId">
+		<query>
+			select area FROM Area area WHERE area.areaName = :area AND (area.entityLifeCycleData.snapshotRecord IS NULL OR area.entityLifeCycleData.snapshotRecord = false)
+		</query>
+	</named-query>
+	<named-query name="address.findZipCodeId">
+		<query>
+			select zipCode FROM ZipCode zipCode WHERE zipCode.zipCode = :zipcode AND (zipCode.entityLifeCycleData.snapshotRecord IS NULL OR zipCode.entityLifeCycleData.snapshotRecord = false)
+		</query>
+	</named-query>
+	<named-query name="address.findZipCodeIdByZipCode">
+		<query>
+			select zipCode.id FROM ZipCode zipCode WHERE zipCode.zipCode = :zipcode and zipCode.masterLifeCycleData.approvalStatus IN :approvalStatus AND (zipCode.entityLifeCycleData.snapshotRecord IS NULL OR zipCode.entityLifeCycleData.snapshotRecord = false)
+		</query>
+	</named-query>
+
+	<named-query name="address.findDistrictId">
+		<query>
+			select dist FROM District dist WHERE dist.districtName = :district
+		</query>
+	</named-query>
+	<named-query name="address.findAllDistrictByCountryId">
+		<query>
+			select dist FROM District dist WHERE dist.state.country.id = :countryId
+		</query>
+	</named-query>
+	<named-query name="address.findRegionId">
+		<query>
+			select reg FROM IntraCountryRegion reg WHERE reg.intraRegionName = :region AND (reg.entityLifeCycleData.snapshotRecord IS NULL OR reg.entityLifeCycleData.snapshotRecord = false)
+		</query>
+	</named-query>
+	<named-query name="address.findAllStatesInCoutry">
+		<query>
+			select DISTINCT state FROM State state WHERE state.country.id = :countryId and state.masterLifeCycleData.approvalStatus IN :approvalStatus AND (state.entityLifeCycleData.snapshotRecord IS NULL OR state.entityLifeCycleData.snapshotRecord = false) AND state.activeFlag = true
+		</query>
+	</named-query>
+
+	<named-query name="address.findAllApprovedStatesInCountry">
+		<query>
+			select DISTINCT state FROM State state WHERE state.country.id = :countryId and state.masterLifeCycleData.approvalStatus IN :approvalStatus AND (state.entityLifeCycleData.snapshotRecord IS NULL OR state.entityLifeCycleData.snapshotRecord = false) AND state.activeFlag = true
+		</query>
+	</named-query>
+
+
+	<named-query name="address.findAllCitiesInCountry">
+		<query>
+			select DISTINCT city FROM City city WHERE city.country.id = :countryId and city.masterLifeCycleData.approvalStatus IN :approvalStatus AND (city.entityLifeCycleData.snapshotRecord IS NULL OR city.entityLifeCycleData.snapshotRecord = false) AND city.activeFlag = true
+		</query>
+	</named-query>
+
+	<named-query name="address.findAllApprovedCitiesInCountry">
+		<query>
+			select DISTINCT city FROM City city WHERE city.country.id = :countryId and city.masterLifeCycleData.approvalStatus IN :approvalStatus AND (city.entityLifeCycleData.snapshotRecord IS NULL OR city.entityLifeCycleData.snapshotRecord = false) AND city.activeFlag = true
+		</query>
+	</named-query>
+	<named-query name="address.AllZipCodesInAState">
+		<query>
+			select DISTINCT zipcode FROM ZipCode zipcode WHERE zipcode.state.id = :stateId and zipcode.masterLifeCycleData.approvalStatus IN :approvalStatus AND (zipcode.entityLifeCycleData.snapshotRecord IS NULL OR zipcode.entityLifeCycleData.snapshotRecord = false) AND zipcode.activeFlag = true
+		</query>
+	</named-query>
+	<named-query name="address.getAllAreaFromCity">
+		<query>
+			select DISTINCT area FROM Area area WHERE area.city.id = :cityId and area.masterLifeCycleData.approvalStatus IN :approvalStatus AND (area.entityLifeCycleData.snapshotRecord IS NULL OR area.entityLifeCycleData.snapshotRecord = false) AND area.activeFlag = true
+		</query>
+	</named-query>
+
+
+	<named-query name="address.getRegionFromState">
+		<query>
+			select region from State state join state.region region where state.region=region.id and  state.id=:stateId
+		</query>
+	</named-query>
+
+	<named-query name="address.getAllAreaFromCountry">
+		<query>
+			select DISTINCT area FROM Area area WHERE area.city.country.id = :countryId and area.masterLifeCycleData.approvalStatus IN :approvalStatus AND (area.entityLifeCycleData.snapshotRecord IS NULL OR area.entityLifeCycleData.snapshotRecord = false) AND area.activeFlag = true
+		</query>
+	</named-query>
+
+	<named-query name="address.getAllAreaFromZipCode">
+		<query>
+			select DISTINCT area FROM Area area WHERE area.zipcode.id = :zipCodeId and area.masterLifeCycleData.approvalStatus IN :approvalStatus AND (area.entityLifeCycleData.snapshotRecord IS NULL OR area.entityLifeCycleData.snapshotRecord = false) AND area.activeFlag = true
+		</query>
+	</named-query>
+	<named-query name="address.getAllCountriesFromRegion">
+		<query>
+			select DISTINCT country FROM Country country WHERE country.region.id = :regionId and country.masterLifeCycleData.approvalStatus IN :approvalStatus AND (country.entityLifeCycleData.snapshotRecord IS NULL OR country.entityLifeCycleData.snapshotRecord = false) AND country.activeFlag = true
+		</query>
+	</named-query>
+	<named-query name="address.getAllIntraCountryRegionsFromCountry">
+		<query>
+			select DISTINCT region FROM IntraCountryRegion region WHERE region.country.id = :countryId and region.masterLifeCycleData.approvalStatus IN :approvalStatus AND (region.entityLifeCycleData.snapshotRecord IS NULL OR region.entityLifeCycleData.snapshotRecord = false) AND region.activeFlag = true
+		</query>
+	</named-query>
+	<named-query name="address.getAllStateInIntraCountryRegions">
+		<query>
+			select DISTINCT state FROM State state WHERE state.region.id = :regionId and state.masterLifeCycleData.approvalStatus IN :approvalStatus AND (state.entityLifeCycleData.snapshotRecord IS NULL OR state.entityLifeCycleData.snapshotRecord = false) AND state.activeFlag = true AND state.activeFlag = true
+		</query>
+	</named-query>
+	<named-query name="address.getAllCityInState">
+		<query>
+			select DISTINCT city FROM City city WHERE city.state.id = :stateId and city.masterLifeCycleData.approvalStatus IN :approvalStatus AND (city.entityLifeCycleData.snapshotRecord IS NULL OR city.entityLifeCycleData.snapshotRecord = false) AND city.activeFlag = true
+		</query>
+	</named-query>
+	<named-query name="address.getAllApprovedCityInState">
+		<query>
+			select DISTINCT city FROM City city WHERE city.state.id = :stateId and city.masterLifeCycleData.approvalStatus IN :approvalStatus AND (city.entityLifeCycleData.snapshotRecord IS NULL OR city.entityLifeCycleData.snapshotRecord = false)
+		</query>
+	</named-query>
+
+	<named-query name="address.getAllDistrictInState">
+		<query>
+			select DISTINCT district FROM District district WHERE district.state.id = :stateId and district.masterLifeCycleData.approvalStatus IN :approvalStatus AND (district.entityLifeCycleData.snapshotRecord IS NULL OR district.entityLifeCycleData.snapshotRecord = false) AND district.activeFlag = true
+		</query>
+	</named-query>
+	<named-query name="address.getAllZipCodeInCity">
+		<query>
+			select DISTINCT zipcode FROM ZipCode zipcode WHERE zipcode.city.id = :cityId and zipcode.masterLifeCycleData.approvalStatus IN :approvalStatus AND (zipcode.entityLifeCycleData.snapshotRecord IS NULL OR zipcode.entityLifeCycleData.snapshotRecord = false) AND zipcode.activeFlag = true
+		</query>
+	</named-query>
+	<named-query name="address.findZipcodeInCity">
+		<query>
+			select zipcode.id FROM ZipCode zipcode WHERE zipcode.city.id = :cityId and zipcode.zipCode=:zipcode and zipcode.masterLifeCycleData.approvalStatus IN :approvalStatus AND (zipcode.entityLifeCycleData.snapshotRecord IS NULL OR zipcode.entityLifeCycleData.snapshotRecord = false) AND zipcode.activeFlag = true
+		</query>
+	</named-query>
+
+	<named-query name="address.getAllZipCodesInCountry">
+		<query>
+			select DISTINCT zipcode FROM ZipCode zipcode WHERE zipcode.country.id = :countryId and zipcode.masterLifeCycleData.approvalStatus IN :approvalStatus AND (zipcode.entityLifeCycleData.snapshotRecord IS NULL OR zipcode.entityLifeCycleData.snapshotRecord = false) AND zipcode.activeFlag = true
+		</query>
+	</named-query>
+	<named-query name="address.findLocationByZipCode">
+		<query>
+			select  concat(pc.latitude,' ', pc.longitude) FROM PostalCode pc WHERE pc.postalCode = :zipCode
+		</query>
+	</named-query>
+
+	<!-- For Map -->
+	<named-query name="address.findGeocode">
+		<query>
+			select  concat(geo.latitude,' ', geo.longitude) FROM GeoData geo WHERE geo.id = :id
+		</query>
+	</named-query>
+	<named-query name="address.findGeocodeLatitude">
+		<query>
+			select  geo.latitude FROM GeoData geo WHERE geo.id = :id
+		</query>
+	</named-query>
+	<named-query name="address.findGeocodeLogitude">
+		<query>
+			select geo.longitude FROM GeoData geo WHERE geo.id = :id
+		</query>
+	</named-query>
+	<named-query name="address.findidlatitudelongitudebycountry">
+		<query>
+			<!--            select  concat(a.latitude,' ', a.longitude,'',a.id)FROM Address a join a.country c WHERE c.countryName=:countryName -->
+			select  concat(a.latitude,' ', a.longitude,' ',a.id)FROM Address a WHERE a.country.id=:countryId
+		</query>
+	</named-query>
+
+	<named-query name="address.findidlatitudelongitudebystate">
+		<query>
+			<!--            select  concat(a.latitude,' ', a.longitude,'',a.id)FROM Address a join a.country c WHERE c.countryName=:countryName -->
+			select  concat(a.latitude,' ', a.longitude,' ',a.id)FROM Address a WHERE a.state.id=:stateId
+		</query>
+	</named-query>
+
+
+	<named-query name="address.findidlatitudelongitudebycity">
+		<query>
+			<!--            select  concat(a.latitude,' ', a.longitude,'',a.id)FROM Address a join a.country c WHERE c.countryName=:countryName -->
+			select  concat(a.latitude,' ', a.longitude,' ',a.id)FROM Address a WHERE a.city.id=:cityId
+		</query>
+	</named-query>
+
+
+
+
+
+
+	<named-query name="address.getminmaxlatlong">
+		<query>
+			select  a.minmaxlatlonglatitude from BoundingCoordinates a
+		</query>
+	</named-query>
+	<named-query name="address.getminmaxlatlongandNegName">
+		<query>
+			select  a from BoundingCoordinates a
+		</query>
+	</named-query>
+	<named-query name="address.getnamebylatlong">
+		<query>
+			select  a.negativeName from BoundingCoordinates a  where a.minmaxlatlonglatitude=:minmaxlatlonglatitude
+		</query>
+	</named-query>
+	<named-query name="address.findTempVillageByName">
+		<query>
+			select vil.id FROM TempVillage vil where vil.name = :village AND (vil.entityLifeCycleData.snapshotRecord IS NULL OR vil.entityLifeCycleData.snapshotRecord = false)
+		</query>
+	</named-query>
+	<named-query name="address.findVillageByName">
+		<query>
+			select vil.id FROM VillageMaster vil where vil.name = :villageName AND (vil.entityLifeCycleData.snapshotRecord IS NULL OR vil.entityLifeCycleData.snapshotRecord = false)
+		</query>
+	</named-query>
+	<named-query name="address.findVillaMastergeByName">
+		<query>
+			select vil FROM VillageMaster vil where vil.name = :villageName AND (vil.entityLifeCycleData.snapshotRecord IS NULL OR vil.entityLifeCycleData.snapshotRecord = false)
+		</query>
+	</named-query>
+	<named-query name="address.findTempTehsilIdByName">
+		<query>
+			select tehsil.id FROM TempTehsil tehsil where tehsil.name = :tehsilName AND (tehsil.entityLifeCycleData.snapshotRecord IS NULL OR tehsil.entityLifeCycleData.snapshotRecord = false)
+		</query>
+	</named-query>
+	<named-query name="address.findTehsilByName">
+		<query>
+			select tehsil FROM Tehsil tehsil where tehsil.name = :tehsilName AND (tehsil.entityLifeCycleData.snapshotRecord IS NULL OR tehsil.entityLifeCycleData.snapshotRecord = false)
+		</query>
+	</named-query>
+
+	<named-query name="address.findCountryIdByCityId">
+		<query>
+			select city.country.id FROM City city where city.id = :cityId AND city.country.masterLifeCycleData.approvalStatus IN :approvalStatus AND (city.country.entityLifeCycleData.snapshotRecord IS NULL OR city.country.entityLifeCycleData.snapshotRecord = false) AND city.country.activeFlag = true
+		</query>
+	</named-query>
+
+	<named-query name="address.findStateIdByCityId">
+		<query>
+			select city.state.id FROM City city where city.id = :cityId AND city.state.masterLifeCycleData.approvalStatus IN :approvalStatus AND (city.state.entityLifeCycleData.snapshotRecord IS NULL OR city.state.entityLifeCycleData.snapshotRecord = false) AND city.state.activeFlag = true
+		</query>
+	</named-query>
+
+	<named-query name="address.getCountryDetailsByCountryId">
+		<query>
+			select new Map(country.countryISOCode as countryISOCode,country.countryISDCode as countryISDCode) from Country country where country.id=:countryId
+		</query>
+	</named-query>
+
+	<named-query name="address.getAddressDetailsByAddressId">
+		<query>
+			select ad from Address ad left outer join fetch ad.country
+			left outer join fetch ad.state
+			left outer join fetch ad.district
+			left outer join fetch ad.city
+			left outer join fetch ad.area
+			left outer join fetch ad.zipcode
+			left outer join fetch ad.region
+			left outer join fetch ad.accomodationType
+			left outer join fetch ad.residenceType
+			where ad.id=:addressId
+		</query>
+	</named-query>
+
+	<!-- Added for PDE AddressUpdate -->
+	<named-query name="address.findAddressTempByGcdAddressRecordId">
+		<query>
+			select at FROM AddressTemp at WHERE at.approvalStatus = :approvalStatus and at.recordId = :recordId
+		</query>
+	</named-query>
+	<named-query name="Country.getAllIntraCountryRegions">
+		<query>
+			select icr FROM IntraCountryRegion icr WHERE icr.masterLifeCycleData.approvalStatus in :statusList and icr.country.id = :countryId
+		</query>
+	</named-query>
+
+
+	<named-query name="address.findVillageIdsByDistrictIdAndTehsilName">
+		<query>
+			select village.id FROM VillageMaster village where village.tehsil.name = :tehsilName AND village.district.id = :districtId AND (village.entityLifeCycleData.snapshotRecord IS NULL OR village.entityLifeCycleData.snapshotRecord = false)
+		</query>
+	</named-query>
+	<named-query name="address.findVillageIdsByDistrictIdAndTehsilId">
+		<query>
+			select village.id FROM VillageMaster village where village.tehsil.id = :tehsilId AND village.district.id = :districtId AND (village.entityLifeCycleData.snapshotRecord IS NULL OR village.entityLifeCycleData.snapshotRecord = false)
+		</query>
+	</named-query>
+	<named-query name="address.findVillageIdsByDistrictId">
+		<query>
+			select village.id FROM VillageMaster village where village.district.id = :districtId AND (village.entityLifeCycleData.snapshotRecord IS NULL OR village.entityLifeCycleData.snapshotRecord = false)
+		</query>
+	</named-query>
+	<named-query name="address.findTehsilIdsByDistrictId">
+		<query>
+			select tehsil.id FROM Tehsil tehsil where tehsil.district.id = :districtId AND (tehsil.entityLifeCycleData.snapshotRecord IS NULL OR tehsil.entityLifeCycleData.snapshotRecord = false)
+		</query>
+	</named-query>
+
+	<named-query name="address.findVillageByStateId">
+		<query>
+			select village FROM VillageMaster village WHERE village.district.id in(select district.id from District district where district.state.id= :stateId) AND village.masterLifeCycleData.approvalStatus IN (0, 3, 4, 6) AND (village.entityLifeCycleData.snapshotRecord IS NULL OR village.entityLifeCycleData.snapshotRecord = false) AND village.id NOT IN (select vill.id FROM ZipCode zipcode INNER JOIN zipcode.village vill WHERE zipcode.masterLifeCycleData.approvalStatus NOT IN(1,5,10))
+		</query>
+	</named-query>
+
+	<named-query name="address.findZipCodeByVillageId">
+		<query>
+			select zipcode FROM ZipCode zipcode INNER JOIN zipcode.village village WHERE village.id =:villageId and zipcode.masterLifeCycleData.approvalStatus = :approvalStatus  AND (zipcode.entityLifeCycleData.snapshotRecord IS NULL OR zipcode.entityLifeCycleData.snapshotRecord = false) AND zipcode.activeFlag = true
+		</query>
+	</named-query>
+	<named-query name="address.AllIsoCodesInCountry">
+		<query>
+			select co.countryISOCode FROM Country co WHERE co.masterLifeCycleData.approvalStatus in (0,3) AND co.activeFlag = true AND (co.entityLifeCycleData.snapshotRecord IS NULL OR co.entityLifeCycleData.snapshotRecord = false)
+		</query>
+	</named-query>
+	<named-query name="address.findISOCodeOfCountry">
+		<query>
+			select co.countryISOCode FROM Country co
+		</query>
+	</named-query>
+	<named-query name="address.getCountryNameByCountryId">
+		<query>
+			select country.countryName FROM Country country WHERE country.id = :countryId
+		</query>
+	</named-query>
+	
+	<named-query name="customPincode.findStateForCustomValidation">
+		<query>
+			select state FROM State state WHERE state.id = :id
+		</query>
+	</named-query>
+	<named-query name="address.getAllApprovedCityUsingStates">
+		<query>
+			select city FROM City city WHERE city.state.id in( :stateList )and city.masterLifeCycleData.approvalStatus IN :approvalStatus AND (city.entityLifeCycleData.snapshotRecord IS NULL OR city.entityLifeCycleData.snapshotRecord = false) AND city.activeFlag = true
+		</query>
+	</named-query>
+	<named-query name="address.getAllApprovedVillagesUsingStates">
+		<query>
+			select DISTINCT village FROM VillageMaster village WHERE village.district.id in(select district.id from District district where district.state.id in :stateList) AND village.masterLifeCycleData.approvalStatus IN :approvalStatus AND (village.entityLifeCycleData.snapshotRecord IS NULL OR village.entityLifeCycleData.snapshotRecord = false) AND village.activeFlag = true
+		</query>
+	</named-query>
+	<named-query name="DistrictMaster.findDistrictByCode">
+		<query>
+			from District d WHERE d.districtCode=:districtCode AND d.masterLifeCycleData.approvalStatus NOT IN :approvalStatus
+		</query>
+	</named-query>
+	<named-query name="DistrictMaster.findStateByCode">
+		<query>
+			from State s WHERE s.stateCode=:stateCode AND s.masterLifeCycleData.approvalStatus IN :approvalStatus
+		</query>
+	</named-query>
+
+	
+
+	<named-query name="CityMaster.findCountryByCode">
+		<query>
+			from Country c WHERE c.countryISOCode=:countryISOCode AND c.masterLifeCycleData.approvalStatus IN :approvalStatus
+		</query>
+	</named-query>
+
+	<named-query name="CityMaster.findStateByCode">
+		<query>
+			from State s WHERE s.stateCode=:stateCode AND s.masterLifeCycleData.approvalStatus IN :approvalStatus
+		</query>
+	</named-query>
+
+	<named-query name="CityMaster.findDistrictByCode">
+		<query>
+			from District d WHERE d.districtCode=:districtCode AND d.masterLifeCycleData.approvalStatus IN :approvalStatus
+		</query>
+	</named-query>
+	<named-query name="CityMaster.findCityByCode">
+		<query>
+			from City c WHERE c.cityCode=:cityCode AND c.masterLifeCycleData.approvalStatus NOT IN :approvalStatus
+		</query>
+	</named-query>
+	<named-query name="StreetMaster.findStreetByCode">
+		<query>
+			from Street s WHERE s.streetCode=:streetCode AND s.masterLifeCycleData.approvalStatus NOT IN :approvalStatus
+		</query>
+	</named-query>
+
+	<named-query name="address.getAllStreetFromCity">
+		<query>
+			select DISTINCT street FROM Street street WHERE street.city.id = :cityId and street.masterLifeCycleData.approvalStatus IN :approvalStatus AND (street.entityLifeCycleData.snapshotRecord IS NULL OR street.entityLifeCycleData.snapshotRecord = false) AND street.activeFlag = true
+		</query>
+	</named-query>
+
+</entity-mappings>
+

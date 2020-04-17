@@ -1,0 +1,167 @@
+<DecisionReasonMapping>
+	<systems>
+		<systemName code="CAS">
+			<stage code="Policy-Refferal">
+				<actions>
+					<action>Approve</action>
+					<action>Reject</action>
+				</actions>
+			</stage>
+			<stage code="fi">
+				<actions>
+					<action>Approve</action>
+					<action>Reject</action>
+				</actions>
+			</stage>
+
+			<stage code="quality_check">
+				<actions>
+					<action>Accept</action>
+					<action>Reject</action>
+					<action>Discrepant</action>
+					<action>File Not Complete</action>
+				</actions>
+			</stage>
+			<stage code="login_acceptance">
+				<actions>
+					<action>Approve</action>
+					<action>Reject</action>
+					<action>Discrepant</action>
+					<action>File Not Complete</action>
+				</actions>
+			</stage>
+
+			<stage code="Document-Varification_CAS">
+				<actions>
+					<action>Save</action>
+					<action>Approve</action>
+					<action>Reject</action>
+				</actions>
+			</stage>
+			<stage code="underwriting">
+				<actions>
+					<action>Approve</action>
+					<action>In-Principle Approve</action>
+					<action>Reject</action>
+				</actions>
+			</stage>
+			<stage code="lead_resolution">
+				<actions>
+					<action>Assign To Pool</action>
+					<action>Move To Application</action>
+					<action>Reject</action>
+					<action>Assign To Others</action>
+				</actions>
+			</stage>
+			<stage code="cancel_application">
+				<actions>
+					<action>Cancel</action>
+				</actions>
+			</stage>
+			<stage code="balance_Transfer">
+				<actions>
+					<action>Balance Transfer</action>
+				</actions>
+			</stage>
+			<stage code="review_cancel_application">
+				<actions>
+					<action>Confirm Cancellation</action>
+					<action>Send Back for Processing to activity</action>
+				</actions>
+			</stage>
+			<stage code="reject_application">
+				<actions>
+					<action>Reject</action>
+				</actions>
+			</stage>
+			<stage code="review_reject_application">
+				<actions>
+					<action>Confirm Rejection</action>
+					<action>Send Back for Processing to Activity</action>
+				</actions>
+			</stage>
+			<stage code="kyc">
+				<actions>
+					<action>Approve</action>
+					<action>Reject</action>
+				</actions>
+			</stage>
+			<stage code="CREDIT_BUREAU_REFERRAL">
+				<actions>
+					<action>Approve</action>
+					<action>Reject</action>
+				</actions>
+			</stage>
+			<stage code="recommendation">
+				<actions>
+					<action>Recommend</action>
+					<action>Not Recommended</action>
+				</actions>
+			</stage>
+			<stage code="Field_Investigation_Initiation">
+				<actions>
+					<action>Waive Off</action>
+				</actions>
+			</stage>
+			<stage code="rcu">
+				<actions>
+					<action>Screening Ok</action>
+					<action>Screening Not Ok</action>
+					<action>Sampling Required</action>
+				</actions>
+			</stage>
+			<stage code="exit">
+				<actions>
+					<action>Exit</action>
+				</actions>
+			</stage>
+			<stage code="hold">
+				<actions>
+					<action>Hold</action>
+				</actions>
+			</stage>
+			<stage code="Operations_Check">
+				<actions>
+					<action>Approve</action>
+					<action>Reject</action>
+				</actions>
+			</stage>
+			<stage code="reassign_to_user">
+				<actions>
+					<action>Reassign</action>
+				</actions>
+			</stage>
+			<stage code="policy_execution">
+				<actions>
+					<action>Approve</action>
+					<action>Reject</action>
+				</actions>
+			</stage>
+		</systemName>
+
+
+		<systemName code="LMS">
+			<stage code="Policy-Refferal">
+				<actions>
+					<action>Save</action>
+					<action>Approve</action>
+					<action>Reject</action>
+				</actions>
+			</stage>
+			<stage code="Field-Investigation_LMS">
+				<actions>
+					<action>Save</action>
+					<action>Approve</action>
+					<action>Reject</action>
+				</actions>
+			</stage>
+			<stage code="Document-Varification_LMS">
+				<actions>
+					<action>Save</action>
+					<action>Approve</action>
+					<action>Reject</action>
+				</actions>
+			</stage>
+		</systemName>
+	</systems>
+</DecisionReasonMapping>

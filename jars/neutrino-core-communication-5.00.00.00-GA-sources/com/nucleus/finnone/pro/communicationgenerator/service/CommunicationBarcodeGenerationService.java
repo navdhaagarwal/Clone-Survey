@@ -1,0 +1,22 @@
+package com.nucleus.finnone.pro.communicationgenerator.service;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import com.nucleus.finnone.pro.communicationgenerator.businessobject.ICommunicationBarcodeGenerationBusinessObject;
+import com.nucleus.finnone.pro.communicationgenerator.domainobject.CommunicationGenerationDetailHistory;
+
+@Named("communicationeGenerationBarcodeDetailService")
+public class CommunicationBarcodeGenerationService implements ICommunicationBarcodeGenerationService {
+
+	@Inject
+	@Named("communicationeGenerationBarcodeDetailBusinessObject")
+	private ICommunicationBarcodeGenerationBusinessObject communicationeGenerationBarcodeDetailBusinessObject;
+
+	@Override
+	public CommunicationGenerationDetailHistory getCommunicationHistoryByUniqueBarcodeReferenceNumber(String barcodeReferenceNumber) {
+
+		return communicationeGenerationBarcodeDetailBusinessObject.getCommunicationHistoryByUniqueBarcodeReferenceNumber(barcodeReferenceNumber);
+	}
+
+}

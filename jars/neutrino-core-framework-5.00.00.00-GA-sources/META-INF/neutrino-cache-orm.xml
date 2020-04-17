@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-mappings version="2.0"
+	xmlns="http://java.sun.com/xml/ns/persistence/orm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm http://java.sun.com/xml/ns/persistence/orm_2_0.xsd">
+
+	<!-- NAMED QUERIES for Master Cache and Impacted Cache -->
+
+	<named-query name="ImpactedCache.getImpactedCachesByCacheAndRegionName">
+		<query>
+     	SELECT e from ImpactedCache e WHERE e.regionName = :regionName AND e.cacheName = :cacheName AND e.entityLifeCycleData.creationTimeStamp <![CDATA[<=]]> :beforeDate  
+        </query>
+	</named-query>
+	<named-query name="ImpactedCache.getImpactedCachesVOsBeforeDate">
+		<query>
+     	SELECT new com.nucleus.finnone.pro.cache.vo.ImpactedCacheVO(e.cacheName,e.regionName, e.groupName, MAX(e.entityLifeCycleData.creationTimeStamp)) from ImpactedCache e 
+     	where e.entityLifeCycleData.creationTimeStamp <![CDATA[<=]]> :beforeDate 
+     	AND (e.lastAttemptedTime <![CDATA[<=]]> :beforeDate OR e.lastAttemptedTime is null) GROUP BY e.cacheName,e.regionName,e.groupName
+        </query>
+	</named-query>
+	<named-query name="ImpactedCache.updateLastUpdatedTime">
+		<query>
+     	UPDATE ImpactedCache e set e.lastAttemptedTime <![CDATA[=]]> :currentTime 
+     	WHERE e.regionName = :regionName 
+     	AND e.cacheName = :cacheName  
+        </query>
+	</named-query>
+	<named-query name="ImpactedCache.updateLastUpdatedTimeByGroupName">
+		<query>
+     	UPDATE ImpactedCache e set e.lastAttemptedTime <![CDATA[=]]> :currentTime 
+     	WHERE e.groupName = :groupName
+        </query>
+	</named-query>
+	<named-query name="ImpactedCache.getImpactedCacheCountByGroupNameAndDate">
+		<query>
+     	SELECT count(*) from ImpactedCache e 
+     	where e.entityLifeCycleData.creationTimeStamp <![CDATA[<=]]> :beforeDate 
+     	AND (e.lastAttemptedTime <![CDATA[<=]]> :beforeDate OR e.lastAttemptedTime is null)
+     	AND e.groupName = :groupName
+        </query>
+	</named-query>
+</entity-mappings>

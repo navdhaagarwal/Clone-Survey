@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-mappings version="2.0"
+	xmlns="http://java.sun.com/xml/ns/persistence/orm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm http://java.sun.com/xml/ns/persistence/orm_2_0.xsd">
+
+	<!-- NAMED QUERIES for generic operations -->
+
+	<named-query name="Communication.getAllCommunication">
+		<query>
+          FROM Communication c WHERE c.ownerEntityUri = :entityUri ORDER BY c.entityLifeCycleData.creationTimeStamp DESC
+        </query>
+	</named-query>
+	<named-query name="Communication.getAllCommunicationForEntityUriList">
+		<query>
+          FROM Communication c WHERE c.ownerEntityUri IN :entityUriList ORDER BY c.entityLifeCycleData.creationTimeStamp ASC
+        </query>
+	</named-query>
+	
+	<named-query name="Communication.getOtherThanAppointmentCommunicationOrderByCreationTimeStamp">
+		<query>
+          FROM Communication c WHERE c.ownerEntityUri = :entityUri AND c.contactedTo is null ORDER BY c.entityLifeCycleData.creationTimeStamp DESC
+        </query>
+	</named-query>
+	
+	<named-query name="Communication.getAppointmentFromCommunicationHistory">
+		<query>
+          FROM Communication c WHERE c.ownerEntityUri = :entityUri AND c.contactedTo is not null ORDER BY c.entityLifeCycleData.creationTimeStamp DESC
+        </query>
+	</named-query>
+	
+	
+	<named-query name="Communication.getLastOtherThanAppointmenLeadStatusCodeFromCommunicationHistory">
+		<query>
+         select status.code FROM Communication c inner join c.communicationTrails ct inner join ct.status status WHERE c.ownerEntityUri = :entityUri AND c.contactedTo is null ORDER BY c.entityLifeCycleData.creationTimeStamp DESC
+        </query>
+	</named-query>
+	
+	
+	<named-query name="Communication.getLastAppointmentTimeFromCommunicationHistory">
+		<query>
+       Select c.contactTime   FROM Communication c WHERE c.ownerEntityUri = :entityUri AND c.contactedTo is not null ORDER BY c.entityLifeCycleData.creationTimeStamp DESC
+        </query>
+	</named-query>
+	
+	
+	
+</entity-mappings>

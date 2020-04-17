@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<infinispan xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="urn:infinispan:config:8.2 http://www.infinispan.org/schemas/infinispan-config-8.2.xsd"
+	xmlns="urn:infinispan:config:8.2">
+
+	<jgroups>
+		<stack-file name="neutrino-session-jgroups" path="neutrino-session-jgroups.xml" />
+	</jgroups>
+	<cache-container name="neutrino-session-cache-manager" statistics="false" shutdown-hook="REGISTER">
+		<transport stack="neutrino-session-jgroups" cluster="neutrino-session-cluster"/>
+		<jmx duplicate-domains="true" />
+
+		<replicated-cache-configuration name="REPL_CACHE_CONFIG"
+			mode="SYNC" remote-timeout="${L3.remote.timeout:20000}" statistics="false" statistics-available="false">
+			<eviction size="-1" strategy="NONE"/>
+			<expiration max-idle="-1" interval="5000" lifespan="-1" />
+			<partition-handling enabled="${L3.partition.handling.enabled:false}" when-split="DENY_READ_WRITES" merge-policy="PREFERRED_ALWAYS"/> 
+			<state-transfer enabled="${L3.state.transfer.enabled:false}" timeout="${L3.state.transfer.timeout:20000000}" />
+			<locking  isolation="READ_COMMITTED" concurrency-level="1000" acquire-timeout="15000" striping="false" />
+			<transaction mode="${L3.transaction.type:NONE}" auto-commit="false" locking="OPTIMISTIC"  />
+		</replicated-cache-configuration>
+
+		
+		<replicated-cache name="SESSION_CACHE" configuration="REPL_CACHE_CONFIG">
+			<state-transfer enabled="true" timeout="${L3.state.transfer.timeout:20000000}" />
+		</replicated-cache>
+		
+	</cache-container>
+</infinispan>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+      http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<!-- To allow standards-based @Secured annotation, enable secured-annotations 
+		See Spring Security 3.1 Reference 2.4 Method Security - http://static.springsource.org/spring-security/site/docs/3.1.x/reference/ns-config.html#ns-protect-pointcut 
+		- http://static.springsource.org/spring-security/site/docs/3.1.x/reference/appendix-namespace.html#d0e8651 
+		See Spring Security 3.1 Reference 15.1.1 Common Built-In Expressions - http://static.springsource.org/spring-security/site/docs/3.1.x/reference/el-access.html -->
+
+
+	<bean id="activeDirectoryAuthenticationProvider"
+		class="com.nucleus.web.security.NeutrinoCustomADLdapAuthenticationProvider">
+		
+		<property name="userDetailsContextMapper" ref="ldapUserDetailMapper" />
+		<property name="groupforRole" value="${core.web.config.group.role}" />
+		
+	</bean>
+
+	<bean id="contextSource"
+		class="org.springframework.security.ldap.DefaultSpringSecurityContextSource">
+		<constructor-arg
+			value="${core.web.config.activeDirectoryAuthenticationProvider.url.value}" />
+		<property name="userDn" value="${core.web.config.ldapusersearch.user.name}" />
+		<property name="password" value="${core.web.config.ldapusersearch.password}" />
+	</bean>
+
+	<bean id="ldapFilterUserSearch"
+		class="org.springframework.security.ldap.search.FilterBasedLdapUserSearch">
+		<constructor-arg index="0"
+			value="${core.web.config.ldapusersearch.searchbase.value}" />
+		<constructor-arg index="1"
+			value="${core.web.config.ldapusersearch.searchfilter.value}" />
+		<constructor-arg index="2" ref="contextSource" />
+	</bean>
+	
+	<bean id="ldapUserSearch" class="com.nucleus.web.ldap.user.NeutrinoLdapServiceImpl">
+		<property name="ldapFilterUserSearch" ref="ldapFilterUserSearch" />
+	</bean>
+
+</beans>

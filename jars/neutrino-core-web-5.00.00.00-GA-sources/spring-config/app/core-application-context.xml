@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:beans="http://www.springframework.org/schema/beans"
+	   xmlns:security="http://www.springframework.org/schema/security"
+	   xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+   		http://www.springframework.org/schema/security
+   		http://www.springframework.org/schema/security/spring-security.xsd">
+   		
+	<import resource="classpath:spring-config/oauth/oauth-security-context.xml" />
+	<import resource="classpath:spring-config/framework-context.xml" />
+	<import resource="classpath:spring-config/app/devops-security-context.xml" />
+	<import resource="classpath:spring-config/app/core-security-context.xml" />
+	<import resource="classpath:websocket-config/websocket-config.xml" />
+
+
+	<bean class="com.nucleus.sso.client.session.NeutrinoSingleSignOutHttpSessionListener"/>
+	<bean class="org.springframework.security.web.session.HttpSessionEventPublisher"/>
+	<bean class="net.bull.javamelody.SessionListener"/>
+
+	<bean id="propertiesMessageSource" class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
+	    <property name="basenames">
+	    	<list>
+	    	</list>
+	    </property>
+	    <property name="defaultEncoding" value="UTF-8"/>
+	    <property name="cacheSeconds" value="-1"/>
+	    <property name="fallbackToSystemLocale" value="true"/>
+	</bean>
+	
+	<bean id="cityValidator" class="${cas.city.validator.class}"></bean>
+
+	<bean id="messageSource" class="com.nucleus.core.messageSource.DatabaseDrivenMessageSource" >
+		<property name="messageResourceService" ref="messageResourceService" />
+		<property name="parentMessageSource"  ref="propertiesMessageSource"/>
+	</bean>
+	
+	<bean id="coreWebValidatorMasterConfigurationLoader" class="com.nucleus.core.initialization.NeutrinoResourceFactoryBean">
+		<property name="resourceLoader" ref="coreWebSecurityConfigResourceLoader"/>
+	</bean>
+	<bean id="coreWebValidatorPropertyPlaceholderConfigurer" class="org.jasypt.spring31.properties.EncryptablePropertySourcesPlaceholderConfigurer">
+		<constructor-arg ref="stringEncryptor" />
+		<property name="ignoreUnresolvablePlaceholders" value="true"/>
+		<property name="locations">
+	     	<list>
+		     	<bean parent="coreWebValidatorMasterConfigurationLoader">
+						<property name="resourceName" value="core-web-mvc-config.properties" />
+					</bean>
+	<bean parent="coreWebValidatorMasterConfigurationLoader">
+		<property name="resourceName" value="finnone-mail-configuration.properties" />
+	</bean>
+	       		<bean parent="coreWebValidatorMasterConfigurationLoader"> <property name="resourceName" value="core-web-masters-validator.properties"/> </bean>
+	     	</list>
+	   </property>
+	</bean>
+
+	<bean id="DBDrivenMessageResourceLoader" class="com.nucleus.core.messageSource.DBDrivenMessageResourceLoader"/>
+	<!-- Abstract bean which allows plug in mechanism for bpmn files to be defined 
+		later by client projects -->
+	<bean id="messageResourcePluginBeanPostProcessor" class="com.nucleus.core.spring.PluginBeanFactoryPostProcessor"
+		abstract="true">
+		<property name="extensionBeanName" value="propertiesMessageSource" />
+		<property name="propertyName" value="basenames" />
+	</bean>
+
+	<bean parent="messageResourcePluginBeanPostProcessor">
+		<property name="pluginBeanName" value="customerMessagesResourcefileName" />
+	</bean>
+	<bean id="customerMessagesResourcefileName" class="java.lang.String">
+		<constructor-arg value="resource-bundles\finnone_customer_messages" />
+	</bean>
+
+	<bean parent="messageResourcePluginBeanPostProcessor">
+		<property name="pluginBeanName" value="messagesResourcefileName" />
+	</bean>
+	<bean id="messagesResourcefileName" class="java.lang.String">
+		<constructor-arg value="resource-bundles\finnone_messages" />
+	</bean>
+
+	<bean parent="messageResourcePluginBeanPostProcessor">
+		<property name="pluginBeanName" value="errorMessagesResourcefileName" />
+	</bean>
+	<bean id="errorMessagesResourcefileName" class="java.lang.String">
+		<constructor-arg value="resource-bundles\finnone_err_messages" />
+	</bean>
+
+	<bean parent="messageResourcePluginBeanPostProcessor">
+		<property name="pluginBeanName" value="masterColumnHeaderMessagesResourcefileName" />
+	</bean>
+	<bean id="masterColumnHeaderMessagesResourcefileName" class="java.lang.String">
+		<constructor-arg value="resource-bundles\masterColumnHeader_messages" />
+	</bean>
+
+	<bean parent="messageResourcePluginBeanPostProcessor">
+		<property name="pluginBeanName" value="actionMessagesResourcefileName" />
+	</bean>
+	<bean id="actionMessagesResourcefileName" class="java.lang.String">
+		<constructor-arg value="resource-bundles\action_messages" />
+	</bean>
+
+	<bean parent="messageResourcePluginBeanPostProcessor">
+		<property name="pluginBeanName" value="configurationMessagesResourcefileName" />
+	</bean>
+	<bean id="configurationMessagesResourcefileName" class="java.lang.String">
+		<constructor-arg value="resource-bundles\configuration_messages" />
+	</bean>
+
+	<bean parent="messageResourcePluginBeanPostProcessor">
+		<property name="pluginBeanName" value="myfavoritesMessagesResourcefileName" />
+	</bean>
+	<bean id="myfavoritesMessagesResourcefileName" class="java.lang.String">
+		<constructor-arg value="resource-bundles\myFavorites_messages_en" />
+	</bean>
+
+	<bean parent="messageResourcePluginBeanPostProcessor">
+		<property name="pluginBeanName" value="proposalMessagesResourcefileName" />
+	</bean>
+	<bean id="proposalMessagesResourcefileName" class="java.lang.String">
+		<constructor-arg value="resource-bundles\proposalColumnHeader_messages_en" />
+	</bean>
+
+	<bean id="lovConfigResourceLoader" parent="rootConfigResourceLoader">
+		<property name="moduleName" value="lov-config" />
+	</bean>
+
+	<bean id="notificationMasterService" class="com.nucleus.notificationMaster.service.NotificationMasterServiceImpl">
+		<property name="roleBasedApplicantServiceList">
+		<list>
+		
+		</list>
+		</property>
+	</bean>
+
+	<bean id="notificationPluginBean" class="com.nucleus.core.spring.PluginBeanFactoryPostProcessor"
+		abstract="true">
+		<property name="extensionBeanName" value="notificationMasterService"/>
+		<property name="propertyName" value="roleBasedApplicantServiceList" />
+		
+	</bean>
+	
+	 <bean id="countryValidator" class="com.nucleus.web.country.master.CountryValidator">
+	
+	</bean> 
+	<bean id="stateValidator" class="com.nucleus.web.state.master.StateValidator">
+	
+	</bean>
+	<bean id="districtValidator" class="com.nucleus.web.district.master.DistrictValidator">
+	
+	</bean>
+	<bean id="zipCodeValidator" class="com.nucleus.web.zipcode.master.ZipCodeValidator">
+	
+	</bean>
+	<bean id="organizationBranchValidator" class="com.nucleus.web.organizationbranch.master.OrganizationBranchValidator">
+	
+	</bean>
+	<bean id="multipartResolver" class="com.nucleus.web.security.NeutrinoMultipartResolver">
+	     <property name="maxUploadSize"
+	                     value="${core.web.config.commonsMultipartResolver.maxUploadSize.value}" />
+	     <!-- Below property is set to 10.2kb by default, exceeding which file will be written and 
+	                     read from disk -->
+	     <property name="maxInMemorySize"
+	                     value="${core.web.config.commonsMultipartResolver.maxUploadSize.value}" />
+    </bean>
+
+	<bean id="lmsTableTagProperties"
+		  class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+		<property name="properties">
+			<props>
+				<prop key="enableToggleCheckBox">true</prop>
+			</props>
+		</property>
+	</bean>
+
+    <bean id="filterMultipartResolver" parent= "multipartResolver" />
+	 <bean id="customMobileNumberValidationBean"
+		class="com.nucleus.mobile.MobileNumberValidationDefault">
+	</bean>
+	
+	<security:filter-security-metadata-source
+			id="additionalSecurityMetadataSource" request-matcher="ant" use-expressions="true">
+			<security:intercept-url pattern="/" access="permitAll" />
+		</security:filter-security-metadata-source>
+	
+</beans>

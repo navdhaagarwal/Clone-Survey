@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-mappings version="2.0"
+	xmlns="http://java.sun.com/xml/ns/persistence/orm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm http://java.sun.com/xml/ns/persistence/orm_2_0.xsd">
+
+	<named-query name="AssignmentMaster.GetByName">
+		<query>
+		Select am from AssignmentMaster am where am.name = :name
+		</query>
+	</named-query>
+
+	<named-query name="AssignmentMaster.GetEntityTypes">
+		<query>
+		Select et from EntityType et where et.displayEntityName IN :displayEntityNameList
+	</query>
+	</named-query>
+
+	<named-query name="AssignmentSet.getByAssignmentMatrixAction">
+		<query>
+		Select assignmentSet from AssignmentSet assignmentSet inner join assignmentSet.assignmentMatrixRowData asamrd where asamrd.assignmentMatrixAction.id = :id
+		</query>
+	</named-query>
+
+	<named-query name="AssignmentSet.getAllAssignmentMatrixActionToCompile">
+		<query>
+          SELECT ama FROM AssignmentMatrixAction ama WHERE ama.compiledExpression IS NULL AND (ama.entityLifeCycleData.snapshotRecord IS NULL OR ama.entityLifeCycleData.snapshotRecord = false)
+        </query>
+	</named-query>
+
+	<named-query name="RuleMatrixMaster.getRateLimitMasters">
+		<query>
+          SELECT rmm FROM RuleMatrixMaster rmm WHERE rmm.ruleMatrixMasterType.id = :ruleMatrixMasterTypeId AND (rmm.entityLifeCycleData.snapshotRecord IS NULL OR rmm.entityLifeCycleData.snapshotRecord = false) AND rmm.masterLifeCycleData.approvalStatus IN :statusList ORDER BY rmm.name ASC
+        </query>
+	</named-query>
+	
+	<named-query name="RuleMatrixMaster.getChargeLimitMasters">
+	<query>
+		SELECT rmm FROM RuleMatrixMaster rmm WHERE rmm.ruleMatrixMasterType.id = :ruleMatrixMasterTypeId AND (rmm.entityLifeCycleData.snapshotRecord IS NULL OR rmm.entityLifeCycleData.snapshotRecord = false) AND rmm.masterLifeCycleData.approvalStatus IN :statusList ORDER BY rmm.name ASC
+	</query>
+</named-query>
+
+	<named-query name="AssignmentMaster.filterByPurpose">
+		<query>
+			Select new map(am.name as name,am.code as code,am.id as id) from AssignmentMaster am inner join am.purpose pur where pur.code=:purposeCode and (
+			lower ( am.code ) like lower( :value ) or lower ( am.name ) like lower( :value )) and (am.entityLifeCycleData.snapshotRecord IS NULL OR
+			am.entityLifeCycleData.snapshotRecord = false) AND am.masterLifeCycleData.approvalStatus IN :statusList
+		</query>
+	</named-query>
+
+</entity-mappings>

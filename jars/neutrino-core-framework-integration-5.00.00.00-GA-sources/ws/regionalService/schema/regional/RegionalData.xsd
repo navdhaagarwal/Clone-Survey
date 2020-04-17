@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" version="1.0"  
+		xmlns:xmime="http://www.w3.org/2005/05/xmlmime"	
+		xmlns:base="http://schema.base.ws.pro.finnone.nucleus.com"  
+		xmlns="http://schema.service.regional.nucleus.com" 
+		targetNamespace="http://schema.service.regional.nucleus.com" 
+          	elementFormDefault="qualified">
+	<xsd:complexType name="RegionalData" />
+</xsd:schema>

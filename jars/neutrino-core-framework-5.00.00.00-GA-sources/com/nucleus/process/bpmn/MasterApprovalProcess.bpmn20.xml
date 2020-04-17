@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.nucleussoftware.com/masterApprovalFlow">
+  <process id="MasterApprovalProcess" name="Master Approval Process">
+    <startEvent id="startevent" name="Start"></startEvent>
+    <serviceTask id="sendMailNotificationToChecker" name="Send Mail Notification To Checker" activiti:expression="${masterApprovalBean.sendMail(checkerNotificationMailBuilder)}"></serviceTask>
+    <parallelGateway id="parallelgateway" name="Parallel Gateway"></parallelGateway>
+    <userTask id="ApprovalTaskForChecker" name="Create approval task" activiti:dueDate="${dateVariable}">
+      <documentation>Checker to verify whether the details provided for the new entity are complete or not.</documentation>
+      <extensionElements>
+        <activiti:taskListener event="create" expression="${bpmnTaskListener.processApproval(task,'Approved,Rejected,Send Back',assigneeAuthorityOrUserUri)}"></activiti:taskListener>
+      </extensionElements>
+    </userTask>
+    <boundaryEvent id="SendRemindermailToChecker" name="Timer for sending reminder mail to Checker" cancelActivity="false" attachedToRef="ApprovalTaskForChecker">
+      <timerEventDefinition>
+        <timeCycle>R2/PT1M</timeCycle>
+      </timerEventDefinition>
+    </boundaryEvent>
+    <exclusiveGateway id="exclusivegateway1" name="Exclusive Gateway"></exclusiveGateway>
+    <serviceTask id="SaveApprovedRecord" name="Save Approved Record" activiti:expression="${masterApprovalBean.saveRecord(processEntity,reviewerId)}"></serviceTask>
+    <serviceTask id="RemoveRejectedRecord" name="Remove Rejected Record" activiti:expression="${masterApprovalBean.removeRecord(processEntity,reviewerId)}"></serviceTask>
+    <serviceTask id="SendRejectionMailNotificationToMaker" name="Send Rejection Mail Notification To Maker" activiti:expression="${masterApprovalBean.sendMail(rejectionMailBuilder)}"></serviceTask>
+    <endEvent id="endevent1" name="End"></endEvent>
+    <parallelGateway id="parallelgateway1" name="Parallel Gateway"></parallelGateway>
+    <serviceTask id="SendMailtoMaker" name="Send mail notification to Maker" activiti:expression="${masterApprovalBean.sendMail(makerNotificationMailBuilder)}"></serviceTask>
+    <userTask id="ChangesSentBackToMaker" name="Reassign changes to Maker">
+      <documentation>Maker will have to resend the details including the incomplete ones.</documentation>
+      <extensionElements>
+        <activiti:taskListener event="create" expression="${bpmnTaskListener.processApproval(task,'Send for approval',assigneeAuthorityOrUserUri)}"></activiti:taskListener>
+      </extensionElements>
+    </userTask>
+    <inclusiveGateway id="inclusivegateway1" name="Inclusive Gateway"></inclusiveGateway>
+    <serviceTask id="sendApprovalMailNotificationToMaker" name="Send Approval Mail Notification To Maker" activiti:expression="${masterApprovalBean.sendMail(approvalMailBuilder)}"></serviceTask>
+    <serviceTask id="ProcessComplete" name="Process Complete" activiti:expression="${masterApprovalBean.processComplete(processEntity)}"></serviceTask>
+    <exclusiveGateway id="exclusivegateway2" name="Exclusive Gateway"></exclusiveGateway>
+    <serviceTask id="saveApprovedBP" name="Save Approved Business Partner" activiti:expression="${businessPartnerMasterApprovalBean.saveRecord(processEntity,reviewerId)}"></serviceTask>
+    <sequenceFlow id="sequenceflow1" name="" sourceRef="startevent" targetRef="inclusivegateway1"></sequenceFlow>
+    <sequenceFlow id="sequenceflow2" name="" sourceRef="parallelgateway" targetRef="sendMailNotificationToChecker"></sequenceFlow>
+    <sequenceFlow id="sequenceflow3" name="" sourceRef="parallelgateway" targetRef="ApprovalTaskForChecker"></sequenceFlow>
+    <sequenceFlow id="sequenceflow4" name="" sourceRef="SendRemindermailToChecker" targetRef="sendMailNotificationToChecker"></sequenceFlow>
+    <sequenceFlow id="sequenceflow5" name="" sourceRef="ApprovalTaskForChecker" targetRef="exclusivegateway1"></sequenceFlow>
+    <sequenceFlow id="sequenceflow13" name="" sourceRef="RemoveRejectedRecord" targetRef="SendRejectionMailNotificationToMaker"></sequenceFlow>
+    <sequenceFlow id="sequenceflow14" name="" sourceRef="SendRejectionMailNotificationToMaker" targetRef="ProcessComplete"></sequenceFlow>
+    <sequenceFlow id="sequenceflow16" name="" sourceRef="sendMailNotificationToChecker" targetRef="endevent1"></sequenceFlow>
+    <sequenceFlow id="sequenceflow6" name="" sourceRef="exclusivegateway1" targetRef="parallelgateway1">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${checkerDecision == "Send Back"}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="sequenceflow10" name="" sourceRef="parallelgateway1" targetRef="SendMailtoMaker"></sequenceFlow>
+    <sequenceFlow id="sequenceflow9" name="" sourceRef="parallelgateway1" targetRef="ChangesSentBackToMaker"></sequenceFlow>
+    <sequenceFlow id="sequenceflow15" name="" sourceRef="SendMailtoMaker" targetRef="endevent1"></sequenceFlow>
+    <sequenceFlow id="sequenceflow8" name="" sourceRef="exclusivegateway1" targetRef="exclusivegateway2">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${checkerDecision == "Approved"}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="sequenceflow7" name="" sourceRef="exclusivegateway1" targetRef="RemoveRejectedRecord">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${checkerDecision == "Rejected"}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow1" name="" sourceRef="inclusivegateway1" targetRef="parallelgateway"></sequenceFlow>
+    <sequenceFlow id="flow2" name="" sourceRef="ChangesSentBackToMaker" targetRef="inclusivegateway1"></sequenceFlow>
+    <sequenceFlow id="flow3" name="" sourceRef="sendApprovalMailNotificationToMaker" targetRef="ProcessComplete"></sequenceFlow>
+    <sequenceFlow id="flow4" name="" sourceRef="SaveApprovedRecord" targetRef="sendApprovalMailNotificationToMaker"></sequenceFlow>
+    <sequenceFlow id="flow5" name="" sourceRef="ProcessComplete" targetRef="endevent1"></sequenceFlow>
+    <sequenceFlow id="flow6" name="" sourceRef="exclusivegateway2" targetRef="saveApprovedBP">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${masterEntityClass == "com.nucleus.core.businesspartner.entity.BusinessPartner"}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow7" name="" sourceRef="exclusivegateway2" targetRef="SaveApprovedRecord">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${masterEntityClass != "com.nucleus.core.businesspartner.entity.BusinessPartner"}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow8" name="" sourceRef="saveApprovedBP" targetRef="sendApprovalMailNotificationToMaker"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_MasterApprovalProcess">
+    <bpmndi:BPMNPlane bpmnElement="MasterApprovalProcess" id="BPMNPlane_MasterApprovalProcess">
+      <bpmndi:BPMNShape bpmnElement="startevent" id="BPMNShape_startevent">
+        <omgdc:Bounds height="35" width="35" x="-50" y="102"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="sendMailNotificationToChecker" id="BPMNShape_sendMailNotificationToChecker">
+        <omgdc:Bounds height="71" width="105" x="193" y="10"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="parallelgateway" id="BPMNShape_parallelgateway">
+        <omgdc:Bounds height="40" width="40" x="90" y="101"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="ApprovalTaskForChecker" id="BPMNShape_ApprovalTaskForChecker">
+        <omgdc:Bounds height="55" width="105" x="193" y="171"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="SendRemindermailToChecker" id="BPMNShape_SendRemindermailToChecker">
+        <omgdc:Bounds height="30" width="30" x="231" y="157"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway1" id="BPMNShape_exclusivegateway1">
+        <omgdc:Bounds height="40" width="40" x="340" y="178"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="SaveApprovedRecord" id="BPMNShape_SaveApprovedRecord">
+        <omgdc:Bounds height="55" width="105" x="560" y="65"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="RemoveRejectedRecord" id="BPMNShape_RemoveRejectedRecord">
+        <omgdc:Bounds height="55" width="105" x="510" y="233"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="SendRejectionMailNotificationToMaker" id="BPMNShape_SendRejectionMailNotificationToMaker">
+        <omgdc:Bounds height="55" width="105" x="730" y="171"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent1" id="BPMNShape_endevent1">
+        <omgdc:Bounds height="35" width="35" x="980" y="181"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="parallelgateway1" id="BPMNShape_parallelgateway1">
+        <omgdc:Bounds height="40" width="40" x="340" y="250"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="SendMailtoMaker" id="BPMNShape_SendMailtoMaker">
+        <omgdc:Bounds height="55" width="105" x="395" y="320"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="ChangesSentBackToMaker" id="BPMNShape_ChangesSentBackToMaker">
+        <omgdc:Bounds height="85" width="105" x="210" y="290"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="inclusivegateway1" id="BPMNShape_inclusivegateway1">
+        <omgdc:Bounds height="40" width="40" x="20" y="100"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="sendApprovalMailNotificationToMaker" id="BPMNShape_sendApprovalMailNotificationToMaker">
+        <omgdc:Bounds height="55" width="105" x="740" y="66"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="ProcessComplete" id="BPMNShape_ProcessComplete">
+        <omgdc:Bounds height="55" width="105" x="865" y="118"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway2" id="BPMNShape_exclusivegateway2">
+        <omgdc:Bounds height="41" width="42" x="414" y="73"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="saveApprovedBP" id="BPMNShape_saveApprovedBP">
+        <omgdc:Bounds height="55" width="105" x="560" y="149"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="sequenceflow1" id="BPMNEdge_sequenceflow1">
+        <omgdi:waypoint x="-15" y="119"></omgdi:waypoint>
+        <omgdi:waypoint x="20" y="120"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sequenceflow2" id="BPMNEdge_sequenceflow2">
+        <omgdi:waypoint x="110" y="101"></omgdi:waypoint>
+        <omgdi:waypoint x="110" y="45"></omgdi:waypoint>
+        <omgdi:waypoint x="193" y="45"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sequenceflow3" id="BPMNEdge_sequenceflow3">
+        <omgdi:waypoint x="110" y="141"></omgdi:waypoint>
+        <omgdi:waypoint x="110" y="198"></omgdi:waypoint>
+        <omgdi:waypoint x="193" y="198"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sequenceflow4" id="BPMNEdge_sequenceflow4">
+        <omgdi:waypoint x="246" y="187"></omgdi:waypoint>
+        <omgdi:waypoint x="245" y="81"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sequenceflow5" id="BPMNEdge_sequenceflow5">
+        <omgdi:waypoint x="298" y="198"></omgdi:waypoint>
+        <omgdi:waypoint x="340" y="198"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sequenceflow13" id="BPMNEdge_sequenceflow13">
+        <omgdi:waypoint x="615" y="260"></omgdi:waypoint>
+        <omgdi:waypoint x="782" y="226"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sequenceflow14" id="BPMNEdge_sequenceflow14">
+        <omgdi:waypoint x="835" y="198"></omgdi:waypoint>
+        <omgdi:waypoint x="924" y="198"></omgdi:waypoint>
+        <omgdi:waypoint x="917" y="173"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sequenceflow16" id="BPMNEdge_sequenceflow16">
+        <omgdi:waypoint x="298" y="45"></omgdi:waypoint>
+        <omgdi:waypoint x="997" y="45"></omgdi:waypoint>
+        <omgdi:waypoint x="997" y="181"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sequenceflow6" id="BPMNEdge_sequenceflow6">
+        <omgdi:waypoint x="360" y="218"></omgdi:waypoint>
+        <omgdi:waypoint x="360" y="250"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sequenceflow10" id="BPMNEdge_sequenceflow10">
+        <omgdi:waypoint x="380" y="270"></omgdi:waypoint>
+        <omgdi:waypoint x="447" y="270"></omgdi:waypoint>
+        <omgdi:waypoint x="447" y="320"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sequenceflow9" id="BPMNEdge_sequenceflow9">
+        <omgdi:waypoint x="340" y="270"></omgdi:waypoint>
+        <omgdi:waypoint x="262" y="270"></omgdi:waypoint>
+        <omgdi:waypoint x="262" y="290"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sequenceflow15" id="BPMNEdge_sequenceflow15">
+        <omgdi:waypoint x="447" y="375"></omgdi:waypoint>
+        <omgdi:waypoint x="447" y="429"></omgdi:waypoint>
+        <omgdi:waypoint x="737" y="429"></omgdi:waypoint>
+        <omgdi:waypoint x="997" y="429"></omgdi:waypoint>
+        <omgdi:waypoint x="997" y="347"></omgdi:waypoint>
+        <omgdi:waypoint x="997" y="216"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sequenceflow8" id="BPMNEdge_sequenceflow8">
+        <omgdi:waypoint x="360" y="178"></omgdi:waypoint>
+        <omgdi:waypoint x="360" y="91"></omgdi:waypoint>
+        <omgdi:waypoint x="414" y="93"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sequenceflow7" id="BPMNEdge_sequenceflow7">
+        <omgdi:waypoint x="360" y="218"></omgdi:waypoint>
+        <omgdi:waypoint x="562" y="233"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+        <omgdi:waypoint x="60" y="120"></omgdi:waypoint>
+        <omgdi:waypoint x="90" y="121"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
+        <omgdi:waypoint x="262" y="375"></omgdi:waypoint>
+        <omgdi:waypoint x="260" y="439"></omgdi:waypoint>
+        <omgdi:waypoint x="114" y="439"></omgdi:waypoint>
+        <omgdi:waypoint x="39" y="439"></omgdi:waypoint>
+        <omgdi:waypoint x="39" y="347"></omgdi:waypoint>
+        <omgdi:waypoint x="40" y="140"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow3" id="BPMNEdge_flow3">
+        <omgdi:waypoint x="845" y="93"></omgdi:waypoint>
+        <omgdi:waypoint x="916" y="93"></omgdi:waypoint>
+        <omgdi:waypoint x="917" y="118"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow4" id="BPMNEdge_flow4">
+        <omgdi:waypoint x="665" y="92"></omgdi:waypoint>
+        <omgdi:waypoint x="740" y="93"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow5" id="BPMNEdge_flow5">
+        <omgdi:waypoint x="970" y="145"></omgdi:waypoint>
+        <omgdi:waypoint x="997" y="145"></omgdi:waypoint>
+        <omgdi:waypoint x="997" y="181"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow6" id="BPMNEdge_flow6">
+        <omgdi:waypoint x="435" y="114"></omgdi:waypoint>
+        <omgdi:waypoint x="434" y="176"></omgdi:waypoint>
+        <omgdi:waypoint x="560" y="176"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="14" width="100" x="10" y="0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow7" id="BPMNEdge_flow7">
+        <omgdi:waypoint x="456" y="93"></omgdi:waypoint>
+        <omgdi:waypoint x="560" y="92"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow8" id="BPMNEdge_flow8">
+        <omgdi:waypoint x="612" y="149"></omgdi:waypoint>
+        <omgdi:waypoint x="792" y="121"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

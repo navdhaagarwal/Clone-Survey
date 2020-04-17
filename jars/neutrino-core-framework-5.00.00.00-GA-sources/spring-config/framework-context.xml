@@ -1,0 +1,113 @@
+<?xml version='1.0' encoding='UTF-8'?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:util="http://www.springframework.org/schema/util" xmlns:jpa="http://www.springframework.org/schema/data/jpa"
+	xmlns:context="http://www.springframework.org/schema/context" xmlns:security="http://www.springframework.org/schema/security"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/context
+    http://www.springframework.org/schema/context/spring-context.xsd
+    http://www.springframework.org/schema/task 
+    http://www.springframework.org/schema/task/spring-task.xsd
+    http://www.springframework.org/schema/util
+    http://www.springframework.org/schema/util/spring-util.xsd
+	http://www.springframework.org/schema/security
+	http://www.springframework.org/schema/security/spring-security.xsd">
+
+	<context:component-scan base-package="com.nucleus">
+		<context:exclude-filter type="annotation"
+			expression="org.springframework.ws.server.endpoint.annotation.Endpoint" />
+		<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+	</context:component-scan>
+	<context:annotation-config />
+
+	<util:map id="tenantProperties">
+	  <entry key="tenantId" value="505" /> 
+	  <entry key="amountFormatI" value="##C##C##C##C##C##C##C##0D" /> 
+	  <entry key="amountFormatM" value="##C###C###C###C###C##0D" />
+	  <entry key="exceptionStackTraceRequired"  value="N" />
+	</util:map>
+
+	<!-- import context from neutrino-core-framework-integration -->
+	<import
+		resource="classpath:spring-config/core-framework-integration-context.xml" />
+		
+	<!-- import of subcontexts -->
+	<import resource="classpath*:spring-config/fileupload-beans.xml" />
+	<import resource="framework-initialization-context.xml" />
+	<import resource="framework-aspect-context.xml" />
+	<import resource="framework-cache-context.xml" />
+	<import resource="framework-services-context.xml" />
+	<import resource="framework-persistence-context.xml" />
+	<import resource="framework-process-context.xml" />
+	<import resource="framework-dbinitializer-context.xml" />
+	<import resource="framework-batch-context.xml" />
+	<import resource="framework-jmx-context.xml" />
+	<import resource="framework-couchdb-context.xml" />
+	<import resource="framework-scheduler-context.xml" />
+	<import resource = "framework-security-context.xml"/>
+	<import resource="classpath*:spring-config/communication-context.xml" />
+	<import resource="framework-aspect.xml" />
+	<import resource="framework-spring-integration-context.xml"/>
+	
+	<bean id="neutrinoRestTemplate" class = "org.springframework.web.client.RestTemplate">
+	</bean>
+	
+	
+	<bean id="antivirusScanService" class="${antivirus.impl.class}"></bean>
+	
+	<bean id="federatedOauthValidationService" 
+		class="${oauth.idp.service.class:com.nucleus.web.security.oauth.federated.CasFederatedTokenValidationServiceImpl}"/>
+	        
+	<bean id="licenseSecuritySercvice" class="com.nucleus.license.security.web.LicenseSecuritySercvice" >
+  		<property name="baseLicenseService" ref="licenseClientCacheService" />
+  		
+	</bean>
+	<bean id="sessionRepository" class="com.nucleus.security.core.session.NeutrinoMapSessionRepository">
+		<property name="defaultMaxInactiveInterval" value="${session.max.inactive.interval}" />
+	</bean>
+
+	<!-- ****This is the actual bean definition to be used, once Session Attribute Code clean up is done across module
+		 ****SECURITY namespacce also to be removed from the XML definition above
+
+		<bean id="springSessionRepositoryFilter" class="com.nucleus.security.core.session.NeutrinoSessionRepositoryFilter">
+			<constructor-arg ref="sessionRepository" />
+	</bean>-->
+
+	<!-- Currently, this is the temporary bean definitions, refer the above commented section for actual definition after code clean up -->
+	<!--**** Temp Bean Definition Starts -->
+	<bean id="springSessionRepositoryFilter" class="org.springframework.security.web.FilterChainProxy">
+		<constructor-arg>
+			<list>
+				<security:filter-chain filters="springSessionRepositoryCoreFilter,springSessionRepositoryPostFilter"
+									   pattern="/**" />
+			</list>
+		</constructor-arg>
+	</bean>
+
+	<bean id="springSessionRepositoryCoreFilter" class="com.nucleus.security.core.session.NeutrinoSessionRepositoryFilter">
+		<constructor-arg ref="sessionRepository" />
+	</bean>
+
+	<bean id="springSessionRepositoryPostFilter"
+		  class="com.nucleus.security.core.session.NeutrinoSessionRepositoryPostFilter">
+		<property name="redirectStrategy" ref="neutrinoRedirectStrategy"/>
+	</bean>
+	<!--**** Temp Bean Definition Ends -->
+
+	<!--<bean id="sessionAttributeStoreCachePopulator" name="sessionAttributeStoreCachePopulator"
+		  class="com.nucleus.security.core.session.SessionAttributeStoreCachePopulator"/>-->
+
+
+	<bean id="neutrinoSpringSessionListener" class="com.nucleus.security.core.session.NeutrinoSpringSessionListener">
+		<constructor-arg ref="sessionRepository" />
+		<!--<constructor-arg ref="sessionAttributeStoreCachePopulator" />-->
+	</bean>
+
+	<beans profile="neutrino-logging-auditing">
+		<import resource="neutrino-logging-context-aspect.xml" />
+	</beans>
+	
+
+</beans>

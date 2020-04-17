@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:task="http://www.springframework.org/schema/task"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/util
+      http://www.springframework.org/schema/util/spring-util.xsd
+    http://www.springframework.org/schema/task 
+    http://www.springframework.org/schema/task/spring-task.xsd">
+
+	<task:annotation-driven executor="neutrinoThreadPoolExecutor" />
+
+	<bean id="beanAccessHelper" class="com.nucleus.finnone.pro.base.utility.BeanAccessHelper">
+	</bean>
+	
+	<bean id="neutrinoTaskDecorator"
+		class="com.nucleus.threadpool.NeutrinoTaskMdcRetainingDecorator">
+	</bean>
+
+
+	<bean id="neutrinoThreadPoolExecutor"
+		class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+		<property name="corePoolSize" value="${framework.core.thread.pool.size}" />
+		<property name="maxPoolSize" value="${framework.max.thread.pool.size}" />
+		<property name="queueCapacity" value="${framework.thread.pool.queue.size}" />
+		<property name="keepAliveSeconds" value="${framework.thread.pool.keep.alive.seconds}" />
+		<property name="taskDecorator" ref="neutrinoTaskDecorator"/>
+	</bean>
+
+
+	<bean id="neutrinoAsyncTaskExecutor" class="org.springframework.core.task.SimpleAsyncTaskExecutor">
+		<property name="taskDecorator" ref="neutrinoTaskDecorator"/>
+	</bean>
+
+
+	<bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
+		<property name="host" value="${mail.smtp.host}" />
+		<property name="port" value="${mail.smtp.port}" />
+		<property name="javaMailProperties">
+			<props>
+				<!-- Use SMTP transport protocol -->
+				<!-- <prop key="mail.transport.protocol">${mail.transport.protocol}</prop> -->
+				<!-- Use SMTP-AUTH to authenticate to SMTP server -->
+				<!-- <prop key="mail.smtp.auth">${mail.smtp.auth}</prop> -->
+				<!-- Use TLS to encrypt communication with SMTP server -->
+				<!-- <prop key="mail.smtp.starttls.enable">${mail.smtp.starttls.enable}</prop> -->
+				<prop key="mail.debug">${mail.debug}</prop>
+			</props>
+		</property>
+		<!-- <property name="username" value="${mail.smtp.username}" /> -->
+		<!-- <property name="password" value="${mail.smtp.password}" /> -->
+	</bean>
+
+
+<bean id="velocityEngine" class="com.nucleus.velocity.util.VelocityEngineFactoryBean">
+       <property name="velocityProperties">
+		 <value>
+			 resource.loader=file,class
+			 file.resource.loader.class=org.apache.velocity.runtime.resource.loader.FileResourceLoader
+			 file.resource.loader.path=${template.root.path}
+			 file.resource.loader.cache=false
+			 class.resource.loader.class=org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader
+			 class.resource.loader.cache=true
+		 </value>
+	 </property>
+ </bean>
+
+	<bean id="eventBus" class="com.nucleus.event.EventBusImpl" />
+
+	<bean id="abstractEventProcessor" class="com.nucleus.event.AbstractEventProcessor"
+		abstract="true" />
+
+	<bean id="eventProcessor" class="${event.processor.class}" parent="abstractEventProcessor" />
+
+	<bean class="com.nucleus.makerchecker.MasterConfigurationLoader">
+		<property name="resourceLoader" ref="frameworkConfigResourceLoader" />
+	</bean>
+
+
+	<bean class="com.nucleus.core.event.NeutrinoEventMulticaster" id="applicationEventMulticaster">
+		<property name="syncEventMulticaster">
+			<bean
+				class="org.springframework.context.event.SimpleApplicationEventMulticaster">
+			</bean>
+		</property>
+		<property name="asyncEventMulticaster">
+			<bean
+				class="org.springframework.context.event.SimpleApplicationEventMulticaster">
+				<property name="taskExecutor" ref="neutrinoThreadPoolExecutor" />
+				<!-- <bean class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor"> 
+					</bean></property> -->
+			</bean>
+		</property>
+	</bean>
+
+
+	<bean id="frameworkMessageSource"
+		class="org.springframework.context.support.ResourceBundleMessageSource">
+		<property name="basenames">
+			<list>
+
+				<!-- files to be added via plug-in mechanism -->
+			</list>
+		</property>
+	</bean>
+
+	<!-- Abstract bean which allows plug in mechanism for event property file 
+		names to be defined later -->
+	<bean id="frameworkMessageSourcePluginBeanPostProcessor" class="com.nucleus.core.spring.PluginBeanFactoryPostProcessor"
+		abstract="true">
+		<property name="extensionBeanName" value="frameworkMessageSource" />
+		<property name="propertyName" value="basenames" />
+	</bean>
+
+	<bean id="entityApprovalPreProcessorResourceLoader"
+		class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+		<property name="locations">
+			<list>
+				<!-- files to be added via plug-in mechanish -->
+			</list>
+		</property>
+	</bean>
+
+	<bean id="frameworkEntityApprovalPreProcessorResourceLoader"
+		class="com.nucleus.core.spring.PluginBeanFactoryPostProcessor"
+		abstract="true">
+		<property name="extensionBeanName" value="entityApprovalPreProcessorResourceLoader" />
+		<property name="propertyName" value="locations" />
+	</bean>
+
+	<bean parent="frameworkEntityApprovalPreProcessorResourceLoader">
+		<property name="pluginBeanName" value="location" />
+
+	</bean>
+	<bean id="location" class="java.lang.String">
+		<constructor-arg
+			value="classpath*:framework-config/entity-approvalpreprocessor-config.properties" />
+	</bean>
+
+	<!-- basenames property value plugged in -->
+	<bean parent="frameworkMessageSourcePluginBeanPostProcessor">
+		<property name="pluginBeanName" value="coreFrameworkMessageSourcePluginProperty1" />
+	</bean>
+	<bean id="coreFrameworkMessageSourcePluginProperty1" class="java.lang.String">
+		<constructor-arg value="resource-bundles.finnone_event_messages" />
+	</bean>
+
+	<bean parent="frameworkMessageSourcePluginBeanPostProcessor">
+		<property name="pluginBeanName" value="coreFrameworkMessageSourcePluginProperty2" />
+	</bean>
+	<bean id="coreFrameworkMessageSourcePluginProperty2" class="java.lang.String">
+		<constructor-arg value="resource-bundles.finnone_mail_message" />
+	</bean>
+
+	<bean parent="frameworkMessageSourcePluginBeanPostProcessor">
+		<property name="pluginBeanName" value="coreFrameworkMessageSourcePluginProperty3" />
+	</bean>
+	<bean id="coreFrameworkMessageSourcePluginProperty3" class="java.lang.String">
+		<constructor-arg value="resource-bundles.messages" />
+	</bean>
+
+
+	<!-- will lookup the above 'coreFrameworkServiceLocator' bean by *TYPE* -->
+	<bean id="coreFrameworkServiceLocator"
+		class="org.springframework.beans.factory.config.ServiceLocatorFactoryBean">
+		<property name="serviceLocatorInterface" value="com.nucleus.core.FrameworkServiceLocator" />
+	</bean>
+
+	<!-- bean to bind all formatters at one place and these formatters will 
+		be available in all controllers -->
+	<bean id="conversionService"
+		class="org.springframework.format.support.FormattingConversionServiceFactoryBean">
+		<property name="formatters">
+			<set>
+				<bean class="com.nucleus.web.formatter.CalendarFormatter" />
+				<bean class="com.nucleus.web.formatter.DateTimeFormatter" />
+				<bean class="com.nucleus.web.formatter.DateFormatter" />
+				<bean id="moneyFormatter" class="com.nucleus.web.formatter.MoneyFormatter" />
+				<bean class="com.nucleus.web.formatter.BigDecimalFormatter" />
+				<bean class="com.nucleus.web.formatter.LongFormatter" />
+				<bean class="com.nucleus.web.formatter.LocalDateFormatter" />
+			</set>
+		</property>
+	</bean>
+
+	<bean class="${event.execution.service.implementation.classname}"
+		name="eventExecutionService" />
+
+
+	
+
+
+	<bean id="requestConfigBuilder" class="org.apache.http.client.config.RequestConfig"
+    factory-method="custom">
+        <property name="socketTimeout" value="${default.socket.timeout}" />
+    </bean>
+
+    <bean id="requestConfig" factory-bean="requestConfigBuilder" factory-method="build" />
+
+    <bean id="httpClientBuilder" class="org.apache.http.impl.client.HttpClientBuilder" factory-method="create">
+        <property name="defaultRequestConfig" ref="requestConfig" />
+         <property name="maxConnPerRoute" value="${default.max.connections.per.host}" />
+         <property name="maxConnTotal" value="${default.max.total.connections}" />
+    </bean>
+
+    <bean id="interceptedHttpClientBuilder" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+        <property name="targetObject" ref="httpClientBuilder" />
+        <property name="targetMethod" value="addInterceptorFirst"> </property>
+        <property name="arguments">
+            <list>
+                <bean class="org.springframework.ws.transport.http.HttpComponentsMessageSender.RemoveSoapHeadersInterceptor"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="httpClient" factory-bean="interceptedHttpClientBuilder" factory-method="build" />
+    
+    	
+	<bean id="jsonParser" class="org.json.simple.parser.JSONParser" />
+	<beans profile="app-server-cluster-provided">
+		<bean id="jmsConnectionFactory"
+			class="org.apache.activemq.ActiveMQConnectionFactory">
+			<property name="brokerURL" value="${jms.broker.url}" />
+			<property name="userName" value="${jms.broker.username}" />
+			<property name="password" value="${jms.broker.password}" />
+		</bean>
+	
+	
+		<bean id="hibernateSearchQueue"
+			class="org.apache.activemq.command.ActiveMQQueue">
+			<property name="physicalName"
+				value="${hibernate.search.default.worker.jms.queue}" />
+		</bean>
+	
+	
+	</beans>
+	
+</beans>

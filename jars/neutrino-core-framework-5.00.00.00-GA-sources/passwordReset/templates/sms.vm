@@ -1,0 +1,1 @@
+Dear Customer, ${otp} is your OTP, valid till next ${otp_validity_minites} Minutes. Please DO NOT disclose it to anyone.

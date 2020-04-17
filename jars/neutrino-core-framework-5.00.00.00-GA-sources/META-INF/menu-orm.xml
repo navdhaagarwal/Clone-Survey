@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-mappings version="2.0"
+                 xmlns="http://java.sun.com/xml/ns/persistence/orm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                 xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm http://java.sun.com/xml/ns/persistence/orm_2_0.xsd">
+
+
+    <named-query name="Menu.getTableCount">
+        <query>
+            SELECT count(id) from MenuEntity me
+        </query>
+    </named-query>
+
+    <named-query name="Menu.getValidDatabaseRecords">
+        <query>
+            SELECT me from MenuEntity me where me.product like :product and me.isActive=true
+        </query>
+    </named-query>
+
+    <named-query name="FrequentMenu.getFrequentMenuFromUser">
+        <query>
+            SELECT me from FrequentMenu me where me.freqMenuUser.id = :user and me.product =:product
+        </query>
+    </named-query>
+
+</entity-mappings>
+

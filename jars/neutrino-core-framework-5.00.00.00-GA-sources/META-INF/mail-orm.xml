@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-mappings version="2.0"
+	xmlns="http://java.sun.com/xml/ns/persistence/orm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm http://java.sun.com/xml/ns/persistence/orm_2_0.xsd">
+	<named-query name="UserMailNotification.notificationByuserAndStatusInbox">
+		<query>SELECT new Map(id as id,msgStatus as msgStatus,toUserUri as toUserUri,mailNotificationPriority as
+    	 		mailNotificationPriority,commonMailContent as commonMailContent) 
+    	 		FROM com.nucleus.core.notification.UserMailNotification AS umn
+    	  		WHERE umn.toUserUri =:userEntityId 
+    	 		AND (umn.entityLifeCycleData.snapshotRecord IS NULL OR umn.entityLifeCycleData.snapshotRecord = false) 
+    	  		AND umn.msgStatus IN :queryStatus ORDER BY umn.entityLifeCycleData.creationTimeStamp DESC
+        </query>
+	</named-query>
+	
+	<named-query name="UserMailNotification.countUserMailInbox">
+		<query>select count(*) from com.nucleus.core.notification.UserMailNotification umn
+    	  where umn.toUserUri LIKE :userEntityId AND (umn.entityLifeCycleData.snapshotRecord IS NULL OR umn.entityLifeCycleData.snapshotRecord = false) and umn.msgStatus IN :queryStatus
+        </query>
+	</named-query>
+	<named-query name="UserMailNotification.countUserMailInboxByStatus">
+		<query>select count(*) from com.nucleus.core.notification.UserMailNotification umn
+    	  where umn.toUserUri = :userEntityId AND (umn.entityLifeCycleData.snapshotRecord IS NULL OR umn.entityLifeCycleData.snapshotRecord = false) and umn.msgStatus = :queryStatus
+        </query>
+	</named-query>
+	
+	<named-query name="UserMailNotification.notificationByuserAndStatusInboxRecent">
+		<query>select new Map(id as id,msgStatus as msgStatus,toUserUri as toUserUri,mailNotificationPriority as
+    	 		mailNotificationPriority,commonMailContent as commonMailContent) from com.nucleus.core.notification.UserMailNotification umn
+    	  where umn.toUserUri = :userEntityId AND (umn.entityLifeCycleData.snapshotRecord IS NULL OR umn.entityLifeCycleData.snapshotRecord = false) and umn.msgStatus IN :queryStatus AND umn.entityLifeCycleData.creationTimeStamp >(select gumn.entityLifeCycleData.creationTimeStamp from UserMailNotification gumn where gumn.id = :lastMailId )
+          ORDER BY umn.entityLifeCycleData.creationTimeStamp DESC
+        </query>
+	</named-query>
+	
+	<named-query name="UserMailNotification.notificationByuserAndStatusOutbox">
+		<query>select new Map(id as id,msgStatus as msgStatus,toUserUri as toUserUri,mailNotificationPriority as mailNotificationPriority,commonMailContent as commonMailContent) 
+		from com.nucleus.core.notification.UserMailNotification umn 
+		where umn.commonMailContent.fromUserUri LIKE :userEntityId 
+		AND (umn.entityLifeCycleData.snapshotRecord IS NULL OR umn.entityLifeCycleData.snapshotRecord = false) 
+		and umn.msgStatus IN :queryStatus ORDER BY umn.entityLifeCycleData.creationTimeStamp DESC
+        </query>
+	</named-query>
+	
+	<named-query name="UserMailNotification.countUserMailOutbox">
+		<query>select count(*) from com.nucleus.core.notification.UserMailNotification umn where umn.commonMailContent.fromUserUri LIKE :userEntityId AND (umn.entityLifeCycleData.snapshotRecord IS NULL OR umn.entityLifeCycleData.snapshotRecord = false) and umn.msgStatus IN :queryStatus
+        </query>
+	</named-query>
+
+
+	<named-query name="UserMailNotification.notificationByuserAndStatusTrash">
+		<query>select new Map(id as id,msgStatus as msgStatus,toUserUri as toUserUri,mailNotificationPriority as mailNotificationPriority,commonMailContent as commonMailContent) from com.nucleus.core.notification.UserMailNotification umn where umn.commonMailContent.fromUserUri LIKE :userEntityId and umn.msgStatus in :msgStatusList1 or (umn.toUserUri LIKE :userEntityId and umn.msgStatus in :msgStatusList2) 
+		or(umn.msgStatus like :msgStatus_deleted_from_inbox_outbox and((umn.toUserUri LIKE :userEntityId and umn.commonMailContent.fromUserUri NOT LIKE :userEntityId) or (umn.toUserUri NOT LIKE :userEntityId and umn.commonMailContent.fromUserUri LIKE :userEntityId))) or (umn.msgStatus like :msgStatus_deleted_from_inbox_outbox and(umn.toUserUri LIKE :userEntityId and umn.commonMailContent.fromUserUri  LIKE :userEntityId))
+		ORDER BY umn.entityLifeCycleData.creationTimeStamp DESC
+        </query>
+	</named-query>
+	
+	<named-query name="UserMailNotification.countUserMailTrash">
+		<query>select count(*) from com.nucleus.core.notification.UserMailNotification umn where umn.commonMailContent.fromUserUri LIKE :userEntityId and umn.msgStatus in :msgStatusList1 or (umn.toUserUri LIKE :userEntityId and umn.msgStatus in :msgStatusList2) 
+		or(umn.msgStatus like :msgStatus_deleted_from_inbox_outbox and((umn.toUserUri LIKE :userEntityId and umn.commonMailContent.fromUserUri NOT LIKE :userEntityId) or (umn.toUserUri NOT LIKE :userEntityId and umn.commonMailContent.fromUserUri LIKE :userEntityId))) or (umn.msgStatus like :msgStatus_deleted_from_inbox_outbox and(umn.toUserUri LIKE :userEntityId and umn.commonMailContent.fromUserUri  LIKE :userEntityId))
+        </query>
+	</named-query>
+	
+	<named-query name="UserEMailVerification.getEmailInfoByEmailAddress">
+		<query>
+		Select r From EMailInfo r where r.emailAddress = :emailAddress
+        </query>
+	</named-query>
+	<named-query name="UserEMailVerification.getEmailInfoByEmailId">
+		<query>
+		Select r From EMailInfo r where r.id = :emailId
+        </query>
+	</named-query>
+	<named-query name="UserEMailVerification.getEmailAuthenticationDetails">
+		<query>
+		Select e From EmailAuthenticationToken e where e.tokenId = :tokenId
+        </query>
+	</named-query>
+		<named-query name="UserOTPVerification.getOTPTokenDetails">
+		<query>
+		Select otp From OTPToken otp where otp.tokenId = :tokenId
+        </query>
+	</named-query>
+
+	<named-query name="UserOTPVerification.getPasswordResetOTPByUserId">
+	<query>
+		Select otp From PasswordResetOTPToken otp where otp.userId = :userId
+	</query>
+	</named-query>
+	
+
+	<named-query name="UserMailNotification.GET_INBOX_NOTIFICATIONS">
+		<query> 
+				SELECT new Map(id as id,msgStatus as msgStatus,toUserUri as toUserUri,mailNotificationPriority as
+    	 		mailNotificationPriority,commonMailContent as commonMailContent) 
+    	 		FROM com.nucleus.core.notification.UserMailNotification AS umn 
+    	  		WHERE umn.toUserUri =:userEntityId  
+    	 		AND (umn.entityLifeCycleData.snapshotRecord IS NULL OR umn.entityLifeCycleData.snapshotRecord = false) 
+    	  		AND umn.msgStatus IN :queryStatus ORDER BY umn.entityLifeCycleData.creationTimeStamp DESC
+        </query>
+	</named-query>
+
+	<named-query name="UserMailNotification.GET_OUTBOX_NOTIFICATIONS">
+		<query>
+			SELECT new Map(id as id,msgStatus as msgStatus,toUserUri as toUserUri,
+			mailNotificationPriority as mailNotificationPriority,
+			commonMailContent as commonMailContent)  
+			FROM UserMailNotification AS umn 
+			WHERE umn.commonMailContent.fromUserUri =:userEntityId 
+			AND (umn.entityLifeCycleData.snapshotRecord IS NULL OR umn.entityLifeCycleData.snapshotRecord = false) 
+			AND umn.msgStatus IN :queryStatus ORDER BY umn.entityLifeCycleData.creationTimeStamp DESC
+        </query>
+	</named-query>
+	
+	
+	<named-query name="UserMailNotification.GET_TRASH_NOTIFICATIONS">
+		<query>
+			SELECT new Map(id as id,msgStatus as msgStatus,toUserUri as toUserUri,mailNotificationPriority as mailNotificationPriority,
+			commonMailContent as commonMailContent)  
+			FROM UserMailNotification AS umn 
+			WHERE (umn.commonMailContent.fromUserUri =:userEntityId OR umn.toUserUri =:userEntityId)		
+			AND umn.msgStatus IN :queryStatus ORDER BY umn.entityLifeCycleData.creationTimeStamp DESC				
+        </query>
+	</named-query>
+
+
+
+
+	<named-query name="UserMailNotification.GET_INBOX_SUCCESSIVE_NOTIFICATIONS_BY_CURRENT_NOTIFICATION_TIMESTAMP">
+		<query>
+			FROM com.nucleus.core.notification.UserMailNotification umn
+    	  	WHERE umn.toUserUri = :userEntityId 
+    	  	AND (umn.entityLifeCycleData.snapshotRecord IS NULL OR umn.entityLifeCycleData.snapshotRecord = false) 
+    	  	AND umn.msgStatus IN :queryStatus  
+    	  	AND umn.entityLifeCycleData.creationTimeStamp >= (SELECT gumn.entityLifeCycleData.creationTimeStamp from UserMailNotification gumn where gumn.id = :notificationId) 
+	        ORDER BY umn.entityLifeCycleData.creationTimeStamp DESC 
+        </query>
+	</named-query>
+	
+	<named-query name="UserMailNotification.GET_OUTBOX_SUCCESSIVE_NOTIFICATIONS_BY_CURRENT_NOTIFICATION_TIMESTAMP">
+		<query>
+			 FROM UserMailNotification AS umn 
+	 		LEFT JOIN FETCH  umn.commonMailContent AS cmc
+			WHERE cmc.fromUserUri =:userEntityId 
+	 		AND (umn.entityLifeCycleData.snapshotRecord IS NULL OR umn.entityLifeCycleData.snapshotRecord = false)
+	 		AND umn.msgStatus IN :queryStatus 	 	
+    	  	AND umn.entityLifeCycleData.creationTimeStamp >= (SELECT gumn.entityLifeCycleData.creationTimeStamp from UserMailNotification gumn where gumn.id = :notificationId) 
+	        ORDER BY umn.entityLifeCycleData.creationTimeStamp DESC 
+        </query>
+	</named-query>
+	<named-query name="UserMailNotification.GET_TRASH_SUCCESSIVE_NOTIFICATIONS_BY_CURRENT_NOTIFICATION_TIMESTAMP">
+		<query>
+			FROM com.nucleus.core.notification.UserMailNotification umn
+    	  	WHERE umn.toUserUri = :userEntityId 
+    	  	AND (umn.entityLifeCycleData.snapshotRecord IS NULL OR umn.entityLifeCycleData.snapshotRecord = false) 
+    	  	AND umn.msgStatus IN :queryStatus  
+    	  	AND umn.entityLifeCycleData.creationTimeStamp >= (SELECT gumn.entityLifeCycleData.creationTimeStamp from UserMailNotification gumn where gumn.id = :notificationId) 
+	        ORDER BY umn.entityLifeCycleData.creationTimeStamp DESC 
+        </query>
+	</named-query>
+	
+	<named-query name="UserMailNotification.GET_INBOX_PREDECESSOR_NOTIFICATIONS_BY_CURRENT_NOTIFICATION_TIMESTAMP">
+		<query>
+			<![CDATA[
+				FROM com.nucleus.core.notification.UserMailNotification umn
+    	  		WHERE umn.toUserUri = :userEntityId 
+    	  		AND (umn.entityLifeCycleData.snapshotRecord IS NULL OR umn.entityLifeCycleData.snapshotRecord = false) 
+    	  		AND umn.msgStatus IN :queryStatus AND umn.entityLifeCycleData.creationTimeStamp <= (SELECT gumn.entityLifeCycleData.creationTimeStamp from UserMailNotification gumn where gumn.id = :notificationId) 
+	         	ORDER BY umn.entityLifeCycleData.creationTimeStamp DESC
+			]]>
+        </query>
+	</named-query>
+	<named-query name="UserMailNotification.GET_OUTBOX_PREDECESSOR_NOTIFICATIONS_BY_CURRENT_NOTIFICATION_TIMESTAMP">
+		<query>
+			<![CDATA[
+				FROM UserMailNotification AS umn 
+	 			LEFT JOIN FETCH  umn.commonMailContent AS cmc
+				WHERE cmc.fromUserUri =:userEntityId 
+	 			AND (umn.entityLifeCycleData.snapshotRecord IS NULL OR umn.entityLifeCycleData.snapshotRecord = false)
+	 			AND umn.msgStatus IN :queryStatus   
+    	  		AND umn.entityLifeCycleData.creationTimeStamp <= (SELECT gumn.entityLifeCycleData.creationTimeStamp from UserMailNotification gumn where gumn.id = :notificationId) 
+	         	ORDER BY umn.entityLifeCycleData.creationTimeStamp DESC
+			]]>
+        </query>
+	</named-query>
+	<named-query name="UserMailNotification.GET_TRASH_PREDECESSOR_NOTIFICATIONS_BY_CURRENT_NOTIFICATION_TIMESTAMP">
+		<query>
+			<![CDATA[
+				FROM com.nucleus.core.notification.UserMailNotification umn
+    	  		WHERE umn.toUserUri = :userEntityId 
+    	  		AND (umn.entityLifeCycleData.snapshotRecord IS NULL OR umn.entityLifeCycleData.snapshotRecord = false) 
+    	  		AND umn.msgStatus IN :queryStatus AND umn.entityLifeCycleData.creationTimeStamp <= (SELECT gumn.entityLifeCycleData.creationTimeStamp from UserMailNotification gumn where gumn.id = :notificationId) 
+	         	ORDER BY umn.entityLifeCycleData.creationTimeStamp DESC
+			]]>
+        </query>
+	</named-query>
+</entity-mappings>

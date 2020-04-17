@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-mappings version="2.0"
+	xmlns="http://java.sun.com/xml/ns/persistence/orm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm http://java.sun.com/xml/ns/persistence/orm_2_0.xsd">
+
+	<!-- NAMED QUERIES for money operations -->
+
+	<named-query name="Currency.getEffectiveRate">
+		<query>
+			 select effectiveRate FROM Currency currency join currency.conversionRateList effectiveRate WHERE currency.id = :currencyId AND  effectiveRate.effectiveFrom &lt;= :today ORDER BY effectiveRate.effectiveFrom DESC
+		</query>
+	</named-query>
+
+	<named-query name="Currency.findByIsoCode">
+		<query>
+			 FROM Currency currency where currency.isoCode = :isoCode AND currency.masterLifeCycleData.approvalStatus in (:approvalStatus) AND (currency.entityLifeCycleData.snapshotRecord IS NULL OR currency.entityLifeCycleData.snapshotRecord = false)
+        </query>
+	</named-query>
+	<named-query name="Currency.findAllForCache">
+		<query>
+			 select currency FROM Currency currency join fetch currency.conversionRateList effectiveRate Where currency.masterLifeCycleData.approvalStatus in (:approvalStatus) AND (currency.entityLifeCycleData.snapshotRecord IS NULL OR currency.entityLifeCycleData.snapshotRecord = false)
+        </query>
+	</named-query>
+	<named-query name="Currency.findAllIdForCache">
+		<query>
+			 select currency.id FROM Currency currency Where currency.masterLifeCycleData.approvalStatus in (:approvalStatus) AND (currency.entityLifeCycleData.snapshotRecord IS NULL OR currency.entityLifeCycleData.snapshotRecord = false)
+        </query>
+	</named-query>
+	<named-query name="Currency.findBaseCurrencyIdForCache">
+		<query>
+			 select currency FROM Currency currency join fetch currency.conversionRateList effectiveRate Where currency.masterLifeCycleData.approvalStatus in (:approvalStatus) AND (currency.isBaseCurrency = true) AND (currency.entityLifeCycleData.snapshotRecord IS NULL OR currency.entityLifeCycleData.snapshotRecord = false)
+        </query>
+	</named-query>
+	
+	<named-query name="Currency.findCurrencyById">
+		<query>
+			 select currency FROM Currency currency join fetch currency.conversionRateList effectiveRate Where currency.masterLifeCycleData.approvalStatus in (:approvalStatus) AND (currency.entityLifeCycleData.snapshotRecord IS NULL OR currency.entityLifeCycleData.snapshotRecord = false) AND currency.id = :currencyId
+        </query>
+	</named-query>
+
+	<named-query name="Currency.findAllApprovedCurrencies">
+		<query>
+			 FROM Currency currency join fetch currency.conversionRateList effectiveRate where currency.masterLifeCycleData.approvalStatus IN :statusList AND (currency.entityLifeCycleData.snapshotRecord IS NULL OR currency.entityLifeCycleData.snapshotRecord = false)
+        </query>
+	</named-query>
+	
+	<named-query name="Currency.findAllApprovedActiveCurrencies">
+		<query>
+			 FROM Currency currency where currency.masterLifeCycleData.approvalStatus IN :statusList AND (currency.entityLifeCycleData.snapshotRecord IS NULL OR currency.entityLifeCycleData.snapshotRecord = false) AND (currency.activeFlag = true)
+        </query>
+	</named-query>
+	<named-query name="Currency.getConversionRateBasedOnEffectiveDate">
+		<query>
+			select convRate FROM Currency currency join currency.conversionRateList convRate where convRate.effectiveFrom = (select max(conversionRate.effectiveFrom) from Currency curr1  join curr1.conversionRateList conversionRate where conversionRate.effectiveFrom &lt;= :effectiveFromDate and curr1.id = :currencyId) and  currency.id = :currencyId
+		</query>
+	</named-query>
+	
+</entity-mappings>

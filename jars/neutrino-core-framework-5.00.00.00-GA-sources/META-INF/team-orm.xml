@@ -1,0 +1,381 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-mappings version="2.0"
+	xmlns="http://java.sun.com/xml/ns/persistence/orm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm http://java.sun.com/xml/ns/persistence/orm_2_0.xsd">
+
+	<!-- NAMED QUERIES for generic operations -->
+
+	<named-query name="Team.getAllTeams">
+		<query>
+          SELECT t FROM Team t where t.masterLifeCycleData.approvalStatus in (0,3,4,6) and (t.entityLifeCycleData.snapshotRecord IS NULL OR t.entityLifeCycleData.snapshotRecord = false) and t.activeFlag = true
+		</query>
+	</named-query>
+
+
+	<named-query name="Team.getTeamByTeamName">
+		<query>
+          SELECT t FROM Team t where t.name=:paramTeamName AND t.masterLifeCycleData.approvalStatus IN (0,3,4,6) and (t.entityLifeCycleData.snapshotRecord IS NULL OR t.entityLifeCycleData.snapshotRecord = false) and t.activeFlag = true
+		</query>
+	</named-query>
+
+	<named-query name="Team.getTeamsOfThisUser">
+		<query>
+          SELECT t FROM Team t where t.name=:paramTeamName AND t.masterLifeCycleData.approvalStatus IN (0,3,4,6) and (t.entityLifeCycleData.snapshotRecord IS NULL OR t.entityLifeCycleData.snapshotRecord = false) and t.activeFlag = true
+		</query>
+	</named-query>
+	<named-query name="Team.fetchTeamUsernamesForTeamId">
+		<query>
+          Select u.username FROM Team t inner join t.users u where t.id = :teamId and (u.masterLifeCycleData.approvalStatus in (:approvalStatusList)) and u.userStatus = 0 AND t.masterLifeCycleData.approvalStatus IN (0,3,4,6) and (t.entityLifeCycleData.snapshotRecord IS NULL OR t.entityLifeCycleData.snapshotRecord = false) and t.activeFlag = true
+		</query>
+	</named-query>
+	<named-query name="Team.getTeamIdsLeadedByThisUsername">
+		<query>
+		  SELECT DISTINCT(t.id) FROM Team t where upper(t.teamLead.username) = upper(:userName) and (t.teamLead.masterLifeCycleData.approvalStatus in (:approvalStatusList)) AND t.masterLifeCycleData.approvalStatus IN (0,3,4,6) and (t.entityLifeCycleData.snapshotRecord IS NULL OR t.entityLifeCycleData.snapshotRecord = false) and t.activeFlag = true
+		</query>
+	</named-query>
+	
+	<named-query name="Team.fetchTeamUsersIdForTeamIdList">
+		<query>
+          Select DISTINCT(user.id) FROM Team t inner join t.users user where t.id IN :teamIdList and (user.masterLifeCycleData.approvalStatus in (:approvalStatusList))  and user.userStatus = 0 AND t.masterLifeCycleData.approvalStatus IN (0,3,4,6) and (t.entityLifeCycleData.snapshotRecord IS NULL OR t.entityLifeCycleData.snapshotRecord = false) and t.activeFlag = true
+		</query>
+	</named-query>
+
+	<named-query name="Team.getTeam">
+		<query>
+          FROM Team t where t.name = :teamName and t.masterLifeCycleData.approvalStatus IN (0,3,4,6) and (t.entityLifeCycleData.snapshotRecord IS NULL OR t.entityLifeCycleData.snapshotRecord = false) and t.activeFlag = true
+		</query>
+	</named-query>
+
+	<named-query name="Team.getAllTeamByTeamName">
+		<query>
+			FROM Team t where t.name = :teamName and t.masterLifeCycleData.approvalStatus IN (0,3,4,6) and (t.entityLifeCycleData.snapshotRecord IS NULL OR t.entityLifeCycleData.snapshotRecord = false) and t.activeFlag = true
+		</query>
+	</named-query>
+
+	<named-query name="Team.getTeamId">
+		<query>
+          Select t.id FROM Team t where t.name = :teamName AND t.masterLifeCycleData.approvalStatus IN (0,3,4,6) and (t.entityLifeCycleData.snapshotRecord IS NULL OR t.entityLifeCycleData.snapshotRecord = false) and t.activeFlag = true
+		</query>
+	</named-query>
+
+	<named-query name="Team.fetchTeamNameForTeamId">
+		<query>
+          Select t.name FROM Team t where t.id = :teamId AND t.masterLifeCycleData.approvalStatus IN (0,3,4,6) and (t.entityLifeCycleData.snapshotRecord IS NULL OR t.entityLifeCycleData.snapshotRecord = false) and t.activeFlag = true
+		</query>
+	</named-query>
+
+	<named-query name="Team.fetchTeamUsersForTeamId">
+		<query>
+          Select tu FROM Team t 
+          inner join t.users tu 
+          where t.id = :teamId and tu.userStatus = 0 and (tu.masterLifeCycleData.approvalStatus in (:approvalStatusList)) AND t.masterLifeCycleData.approvalStatus IN (0,3,4,6) and (t.entityLifeCycleData.snapshotRecord IS NULL OR t.entityLifeCycleData.snapshotRecord = false) and t.activeFlag = true
+		</query>
+	</named-query>
+	
+	<named-query name="Team.fetchTeamUserIdsForTeamId">
+		<query>
+          Select tu.id FROM Team t 
+          inner join t.users tu 
+          where t.id = :teamId  and tu.userStatus = 0 and (tu.masterLifeCycleData.approvalStatus in (:approvalStatusList)) AND t.masterLifeCycleData.approvalStatus IN (0,3,4,6) and (t.entityLifeCycleData.snapshotRecord IS NULL OR t.entityLifeCycleData.snapshotRecord = false) and t.activeFlag = true
+		</query>
+	</named-query>
+	
+	<named-query name="Team.getAllUsersByTeamAndUserStatus">
+		<query>
+          SELECT u FROM Team t 
+          INNER JOIN t.users u 
+          WHERE t.id = :teamId AND (u.masterLifeCycleData.approvalStatus in (:approvalStatusList)) AND u.userStatus IN(:userStatusList) AND t.masterLifeCycleData.approvalStatus IN (0,3,4,6) and (t.entityLifeCycleData.snapshotRecord IS NULL OR t.entityLifeCycleData.snapshotRecord = false) and t.activeFlag = true
+		</query>
+	</named-query>
+	
+	<named-query name="Team.fetchTeamUsersForTeamIdList">
+		<query>
+          Select tu FROM Team t 
+          inner join t.users tu 
+          where t.id IN :teamIdList and tu.userStatus = 0 and (tu.masterLifeCycleData.approvalStatus in (:approvalStatusList)) AND t.masterLifeCycleData.approvalStatus IN (0,3,4,6) and (t.entityLifeCycleData.snapshotRecord IS NULL OR t.entityLifeCycleData.snapshotRecord = false) and t.activeFlag = true
+		</query>
+	</named-query>
+
+	<named-query name="Team.getTeamBranchCalendar">
+		<query>
+          Select t.teamBranch.branchCalendar FROM Team t where t.id = :teamId
+        </query>
+	</named-query>
+
+	<named-query name="Team.getTeamByUserId">
+		<query>
+		  
+          Select t FROM Team t inner join t.users u WHERE u.id = :userId  AND t.masterLifeCycleData.approvalStatus IN (0,3,4,6) and (t.entityLifeCycleData.snapshotRecord IS NULL OR t.entityLifeCycleData.snapshotRecord = false) and t.activeFlag = true
+		</query>
+	</named-query>
+
+	<named-query name="Team.getTeamIdByUserId">
+		<query>
+		  
+          Select t.id FROM Team t inner join t.users u WHERE u.id = :userId AND t.masterLifeCycleData.approvalStatus IN (0,3,4,6) and (t.entityLifeCycleData.snapshotRecord IS NULL OR t.entityLifeCycleData.snapshotRecord = false) and t.activeFlag = true
+		</query>
+	</named-query>
+
+	<named-query name="Team.getAllTeamIdByUserId">
+		<query>
+			Select t.id FROM Team t inner join t.users u WHERE u.id = :userId AND (t.entityLifeCycleData.snapshotRecord IS NULL OR t.entityLifeCycleData.snapshotRecord = false)
+		</query>
+	</named-query>
+
+	<named-query name="Team.getTheTeamsNotOfThisUser">
+		<query>
+          Select t FROM Team t inner join t.users u WHERE u.id != :userId and (u.masterLifeCycleData.approvalStatus in (0,3)) AND t.masterLifeCycleData.approvalStatus IN (0,3,4,6) and (t.entityLifeCycleData.snapshotRecord IS NULL OR t.entityLifeCycleData.snapshotRecord = false) and t.activeFlag = true
+		</query>
+	</named-query>
+
+	<named-query name="Team.getLeaderOfNumberOfTeams">
+		<query>
+		  SELECT COUNT(*) FROM Team t where t.teamLead.id = :userId and t.masterLifeCycleData.approvalStatus IN (0,3,4,6) and (t.entityLifeCycleData.snapshotRecord IS NULL OR t.entityLifeCycleData.snapshotRecord = false) and t.activeFlag = true
+		</query>
+	</named-query>
+
+	<named-query name="Team.getNoOfTeamsRepresentedBy">
+		<query>
+		  SELECT COUNT(*) FROM Team t inner join t.users u WHERE u.id = :userId and t.masterLifeCycleData.approvalStatus IN (0,3,4,6) and (t.entityLifeCycleData.snapshotRecord IS NULL OR t.entityLifeCycleData.snapshotRecord = false) and t.activeFlag = true
+		</query>
+	</named-query>
+
+	<named-query name="Team.getTeamsLeadedByThisUser">
+		<query>
+		  SELECT t FROM Team t where t.teamLead.id = :userId and t.masterLifeCycleData.approvalStatus in (0,3,4,6) and (t.entityLifeCycleData.snapshotRecord IS NULL OR t.entityLifeCycleData.snapshotRecord = false) and t.activeFlag = true
+		</query>
+	</named-query>
+
+
+	<named-query name="Team.getTeamsLeadedByUserIdAndActiveFlag">
+		<query>
+		  SELECT t FROM Team t where t.teamLead.id = :userId AND t.teamLead.masterLifeCycleData.approvalStatus in (:approvalStatusList) AND activeFlag=:activeFlag and t.masterLifeCycleData.approvalStatus in (0,3,4,6)
+        </query>
+	</named-query>
+
+
+	
+
+	<named-query name="Team.fetchTeamBranchNameForTeamId">
+		<query>
+		  SELECT t.teamBranch.name FROM Team t where t.id = :teamId
+        </query>
+	</named-query>
+
+	<named-query name="Team.fetchTeamLeadForTeamId">
+		<query>
+		  SELECT t.teamLead FROM Team t where t.id = :teamId
+        </query>
+	</named-query>
+
+	<named-query name="Team.fetchAllTeamLead">
+		<query>
+		  SELECT DISTINCT(t.teamLead) FROM Team t where t.teamLead.masterLifeCycleData.approvalStatus in (:approvalStatusList) and t.masterLifeCycleData.approvalStatus IN (0,3,4,6) and (t.entityLifeCycleData.snapshotRecord IS NULL OR t.entityLifeCycleData.snapshotRecord = false) and t.activeFlag = true
+		</query>
+	</named-query>
+
+	<named-query name="Team.getTeamsLeadedByThisUserByUserInfo">
+		<query>
+		  SELECT t FROM Team t where t.teamLead.id = :userId AND t.teamBranch.id = :branchId and t.masterLifeCycleData.approvalStatus IN (0,3,4,6) and (t.entityLifeCycleData.snapshotRecord IS NULL OR t.entityLifeCycleData.snapshotRecord = false) and t.activeFlag = true
+		</query>
+	</named-query>
+
+
+	<named-query name="Team.getTeamsOfUserInLoggedInBranch">
+		<query>
+		  
+          Select t FROM Team t inner join t.users u WHERE u.id = :userId AND t.teamBranch.id = :branchId and t.masterLifeCycleData.approvalStatus IN (0,3,4,6) and (t.entityLifeCycleData.snapshotRecord IS NULL OR t.entityLifeCycleData.snapshotRecord = false) and t.activeFlag = true
+		</query>
+	</named-query>
+
+	<named-query name="Team.getTeamsIdOfUserInLoggedInBranch">
+		<query>
+		  
+          Select t.id FROM Team t inner join t.users u WHERE u.id = :userId AND t.teamBranch.id = :branchId and t.masterLifeCycleData.approvalStatus IN (0,3,4,6) and (t.entityLifeCycleData.snapshotRecord IS NULL OR t.entityLifeCycleData.snapshotRecord = false) and t.activeFlag = true
+		</query>
+	</named-query>
+	
+	<named-query name="Team.getTeamsIdOfUserWithoutLoggedInBranch">
+		<query>
+		  
+          Select t.id FROM Team t inner join t.users u WHERE u.id = :userId and t.masterLifeCycleData.approvalStatus IN (0,3,4,6) and (t.entityLifeCycleData.snapshotRecord IS NULL OR t.entityLifeCycleData.snapshotRecord = false) and t.activeFlag = true
+		</query>
+	</named-query>
+
+	<named-query name="Team.getAllTeamsOfLoggedInBranchOfThisUser">
+		<query>
+		  
+          Select t FROM Team t WHERE t.teamBranch.id = :branchId and t.masterLifeCycleData.approvalStatus IN (0,3,4,6) and (t.entityLifeCycleData.snapshotRecord IS NULL OR t.entityLifeCycleData.snapshotRecord = false) and t.activeFlag = true
+		</query>
+	</named-query>
+	
+	<named-query name="Team.getAllTeamsOfThisBranch">
+		<query>
+		  
+          Select t FROM Team t WHERE t.teamBranch.id = :branchId and t.masterLifeCycleData.approvalStatus in (:approvalStatusList) and (t.entityLifeCycleData.snapshotRecord IS NULL OR t.entityLifeCycleData.snapshotRecord = false) and t.activeFlag = true
+		</query>
+	</named-query>
+
+
+	<!-- For Performance T -->
+	
+	<named-query name="Team.getTeamIdsLeadedByThisUserByUserInfo">
+		<query>
+		  SELECT DISTINCT(t.id) FROM Team t where t.teamLead.id = :userId AND t.teamBranch.id = :branchId and t.masterLifeCycleData.approvalStatus in (0,3,4,6) and (t.entityLifeCycleData.snapshotRecord IS NULL OR t.entityLifeCycleData.snapshotRecord = false) and t.activeFlag = true
+		</query>
+	</named-query>
+
+<named-query name="Team.getTeamIdsLeadOfThisUser">
+		<query>
+		  Select t.teamLead.id FROM Team t inner join t.users u WHERE u.id = :userId and t.masterLifeCycleData.approvalStatus in (0,3,4,6) and (t.entityLifeCycleData.snapshotRecord IS NULL OR t.entityLifeCycleData.snapshotRecord = false) and t.activeFlag = true
+        </query>
+	</named-query>
+
+	<named-query name="Team.getTeamIdsOfUserInLoggedInBranch">
+		<query>
+		  
+          Select DISTINCT(t.id) FROM Team t inner join t.users u WHERE u.id = :userId AND t.teamBranch.id = :branchId and t.masterLifeCycleData.approvalStatus in (0,3,4,6) and (t.entityLifeCycleData.snapshotRecord IS NULL OR t.entityLifeCycleData.snapshotRecord = false) and t.activeFlag = true
+        </query>
+	</named-query>
+	<named-query name="Team.getTeamIdsLeadedByThisUser">
+		<query>
+		  SELECT DISTINCT(t.id) FROM Team t where t.teamLead.id = :userId and t.masterLifeCycleData.approvalStatus in (:approvalStatusList) and (t.entityLifeCycleData.snapshotRecord IS NULL OR t.entityLifeCycleData.snapshotRecord = false) and t.activeFlag = true
+        </query>
+	</named-query>
+	<named-query name="Team.fetchTeamLeadIdForTeamId">
+		<query>
+		  SELECT DISTINCT(t.teamLead.id) FROM Team t where t.id = :teamId
+        </query>
+	</named-query>
+
+	<named-query name="Team.getAllTeamIdsOfLoggedInBranchOfThisUser">
+		<query>
+
+          Select DISTINCT(t.id) FROM Team t WHERE t.teamBranch.id = :branchId and t.masterLifeCycleData.approvalStatus in (0,3,4,6) and (t.entityLifeCycleData.snapshotRecord IS NULL OR t.entityLifeCycleData.snapshotRecord = false) and t.activeFlag = true
+        </query>
+	</named-query>
+	<named-query name="Team.getAllTeamIdsAndNamesOfLoggedInBranchOfThisUser">
+		<query>
+		  
+          Select t.id,t.name FROM Team t WHERE t.teamBranch.id = :branchId and t.masterLifeCycleData.approvalStatus in (0,3,4,6) and (t.entityLifeCycleData.snapshotRecord IS NULL OR t.entityLifeCycleData.snapshotRecord = false) and t.activeFlag = true order by lower(t.name),lower(t.teamBranch.name)
+        </query>
+	</named-query>
+	<named-query name="Team.getAllTeamIdsAndNmaes">
+		<query>
+          SELECT t.id,t.name FROM Team t where t.masterLifeCycleData.approvalStatus in (:approvalStatusList) and (t.entityLifeCycleData.snapshotRecord IS NULL OR t.entityLifeCycleData.snapshotRecord = false) and t.activeFlag = true
+        </query>
+	</named-query>
+	<named-query name="Team.getTeamIdsAndNamesLeadedByThisUserByUserInfo">
+		<query>
+		  SELECT t.id,t.name FROM Team t where t.teamLead.id = :userId AND t.teamBranch.id = :branchId and t.masterLifeCycleData.approvalStatus in (0,3,4,6) and (t.entityLifeCycleData.snapshotRecord IS NULL OR t.entityLifeCycleData.snapshotRecord = false) and t.activeFlag = true
+        </query>
+	</named-query>
+	<named-query name="Team.getTeamBranchByTeamId">
+		<query>
+          Select t.teamBranch.id FROM Team t where t.id = :teamId
+        </query>
+	</named-query>
+	<named-query name="Team.getTeamIdsAndNamesOfUserInLoggedInBranch">
+		<query>
+		  
+          Select t.id,t.name FROM Team t inner join t.users u WHERE u.id = :userId AND t.teamBranch.id = :branchId and t.masterLifeCycleData.approvalStatus in (0,3,4,6) and (t.entityLifeCycleData.snapshotRecord IS NULL OR t.entityLifeCycleData.snapshotRecord = false) and t.activeFlag = true
+        </query>
+	</named-query>
+	<named-query
+		name="Team.getassosiatedUserIdsandusernamesWithTeamBasedOnTeamID">
+		<query>
+		Select u.id,u.username FROM Team t inner join t.users u where t.id = :teamId and u.userStatus = 0 and (u.masterLifeCycleData.approvalStatus in (:approvalStatusList))
+        </query>
+	</named-query>
+	
+	<named-query
+		name="Team.getUserIdNameMapByTeamId">
+		<query>
+		Select NEW MAP(u.id as id,u.username as name) FROM Team t inner join t.users u where t.id = :teamId and u.userStatus = 0 and (u.masterLifeCycleData.approvalStatus in (:approvalStatusList))
+        </query>
+	</named-query>
+	
+		<named-query name="Team.getAllTeamIds">
+		<query>
+          SELECT DISTINCT(t.id) FROM Team t where t.masterLifeCycleData.approvalStatus in (0,3,4,6) and (t.entityLifeCycleData.snapshotRecord IS NULL OR t.entityLifeCycleData.snapshotRecord = false) and t.activeFlag = true
+        </query>
+	</named-query>
+	<named-query name="Team.fetchTeamBranchForTeamId">
+		<query>
+		  SELECT t.teamBranch FROM Team t where t.id = :teamId
+        </query>
+	</named-query>
+	
+	<named-query
+		name="Team.getassosiatedUserId">
+		<query>
+		Select u.id FROM Team t inner join t.users u where t.id = :teamId and u.id != :userId and u.userStatus = 0 and (u.masterLifeCycleData.approvalStatus in (:approvalStatusList))
+        </query>
+	</named-query>
+	
+	<named-query name="Users.InCurrentBranchAndTeam">
+		<query>		
+          SELECT u.associatedUser FROM UserOrgBranchMapping u where u.organizationBranch.id = :branchId and u.associatedUser.id in :userIds
+        </query>
+	</named-query>
+	
+	<named-query name="Users.InCurrentBranchListAndTeam">
+		<query>		
+          SELECT u.associatedUser FROM UserOrgBranchMapping u where u.organizationBranch.id in :branchId and u.associatedUser.id in :userIds
+        </query>
+	</named-query>
+	
+	<named-query name="Team.fetchUsersForTeamLead">
+		<query>
+          Select user FROM Team t inner join t.users user where t.id = :teamId and user.teamLead IS TRUE and user.id != :userId and (user.masterLifeCycleData.approvalStatus in (:approvalStatusList))
+        </query>
+	</named-query>
+	
+	<named-query name="Team.getTeamsNotLeadByThisUser">
+		<query>
+			  Select t FROM Team t inner join t.users user where user.id = :userId and t.teamLead.id != :userId and (user.masterLifeCycleData.approvalStatus in (:approvalStatusList)) and t.masterLifeCycleData.approvalStatus in (0,3,4,6) and (t.entityLifeCycleData.snapshotRecord IS NULL OR t.entityLifeCycleData.snapshotRecord = false) and t.activeFlag = true
+	        </query>
+	</named-query>
+	
+	<named-query name="Team.fetchUsersIdForTeamLead">
+		<query>
+          Select user.id FROM Team t inner join t.users user where t.id = :teamId and user.teamLead IS TRUE and user.id != :userId and user.userStatus = 0 and (user.masterLifeCycleData.approvalStatus in (:approvalStatusList))
+        </query>
+	</named-query>
+	
+	<named-query name="Team.getDistinctTeamLeadIdsOfThisUser">
+		<query>
+		  Select DISTINCT(t.teamLead.id) FROM Team t inner join t.users u WHERE u.id = :userId and t.masterLifeCycleData.approvalStatus in (0,3,4,6) and (t.entityLifeCycleData.snapshotRecord IS NULL OR t.entityLifeCycleData.snapshotRecord = false) and t.activeFlag = true
+        </query>
+	</named-query>
+	<named-query name="Team.getTeamNameByUserId">
+		<query>
+		  
+          Select t.name FROM Team t inner join t.users u WHERE u.id = :userId and t.masterLifeCycleData.approvalStatus in (0,3,4,6) and (t.entityLifeCycleData.snapshotRecord IS NULL OR t.entityLifeCycleData.snapshotRecord = false) and t.activeFlag = true
+        </query>
+	</named-query>
+	
+	<named-query name="Team.getUsersFromTeamIds">
+		<query>	
+          Select DISTINCT(u) FROM Team t inner join t.users u WHERE t.id in :teamIds and u.userStatus = 0 and  (u.masterLifeCycleData.approvalStatus in (:approvalStatusList)) and (t.entityLifeCycleData.snapshotRecord IS NULL OR t.entityLifeCycleData.snapshotRecord = false) and t.activeFlag = true
+        </query>
+	</named-query>
+	<named-query name="Team.getTeamsFromTeamIds">
+		<query>	
+          FROM Team t WHERE t.id in :teamIds
+        </query>
+	</named-query>
+
+	<named-query name="Team.getNoOfTeamsByTeamName">
+		<query>
+		  SELECT COUNT(*) FROM Team t where lower(trim(t.name)) = lower(trim(:teamName)) and t.masterLifeCycleData.approvalStatus in (:approvalStatusList) and (t.entityLifeCycleData.snapshotRecord IS NULL OR t.entityLifeCycleData.snapshotRecord = false) and t.activeFlag = true
+        </query>
+	</named-query>
+
+	<named-query name="Team.findTeamByTeamName">
+		<query>
+			SELECT t FROM Team t where t.name=:teamName and t.masterLifeCycleData.approvalStatus NOT IN (1,2,3,4,6,5,10) and (t.entityLifeCycleData.snapshotRecord IS NULL OR t.entityLifeCycleData.snapshotRecord = false) and t.activeFlag = true
+		</query>
+	</named-query>
+	
+</entity-mappings>

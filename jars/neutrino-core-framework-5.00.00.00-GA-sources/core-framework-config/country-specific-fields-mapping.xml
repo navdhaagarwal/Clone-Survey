@@ -1,0 +1,306 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- XML for mapping Address Tag where country specific fields are required 
+   to be displayed -->
+<address-configs>
+	<!-- <address-config>
+       <context>master</context>
+       China
+       <target-country name="CH">
+          <field-config name="postalcode" mandatory="true" label="key.address.postalcode" />
+          <field-config name="area" mandatory="true" label="key.address.area" />
+          <field-config name="city" mandatory="true" label="key.address.city" />
+          <field-config name="barangay" mandatory="true" label="key.address.barangay" />
+          <field-config name="province" mandatory="true" label="key.address.province" />
+          <field-config name="region" mandatory="true" label="key.address.region" />
+          <field-config name="town" mandatory="true" label="key.address.town" />
+          <field-config name="address1" mandatory="true" label="key.address.addressLine1" maxLength="45"></field-config>
+          <field-config name="address2" mandatory="false" label="key.address.addressLine2"  maxLength="45"></field-config>
+       </target-country>
+    </address-config> -->
+	<address-config>
+		<context>master</context>
+		<!-- India -->
+		<target-country name="IND">
+			<field-config name="address1" mandatory="true" label="key.address.line1.flat.plot.number"></field-config>
+			<field-config name="address2" mandatory="false" label="key.address.addressLine2"></field-config>
+			<field-config name="address3" mandatory="false" label="key.address.addressLine3"></field-config>
+			<field-config name="pinCode" mandatory="true" label="key.address.pincode" />
+			<field-config name="region" mandatory="false" label="key.address.region" />
+			<field-config name="state" mandatory="true" label="key.address.state" />
+			<field-config name="city" mandatory="false" label="key.address.city" />
+			<field-config name="district" mandatory="false" label="key.address.district" />
+			<field-config name="taluka" mandatory="false" label="key.address.taluka" />
+			<field-config name="village" mandatory="false" label="key.address.village" />
+			<field-config name="accomodationType" mandatory="true" label="key.address.residenceStatus" />
+			<field-config name="residenceType" mandatory="false" label="key.address.residenceType" />
+		</target-country>
+		<target-country name="IND">
+			<address-type name="ResidentialAddress,PermanentAddress,OfficeAddress,PropertyAddress,PropertyAddress2,AlternateBusinessAddress,AdditionalAddress">
+				<field-config name="address1" mandatory="true" label="key.address.line1.flat.plot.number"></field-config>
+				<field-config name="address2" mandatory="false" label="key.address.addressLine2"></field-config>
+				<field-config name="address3" mandatory="false" label="key.address.addressLine3"></field-config>
+				<field-config name="pinCode" mandatory="true" label="key.address.pincode" />
+				<field-config name="region" mandatory="false" label="key.address.region" />
+				<field-config name="state" mandatory="true" label="key.address.state" />
+				<field-config name="city" mandatory="false" label="key.address.city" />
+				<field-config name="district" mandatory="false" label="key.address.district" />
+				<field-config name="taluka" mandatory="false" label="key.address.taluka" />
+				<field-config name="village" mandatory="false" label="key.address.village" />
+				<field-config name="accomodationType" mandatory="true" label="key.address.residenceStatus" />
+				<field-config name="residenceType" mandatory="false" label="key.address.residenceType" />
+			</address-type>
+		</target-country>
+		<target-country name="IND">
+			<address-type name="OfficeAddress">
+				<filter-code name="unimaster">
+					<field-config name="address1" mandatory="true" label="key.address.line1.flat.plot.number"></field-config>
+					<field-config name="address2" mandatory="false" label="key.address.addressLine2"></field-config>
+					<field-config name="address3" mandatory="false" label="key.address.addressLine3"></field-config>
+					<field-config name="pinCode" mandatory="true" label="key.address.pincode" />
+					<field-config name="region" mandatory="false" label="key.address.region" />
+					<field-config name="state" mandatory="true" label="key.address.state" />
+					<field-config name="city" mandatory="false" label="key.address.city" />
+					<field-config name="district" mandatory="false" label="key.address.district" />
+					<field-config name="taluka" mandatory="false" label="key.address.taluka" />
+					<field-config name="village" mandatory="false" label="key.address.village" />
+					<field-config name="accomodationType" mandatory="true" label="key.address.residenceStatus" />
+					<field-config name="residenceType" mandatory="false" label="key.address.residenceType" />
+				</filter-code>
+			</address-type>
+		</target-country>
+		<target-country name="IND">
+			<address-type name="OfficeAddress">
+				<filter-code name="clgmaster">
+					<field-config name="address1" mandatory="true" label="key.address.line1.flat.plot.number"></field-config>
+					<field-config name="address2" mandatory="false" label="key.address.addressLine2"></field-config>
+					<field-config name="address3" mandatory="false" label="key.address.addressLine3"></field-config>
+					<field-config name="pinCode" mandatory="true" label="key.address.pincode" />
+					<field-config name="region" mandatory="false" label="key.address.region" />
+					<field-config name="state" mandatory="true" label="key.address.state" />
+					<field-config name="city" mandatory="false" label="key.address.city" />
+					<field-config name="district" mandatory="false" label="key.address.district" />
+					<field-config name="taluka" mandatory="false" label="key.address.taluka" />
+					<field-config name="village" mandatory="false" label="key.address.village" />
+					<field-config name="accomodationType" mandatory="true" label="key.address.residenceStatus" />
+					<field-config name="residenceType" mandatory="false" label="key.address.residenceType" />
+				</filter-code>
+			</address-type>
+		</target-country>
+		<target-country name="IRL">
+			<address-type name="ResidentialAddress,PermanentAddress">
+				<field-config name="address1" mandatory="true" label="key.address.line1.flat.plot.number"></field-config>
+				<field-config name="address2" mandatory="false" label="key.address.addressLine2"></field-config>
+				<field-config name="address3" mandatory="false" label="key.address.addressLine3"></field-config>
+				<field-config name="address4" mandatory="false" label="key.address.addressLine4"></field-config>
+				<field-config name="pinCode" mandatory="true" label="key.address.pincode" />
+				<field-config name="region" mandatory="false" label="key.address.region" />
+				<field-config name="state" mandatory="true" label="key.address.state" />
+				<field-config name="city" mandatory="false" label="key.address.city" />
+				<field-config name="district" mandatory="false" label="key.address.district" />
+				<field-config name="taluka" mandatory="false" label="key.address.taluka" />
+				<field-config name="village" mandatory="false" label="key.address.village" />
+				<field-config name="accomodationType" mandatory="true" label="key.address.residenceStatus" />
+				<field-config name="residenceType" mandatory="false" label="key.address.residenceType" />
+				<field-config name="additionalField1" mandatory="true" label="key.additional.field1"></field-config>
+				<field-config name="additionalField2" mandatory="false" label="key.additional.field2"></field-config>
+				<field-config name="additionalField3" mandatory="false" label="key.additional.field3"></field-config>
+				<field-config name="additionalField4" mandatory="false" label="key.additional.field4"></field-config>
+				<field-config name="additionalField5" mandatory="false" label="key.additional.field5"></field-config>
+				<field-config name="genericYesNo" mandatory="false" label="key.genericYesNo"></field-config>
+				<field-config name="remarks" mandatory="false" label="key.remarks"></field-config>
+			</address-type>
+		</target-country>
+		<target-country name="IRL">
+			<address-type name="OfficeAddress">
+				<filter-code name="unimaster">
+					<field-config name="accomodationType" mandatory="true" label="key.address.residenceStatus" />
+					<field-config name="state" mandatory="true" label="key.address.city" />
+					<field-config name="region" mandatory="false" label="key.address.region" />
+					<field-config name="street" mandatory="true" label="key.address.street" maxLength="50"/>
+					<field-config name="district" mandatory="false" label="key.address.district" />
+					<field-config name="address1" mandatory="false" label="key.address.addressLine1" maxLength="45" ></field-config>
+					<field-config name="poBox" mandatory="true" label="key.address.pobox" maxLength="19" />
+					<field-config name="pinCode" mandatory="false" label="key.address.postalcode" />
+				</filter-code>
+			</address-type>
+		</target-country>
+		<target-country name="IRL">
+			<address-type name="OfficeAddress">
+				<filter-code name="clgmaster">
+					<field-config name="address1" mandatory="true" label="key.address.line1.flat.plot.number"></field-config>
+					<field-config name="address2" mandatory="false" label="key.address.addressLine2"></field-config>
+					<field-config name="address3" mandatory="false" label="key.address.addressLine3"></field-config>
+					<field-config name="pinCode" mandatory="true" label="key.address.pincode" />
+					<field-config name="region" mandatory="false" label="key.address.region" />
+					<field-config name="state" mandatory="true" label="key.address.state" />
+					<field-config name="city" mandatory="false" label="key.address.city" />
+					<field-config name="district" mandatory="false" label="key.address.district" />
+					<field-config name="taluka" mandatory="false" label="key.address.taluka" />
+					<field-config name="village" mandatory="false" label="key.address.village" />
+					<field-config name="accomodationType" mandatory="true" label="key.address.residenceStatus" />
+					<field-config name="residenceType" mandatory="false" label="key.address.residenceType" />
+				</filter-code>
+			</address-type>
+		</target-country>
+		<target-country name="IND">
+			<filter-code name="agriCollateral">
+				<field-config name="address1" mandatory="true" label="key.address.line1.flat.plot.number"></field-config>
+				<field-config name="address2" mandatory="false" label="key.address.addressLine2"></field-config>
+				<field-config name="address3" mandatory="false" label="key.address.addressLine3"></field-config>
+				<field-config name="pinCode" mandatory="true" label="key.address.pincode" />
+				<field-config name="region" mandatory="false" label="key.address.region" />
+				<field-config name="state" mandatory="true" label="key.address.state" />
+				<field-config name="city" mandatory="false" label="key.address.city" />
+				<field-config name="district" mandatory="true" label="key.address.district" />
+				<field-config name="taluka" mandatory="false" label="key.address.taluka" />
+				<field-config name="village" mandatory="true" label="key.address.village" />
+				<field-config name="accomodationType" mandatory="true" label="key.address.residenceStatus" />
+				<field-config name="residenceType" mandatory="false" label="key.address.residenceType" />
+			</filter-code>
+		</target-country>
+		<target-country name="SAU">
+			<field-config name="accomodationType" mandatory="true" label="key.address.residenceStatus" />
+			<field-config name="state" mandatory="true" label="key.address.city" />
+			<field-config name="region" mandatory="false" label="key.address.region" />
+			<field-config name="street" mandatory="true" label="key.address.street" maxLength="50"/>
+			<field-config name="district" mandatory="false" label="key.address.district" />
+			<field-config name="address1" mandatory="false" label="key.address.addressLine1" maxLength="45" ></field-config>
+			<field-config name="poBox" mandatory="true" label="key.address.pobox" maxLength="19" />
+			<field-config name="pinCode" mandatory="false" label="key.address.postalcode" />
+		</target-country>
+
+		<target-country name="AUS">
+			<field-config name="region" mandatory="true" label="key.address.region" />
+			<field-config name="state" mandatory="true" label="key.address.state" />
+			<field-config name="city" mandatory="true" label="key.address.city" />
+			<field-config name="streetMaster" mandatory="true" label="key.address.street" />
+			<field-config name="district" mandatory="false" label="key.address.district" />
+			<field-config name="pinCode" mandatory="true" label="key.address.pincode" />
+			<field-config name="address1" mandatory="true" label="key.address.line1.flat.plot.number"></field-config>
+			<field-config name="address2" mandatory="false" label="key.address.addressLine2"></field-config>
+			<field-config name="address3" mandatory="false" label="key.address.addressLine3"></field-config>
+			<field-config name="additionalDropdownField1" mandatory="false" label="key.address.additionalDropdownField1" binderName="CityType" itemLabel="name" itemValue="code"></field-config>
+			<field-config name="additionalDropdownField2" mandatory="false" label="key.address.additionalDropdownField2" binderName="CityType" itemLabel="name" itemValue="code"></field-config>
+		</target-country>
+
+
+		<target-country name="AUS">
+			<address-type name="ResidentialAddress,PermanentAddress,OfficeAddress,PropertyAddress,PropertyAddress2,AlternateBusinessAddress,AdditionalAddress,agriCollateral">
+				<field-config name="region" mandatory="true" label="key.address.region" />
+				<field-config name="state" mandatory="true" label="key.address.state" />
+				<field-config name="city" mandatory="true" label="key.address.city" />
+				<field-config name="streetMaster" mandatory="true" label="key.address.street" />
+				<field-config name="district" mandatory="false" label="key.address.district" />
+				<field-config name="pinCode" mandatory="true" label="key.address.pincode" />
+				<field-config name="address1" mandatory="true" label="key.address.line1.flat.plot.number"></field-config>
+				<field-config name="address2" mandatory="false" label="key.address.addressLine2"></field-config>
+				<field-config name="address3" mandatory="false" label="key.address.addressLine3"></field-config>
+				<field-config name="additionalDropdownField1" mandatory="false" label="key.address.additionalDropdownField1" binderName="CityType" itemLabel="name" itemValue="code"></field-config>
+				<field-config name="additionalDropdownField2" mandatory="false" label="key.address.additionalDropdownField2" binderName="CityType" itemLabel="name" itemValue="code"></field-config>
+			</address-type>
+		</target-country>
+
+		<target-country name="default">
+			<field-config name="region" mandatory="false" label="key.address.region" />
+			<field-config name="state" mandatory="true" label="key.address.state" />
+			<field-config name="city" mandatory="false" label="key.address.city" />
+			<field-config name="district" mandatory="false" label="key.address.district" />
+			<field-config name="pinCode" mandatory="true" label="key.address.pincode" />
+			<field-config name="area" mandatory="false" label="key.address.area" />
+			<field-config name="taluka" mandatory="false" label="key.address.taluka" />
+			<field-config name="village" mandatory="false" label="key.address.village" />
+			<field-config name="address1" mandatory="true" label="key.address.line1.flat.plot.number"></field-config>
+			<field-config name="address2" mandatory="false" label="key.address.addressLine2"></field-config>
+			<field-config name="address3" mandatory="false" label="key.address.addressLine3"></field-config>
+			<field-config name="accomodationType" mandatory="true" label="key.address.residenceStatus" />
+			<field-config name="residenceType" mandatory="false" label="key.address.residenceType" />
+		</target-country>
+	</address-config>
+	<!-- <address-config>
+       <context>master</context>
+       Africa
+       <target-country name="AF">
+          <field-config name="zipcode" mandatory="true" label="key.address.zipcode" />
+          <field-config name="area" mandatory="true" label="key.address.area" />
+          <field-config name="city" mandatory="true" label="key.address.city" />
+          <field-config name="province" mandatory="true" label="key.address.province" />
+          <field-config name="address1" mandatory="true" label="key.address.addressLine1" maxLength="45"></field-config>
+          <field-config name="address2" mandatory="false" label="key.address.addressLine2" maxLength="45"></field-config>
+          <field-config name="address3" mandatory="false" label="key.address.addressLine3" maxLength="45"></field-config>
+       </target-country>
+    </address-config> -->
+	<!-- <address-config>
+       <context>master</context>
+       Arab Emirates
+       <target-country name="UAE">
+          <field-config name="zipcode" mandatory="true" label="key.address.zipcode" />
+          <field-config name="area" mandatory="true" label="key.address.area" />
+          <field-config name="city" mandatory="true" label="key.address.city" />
+          <field-config name="region" mandatory="true" label="key.address.region" />
+          <field-config name="state" mandatory="true" label="key.address.state" />
+          <field-config name="address1" mandatory="true" label="key.address.addressLine1" maxLength="45"></field-config>
+       </target-country>
+    </address-config> -->
+	<!-- <address-config>
+       <context>master</context>
+       USA
+       <target-country name="US">
+          <field-config name="zipcode" mandatory="true" label="key.address.zipcode" />
+          <field-config name="area" mandatory="true" label="key.address.area" />
+          <field-config name="city" mandatory="true" label="key.address.city" />
+          <field-config name="address1" mandatory="true" label="key.address.addressLine1" maxLength="45"></field-config>
+          <field-config name="address2" mandatory="false" label="key.address.addressLine2" maxLength="45"></field-config>
+       </target-country>
+       AUS
+       <target-country name="AUS">
+          <field-config name="state" mandatory="true" label="key.address.state" />
+          <field-config name="postalcode" mandatory="true" label="key.address.postalcode" />
+          <field-config name="area" mandatory="true" label="key.address.area" />
+          <field-config name="address1" mandatory="true" label="key.address.addressLine1" maxLength="45"></field-config>
+          <field-config name="address2" mandatory="false" label="key.address.addressLine2" maxLength="45"></field-config>
+       </target-country>
+       <target-country name="ENG" >
+          <field-config name="state" mandatory="true" label="key.address.state" />
+          <field-config name="city" mandatory="true" label="key.address.city" />
+          <field-config name="postalcode" mandatory="true" label="key.address.postalcode" />
+          <field-config name="address1" mandatory="true" label="key.address.addressLine1" maxLength="45"></field-config>
+          <field-config name="address2" mandatory="false" label="key.address.addressLine2" maxLength="45"></field-config>
+       </target-country>
+       <target-country name="SCT" >
+          <field-config name="state" mandatory="true" label="key.address.county" />
+          <field-config name="city" mandatory="true" label="key.address.city" />
+          <field-config name="postalcode" mandatory="true" label="key.address.postalcode" />
+          <field-config name="address1" mandatory="true" label="key.address.addressLine1" maxLength="45"></field-config>
+          <field-config name="address2" mandatory="false" label="key.address.addressLine2" maxLength="45"></field-config>
+       </target-country>
+       <target-country name="WLS">
+          <field-config name="state" mandatory="true" label="key.address.county" />
+          <field-config name="city" mandatory="true" label="key.address.city" />
+          <field-config name="postalcode" mandatory="true" label="key.address.postalcode" />
+          <field-config name="address1" mandatory="true" label="key.address.addressLine1" maxLength="45"></field-config>
+          <field-config name="address2" mandatory="false" label="key.address.addressLine2" maxLength="45"></field-config>
+       </target-country>
+       <target-country name="JPN">
+          <field-config name="state" mandatory="true" label="key.address.prefecture" />
+          <field-config name="city" mandatory="true" label="key.address.city" />
+          <field-config name="postalcode" mandatory="true" label="key.address.postalcode" />
+          <field-config name="address1" mandatory="true" label="key.address.addressLine1" maxLength="45"></field-config>
+          <field-config name="address2" mandatory="false" label="key.address.addressLine2" maxLength="45"></field-config>
+       </target-country>
+       <target-country name="ZAF">
+          <field-config name="state" mandatory="false" label="key.address.province" />
+          <field-config name="city" mandatory="true" label="key.address.city" />
+          <field-config name="area" mandatory="fasle" label="key.address.area" />
+          <field-config name="address1" mandatory="true" label="key.address.addressLine1" maxLength="45"></field-config>
+          <field-config name="address2" mandatory="false" label="key.address.addressLine2" maxLength="45"></field-config>
+           <field-config name="address3" mandatory="false" label="key.address.addressLine3" maxLength="45"></field-config>
+       </target-country>
+       <target-country name="USA" >
+            <field-config name="state" mandatory="true" label="key.address.state" />
+            <field-config name="city" mandatory="false" label="key.address.city" />
+            <field-config name="postalcode" mandatory="false" label="key.address.postalcode" />
+            <field-config name="address1" mandatory="false" label="key.address.addressLine1" maxLength="45"></field-config>
+            <field-config name="address2" mandatory="false" label="key.address.addressLine2" maxLength="45"></field-config>
+       </target-country>
+    </address-config> -->
+</address-configs>

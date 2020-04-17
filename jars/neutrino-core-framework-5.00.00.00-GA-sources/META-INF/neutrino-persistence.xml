@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence xmlns="http://java.sun.com/xml/ns/persistence"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd"
+	version="2.0">
+
+	<persistence-unit name="neutrino-persistence-framework">
+		<mapping-file>META-INF/authority-orm.xml</mapping-file>
+		<mapping-file>META-INF/maker-checker-orm.xml</mapping-file>
+		<mapping-file>META-INF/user-orm.xml</mapping-file>
+		<mapping-file>META-INF/generic-entity-operations-orm.xml</mapping-file>
+		<mapping-file>META-INF/persisted-configuration-orm.xml</mapping-file>
+		<mapping-file>META-INF/snapshot-orm.xml</mapping-file>
+		<mapping-file>META-INF/task-orm.xml</mapping-file>
+		<mapping-file>META-INF/generic-parameter-orm.xml</mapping-file>
+		<mapping-file>META-INF/organization-orm.xml</mapping-file>
+		<mapping-file>META-INF/area-orm.xml</mapping-file>
+		<mapping-file>META-INF/address-orm.xml</mapping-file>
+		<mapping-file>META-INF/ipaddress-orm.xml</mapping-file>
+		<mapping-file>META-INF/country-orm.xml</mapping-file>
+		<mapping-file>META-INF/document-orm.xml</mapping-file>
+		<mapping-file>META-INF/query-orm.xml</mapping-file>
+		<mapping-file>META-INF/mail-orm.xml</mapping-file>
+		<mapping-file>META-INF/communication-orm.xml</mapping-file>
+		<mapping-file>META-INF/team-orm.xml</mapping-file>
+		<mapping-file>META-INF/trustedSource-orm.xml</mapping-file>
+		<mapping-file>META-INF/apimgmt-orm.xml</mapping-file>
+		<mapping-file>META-INF/organization-template-orm.xml</mapping-file>
+		<mapping-file>META-INF/watched-item-orm.xml</mapping-file>
+		<mapping-file>META-INF/feedback-orm.xml</mapping-file>
+		<mapping-file>META-INF/formDefinition-orm.xml</mapping-file>
+		<mapping-file>META-INF/user-branch-core-orm.xml</mapping-file>
+		<mapping-file>META-INF/userShortcuts-orm.xml</mapping-file>
+		<mapping-file>META-INF/message-resource-orm.xml</mapping-file>
+		<mapping-file>META-INF/tag-orm.xml</mapping-file>
+		<mapping-file>META-INF/money-orm.xml</mapping-file>
+		<mapping-file>META-INF/chat-orm.xml</mapping-file>
+		<mapping-file>META-INF/notification-master-orm.xml</mapping-file>
+		<mapping-file>META-INF/adhoc-task-orm.xml</mapping-file>
+		<mapping-file>META-INF/exception-orm.xml</mapping-file>
+		<mapping-file>META-INF/role-authorities-orm.xml</mapping-file>
+		<mapping-file>META-INF/date-orm.xml</mapping-file>
+		<mapping-file>META-INF/usercityvillagemapping-orm.xml</mapping-file>
+		<mapping-file>META-INF/passwordpolicy-orm.xml</mapping-file>
+		<mapping-file>META-INF/seedData-orm.xml</mapping-file>
+		<mapping-file>META-INF/neutrino-cache-orm.xml</mapping-file>
+		<mapping-file>META-INF/menu-orm.xml</mapping-file>
+	    <mapping-file>META-INF/js-message-resource-orm.xml</mapping-file>
+	</persistence-unit>
+
+</persistence>

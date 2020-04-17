@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-mappings version="2.0"
+	xmlns="http://java.sun.com/xml/ns/persistence/orm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm http://java.sun.com/xml/ns/persistence/orm_2_0.xsd">
+
+	<named-query name="Tag.AllTagsForUri">
+		<query>
+		SELECT ct.tagName FROM ClassificationTag  ct INNER JOIN ct.entityUris eu WHERE eu = :entityUri
+		</query>
+	</named-query>
+	<named-query name="Tag.TagByName">
+		<query>
+		 FROM ClassificationTag  ct WHERE ct.tagName = :tagName 
+		</query>
+	</named-query>
+	
+	<named-query name="Tag.TagByTagNameList">
+		<query>
+		 FROM ClassificationTag  ct WHERE ct.tagName IN :tagName 
+		</query>
+	</named-query>
+	<named-query name="Tag.AllTags">
+		<query>
+		SELECT ct.tagName FROM ClassificationTag  ct 
+		</query>
+	</named-query>
+	<named-query name="Tag.AutoComplete">
+		<query>
+			SELECT DISTINCT ct.tagName FROM ClassificationTag  ct WHERE ct.tagName LIKE :tagName AND ct.tagName NOT IN (SELECT ct.tagName FROM ClassificationTag  ct 
+			INNER JOIN ct.entityUris eu where eu =:entityUri) order by lower(ct.tagName)
+		</query>
+	</named-query>
+</entity-mappings>

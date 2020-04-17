@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:sws="http://www.springframework.org/schema/web-services"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+  http://www.springframework.org/schema/web-services http://www.springframework.org/schema/web-services/web-services-2.0.xsd
+  http://www.springframework.org/schema/context
+    http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<context:component-scan base-package="com.nucleus"
+		use-default-filters="false">
+		<context:include-filter type="annotation"
+			expression="org.springframework.ws.server.endpoint.annotation.Endpoint" />
+	</context:component-scan>
+	
+	<sws:static-wsdl id="CommAsyncService"
+		location="classpath:ws/wsdl/async/commAsyncService.wsdl" />
+	
+	<sws:annotation-driven marshaller="coreFrameworkMtomEnabledMarshaller"
+		unmarshaller="coreFrameworkMtomEnabledMarshaller" />
+	
+	<!--<sws:interceptors>
+		<bean
+			class="com.nucleus.ws.core.inbound.config.interceptor.NeutrinoWebServiceLoggingInterceptor">
+			<property name="integrationConfigurationService" ref="integrationConfigurationService" />
+		</bean>
+		<bean name="neutrinoWebServiceSecurityIntercepter"
+			class="com.nucleus.ws.core.inbound.config.interceptor.NeutrinoWebServiceAuthenticationInterceptor">
+			<property name="validationActions" value="Signature" />
+			<property name="validationSignatureCrypto">
+				<bean
+					class="org.springframework.ws.soap.security.wss4j2.support.CryptoFactoryBean">
+					<property name="keyStorePassword" value="storepass@Neutrino-CAS" />
+					<property name="keyStoreLocation"
+						value="classpath:/keystore/Neutrino-CAS_Root.jks" />
+				</bean>
+			</property>
+		</bean>
+		<bean id="neutrinoWebServiceAuthorizationIntercepter"
+			class="com.nucleus.ws.core.inbound.config.interceptor.NeutrinoWebServiceAuthorizationInterceptor">
+			<property name="integrationConfigurationService" ref="integrationConfigurationService" />
+		</bean>
+		<bean id="neutrinoWebServiceThrottlerInterceptor"
+			class="com.nucleus.ws.core.inbound.config.interceptor.NeutrinoWebServiceThrottlerInterceptor">
+		</bean>
+
+	</sws:interceptors> -->
+
+
+	<!-- The key values and default endpoint use the format faultCode,faultString,locale, 
+		where only the fault code is required. If the fault string is not set, it 
+		will default to the exception message.If the language is not set, it will 
+		default to English. -->
+	<bean id="exceptionResolver"
+		class="org.springframework.ws.soap.server.endpoint.SoapFaultMappingExceptionResolver">
+		<property name="defaultFault" value="SERVER" />
+		<property name="exceptionMappings">
+			<value>
+				org.springframework.oxm.ValidationFailureException=CLIENT,Oops!Something
+				went
+				wrong
+			</value>
+		</property>
+	</bean>
+
+	<bean id="springWSEndpointRegistery"
+		class="com.nucleus.ws.core.inbound.config.SpringWSEndpointRegistery">
+	</bean>
+
+</beans>

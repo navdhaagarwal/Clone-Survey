@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:beans="http://www.springframework.org/schema/beans"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:sws="http://www.springframework.org/schema/web-services"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+ 		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+	<bean id="coreFrameworkintegrationConfigResourceLoader" class="com.nucleus.core.initialization.NeutrinoResourceLoader">
+		<constructor-arg index="0" value="neutrino-product-suite-config"></constructor-arg>
+		<constructor-arg index="1" value="common-config"></constructor-arg>
+		<property name="moduleName" value="core-framework-integration-config" />
+	</bean>
+
+
+	<bean id="coreFrameworkIntegrationPropertyPlaceholderConfigurer"
+		class="org.jasypt.spring31.properties.EncryptablePropertySourcesPlaceholderConfigurer">
+		<constructor-arg ref="stringEncryptor" />
+		<property name="ignoreUnresolvablePlaceholders" value="true" />
+		<property name="locations">
+			<list>
+				<value>#{coreFrameworkintegrationConfigResourceLoader.resolvePath('core-framework-integration-config.properties')}
+				</value>
+			</list>
+		</property>
+	</bean>
+
+	 <bean id="finnOneCoreFrameworkCommonWSClientTemplate" class="org.springframework.ws.client.core.WebServiceTemplate">
+		<constructor-arg ref="coreFrameworkAxiomSoapMessageFactory" />
+		<property name="marshaller" ref="coreFrameworkMtomEnabledMarshaller" />
+		<property name="unmarshaller" ref="coreFrameworkMtomEnabledMarshaller" />
+		<property name="messageSender">
+			<bean
+				class="com.nucleus.cfi.integration.common.client.NeutrinoHttpComponentsMessageSender">
+				<property name="compressRequestToGzip" value="${cfi.integration.finnOneCoreWSTemplate.compressRequestToGzip}" />
+				<property name="requestCompressionThreshold" value="${cfi.integration.finnOneCoreWSTemplate.requestCompressionThreshold}" />
+			</bean>
+		</property>
+		<property name="interceptors">
+		 <list>
+                <ref bean="neutrinoWSHeaderClientInterceptor"/>
+              
+        </list>
+		
+		</property>
+	</bean> 
+
+	
+    <bean id="outgoingWsSecurityInterceptor" class="org.springframework.ws.soap.security.wss4j2.Wss4jSecurityInterceptor" >
+                <property name="securementActions" value="UsernameToken"/>
+                <property name="securementUsername" value="${wss4j.incoming.outgoing.principal}"/>
+                <property name="securementPassword" value="${wss4j.incoming.outgoing.credential}"/>
+    </bean>
+    
+	<!-- use SOAP 1.1 by default -->
+	<bean id="coreFrameworkAxiomSoapMessageFactory"
+		class="org.springframework.ws.soap.axiom.AxiomSoapMessageFactory">
+		<property name="payloadCaching" value="true" />
+		<property name="attachmentCaching" value="false" />
+		<property name="attachmentCacheThreshold" value="4096" />
+	</bean>
+
+	<bean id="coreFrameworkMtomEnabledMarshaller" class="org.springframework.oxm.jaxb.Jaxb2Marshaller">
+		<property name="contextPaths" ref="coreFrameworkContextPaths" />
+		<property name="mtomEnabled" value="true" />
+	</bean>
+
+	<util:list id="coreFrameworkContextPaths">
+		<value>com.nucleus.cfi.ws.client.stub.mailMessageService</value>
+		<value>com.nucleus.cfi.ws.client.stub.shortMessageService</value>
+		<value>com.nucleus.cfi.ws.client.stub.communication.async</value>
+		<value>com.nucleus.cfi.ws.client.stub.pushNotificationService</value>
+	</util:list>
+</beans>

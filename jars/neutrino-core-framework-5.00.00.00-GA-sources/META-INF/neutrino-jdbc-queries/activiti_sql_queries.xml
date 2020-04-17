@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<neutrino-jdbc-queries xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="neutrino-jdbc-queries-schema.xsd">
+	<named-sql-query name="ACT_VAR_LONG_VALUE_BY_PROCESS_INSTANCE_IDs">
+		<default-query>select EXECUTION_ID_ as  processInstId,LONG_ as longValue from ACT_RU_VARIABLE where EXECUTION_ID_ in (:processInstIds) and NAME_ = :variableName and TASK_ID_ is null</default-query>
+	</named-sql-query>
+
+	<named-sql-query name="ACT_VAR_TEXT_VALUE_BY_PROCESS_INSTANCE_IDs">
+		<default-query>select EXECUTION_ID_ as  processInstId,TEXT_ as textValue from ACT_RU_VARIABLE where EXECUTION_ID_ in (:processInstIds) and NAME_ = :variableName and TASK_ID_ is null</default-query>
+	</named-sql-query>
+
+	<named-sql-query name="IDENTITY_LINK_GROUP_IDs_BY_TASK_IDs">
+		<default-query>select TASK_ID_ as taskId, GROUP_ID_  groupId from ACT_RU_IDENTITYLINK where TASK_ID_ in (:taskIds) and TYPE_ = :identityLinkType</default-query>
+	</named-sql-query>
+	
+	<named-sql-query name="QUERY_FOR_HISTORIC_TASK_VARIABLES">
+		<default-query>SELECT DISTINCT AHV.LONG_ FROM ACT_HI_VARINST AHV WHERE AHV.NAME_ =  :variableName AND AHV.PROC_INST_ID_ IN (:processInstIds)</default-query>
+	</named-sql-query>
+
+	<named-sql-query name="LAST_ACTIONS_BY_APP_ID">
+	<default-query>
+		select apsd.application_id as applicationId,apsd.stage_name as stageName,apsd.end_time_stamp as endTimeStamp,(select username from users where (ht.assignee_ is not null and id=substr(ht.assignee_,23)))as username from (SELECT t1.id,t1.application_id,t1.end_time_stamp,t1.stage_name,t1.workflow_sub_process_id FROM app_processing_step_data t1 LEFT OUTER JOIN app_processing_step_data t2 ON t1.application_id = t2.application_id AND ((t1.end_time_stamp &lt; t2.end_time_stamp)or (t1.end_time_stamp = t2.end_time_stamp and t1.id &lt;t2.id)) WHERE t2.application_id IS NULL and t1.application_id in (:appIds) and t1.end_time_stamp is not null) apsd inner join act_hi_taskinst ht on apsd.workflow_sub_process_id=ht.proc_inst_id_ where ht.name_='Assign To User'
+		</default-query>
+	</named-sql-query>
+
+	<named-sql-query name="LAST_ACTIVITY_BY_APP_ID">
+		<default-query>
+		select rv1.text_ as appId, rv2.text_  as stageName, (select username from users where id=substr(rt.assignee_,23)) as assignee from act_ru_variable rv1 inner join act_ru_variable rv2 on rv1.proc_inst_id_=rv2.proc_inst_id_ inner join act_ru_task rt on rt.proc_inst_id_=rv1.proc_inst_id_ where rv1.name_='applicationId' and rv1.text_ in (:appIds) and rv2.name_='stageName' and rt.name_ in('Assign To User','Pool')
+		</default-query>
+	</named-sql-query>
+
+</neutrino-jdbc-queries>

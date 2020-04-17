@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<infinispan xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xmlns="urn:infinispan:config:9.2"
+            xsi:schemaLocation="urn:infinispan:config:9.2 http://www.infinispan.org/schemas/infinispan-config-9.2.xsd">
+
+	<jgroups>
+		<stack-file name="configurationFile" path="neutrino-fw-jgroups.xml" />
+	</jgroups>
+	<cache-container name="FWCacheManager" statistics="false" default-cache="null-values-cache" shutdown-hook="REGISTER">
+		<transport stack="configurationFile" cluster="neutrino-fw-cluster"/>
+		<jmx duplicate-domains="true" />
+
+		<local-cache-configuration name="FW_CACHE_CONFIG_LOCAL" statistics="false" statistics-available="false">
+			<eviction size="-1" strategy="NONE"/>
+			<expiration max-idle="-1" interval="5000" lifespan="-1" />
+			<locking  isolation="READ_COMMITTED" concurrency-level="1000" acquire-timeout="15000" striping="false" />
+			<transaction mode="NONE" auto-commit="false" locking="OPTIMISTIC"  />
+		</local-cache-configuration>
+		
+		<replicated-cache-configuration name="FW_CACHE_CONFIG"
+			mode="SYNC" remote-timeout="${L3.remote.timeout:20000}" statistics="false" statistics-available="false">
+			<eviction size="-1" strategy="NONE"/>
+			<expiration max-idle="-1" interval="5000" lifespan="-1" />
+			<partition-handling enabled="${L3.partition.handling.enabled:false}" when-split="DENY_READ_WRITES" merge-policy="PREFERRED_ALWAYS"/> 
+			<state-transfer enabled="${L3.state.transfer.enabled:false}" timeout="${L3.state.transfer.timeout:20000000}" />
+			<locking  isolation="READ_COMMITTED" concurrency-level="1000" acquire-timeout="15000" striping="false" />
+			<transaction mode="${L3.transaction.type:NONE}" auto-commit="false" locking="OPTIMISTIC"  />
+		</replicated-cache-configuration>
+
+		<replicated-cache name="null-values-cache"
+			mode="SYNC" remote-timeout="${L3.remote.timeout:20000}" statistics="false" statistics-available="false">
+			<eviction size="-1" strategy="NONE"/>
+			<expiration max-idle="-1" interval="5000" lifespan="-1" />
+			<partition-handling enabled="${L3.partition.handling.enabled:false}" when-split="DENY_READ_WRITES" merge-policy="PREFERRED_ALWAYS"/> 
+			<state-transfer enabled="${L3.state.transfer.enabled:false}" timeout="${L3.state.transfer.timeout:20000000}" />
+			<locking  isolation="READ_COMMITTED" concurrency-level="1000" acquire-timeout="15000" striping="false" />
+			<transaction mode="${L3.transaction.type:NONE}" auto-commit="false" locking="OPTIMISTIC"  />
+		</replicated-cache>
+		
+		<replicated-cache name="MASTER_CACHE"
+			mode="SYNC" remote-timeout="${L3.remote.timeout:20000}" statistics="false"
+			statistics-available="false">
+			<eviction size="-1" strategy="NONE"/>
+			<expiration max-idle="-1" interval="5000" lifespan="-1" />
+			<partition-handling enabled="${L3.partition.handling.enabled:false}" when-split="DENY_READ_WRITES" merge-policy="PREFERRED_ALWAYS"/> 
+			<state-transfer enabled="${L3.state.transfer.enabled:false}" timeout="${L3.state.transfer.timeout:20000000}" />
+			<locking  isolation="READ_COMMITTED" concurrency-level="1000" acquire-timeout="15000" striping="false" />
+			<transaction mode="${L3.transaction.type:NONE}" auto-commit="false" locking="${L3.master.cache.locking.strategy:OPTIMISTIC}"  />
+		</replicated-cache>
+		
+		<replicated-cache name="MASTER_CACHE_INDIVIDUAL"
+			mode="SYNC" remote-timeout="${L3.remote.timeout:20000}" statistics="false"
+			statistics-available="false">
+			<eviction size="-1" strategy="NONE"/>
+			<expiration max-idle="-1" interval="5000" lifespan="-1" />
+			<partition-handling enabled="${L3.partition.handling.enabled:false}" when-split="DENY_READ_WRITES" merge-policy="PREFERRED_ALWAYS"/> 
+			<state-transfer enabled="${L3.state.transfer.enabled:false}" timeout="${L3.state.transfer.timeout:20000000}" />
+			<locking  isolation="READ_COMMITTED" concurrency-level="1000" acquire-timeout="15000" striping="false" />
+			<transaction mode="${L3.transaction.type:NONE}" auto-commit="false" locking="${L3.master.cache.locking.strategy:OPTIMISTIC}"  />
+		</replicated-cache>
+
+<replicated-cache name="COMMUNICATION_EVENT_MAPPING_CACHE" configuration="FW_CACHE_CONFIG"/>
+		<replicated-cache name="SCRIPTPARAMETER_EVALUATOR_BY_PARAM_ID" configuration="FW_CACHE_CONFIG"/>
+		<replicated-cache name="SCRIPTRULE_EVALUATOR_BY_SCRIPTRULE_ID" configuration="FW_CACHE_CONFIG"/>
+		<replicated-cache name="SESSION_REGISTRY_PRINCIPALS_CACHE" configuration="FW_CACHE_CONFIG"/>
+		<replicated-cache name="SESSION_REGISTRY_SESSION_IDS_CACHE" configuration="FW_CACHE_CONFIG"/>
+		<replicated-cache name="PARAMETER_CACHE_ID" configuration="FW_CACHE_CONFIG"/>
+		<replicated-cache name="PARAMETER_BY_TYPE_AND_NAME" configuration="FW_CACHE_CONFIG"/>
+		<replicated-cache name="OG_PARAMETER_BY_OG" configuration="FW_CACHE_CONFIG"/>
+		<replicated-cache name="DECRYPTED_PARAM_SCRIPT_ID" configuration="FW_CACHE_CONFIG"/>
+		<replicated-cache name="CURRENCY_CACHE_ISO" configuration="FW_CACHE_CONFIG"/>
+		<replicated-cache name="CURRENCY_CACHE_BY_ID" configuration="FW_CACHE_CONFIG"/>
+		<replicated-cache name="CURRENCY_CACHE_APPROVED_ACTIVE" configuration="FW_CACHE_CONFIG"/>
+		<replicated-cache name="CURRENCY_CONVERSION_RATE" configuration="FW_CACHE_CONFIG"/>
+		<replicated-cache name="CURRENCY_COMMON_PROPS" configuration="FW_CACHE_CONFIG"/>
+		<replicated-cache name="CONFIGURATION_DISTINCT_MODIFIABLE_PROPERTYKEY" configuration="FW_CACHE_CONFIG"/>
+		<replicated-cache name="CONFIGURATION_DISTINCT_PROPERTKEY" configuration="FW_CACHE_CONFIG"/>
+		<replicated-cache name="CONFIGURATION_GROUP_CACHE_ASSOCIATED_ENTITY" configuration="FW_CACHE_CONFIG"/>
+		<replicated-cache name="CONFIGURATION_GROUP_ID" configuration="FW_CACHE_CONFIG"/>
+		<replicated-cache name="ENTITYURI_PROPKEY_CONFIG_MAP" configuration="FW_CACHE_CONFIG"/>
+		<replicated-cache name="ENTITYURI_PROPKEY_CONFIGVO_MAP" configuration="FW_CACHE_CONFIG"/>
+		<replicated-cache name="COMM_DATA_PREP_DTL" configuration="FW_CACHE_CONFIG"/>
+		<replicated-cache name="COMMUNICATION_MST" configuration="FW_CACHE_CONFIG"/>
+		<replicated-cache name="COMMUNICATION_TEMPLATE" configuration="FW_CACHE_CONFIG"/>
+		<replicated-cache name="COMMUNICATION_RETRY_ATTEMPT_CONFIG" configuration="FW_CACHE_CONFIG"/>
+		<replicated-cache name="COMMUNICATION_CODE_ADDITIONAL_METHODS" configuration="FW_CACHE_CONFIG"/>
+		
+		<replicated-cache name="USER_RECORD_IDENTIFIER_BASE_RECORD_IDENTIFIER_CODE" configuration="FW_CACHE_CONFIG"/>
+		<replicated-cache name="GENERIC_PARAMETER_CODE_ENTITY" configuration="FW_CACHE_CONFIG"/>
+		<replicated-cache name="GENERIC_PARAMETER_NAME_ENTITY" configuration="FW_CACHE_CONFIG"/>
+		<replicated-cache name="GENERIC_PARAMETER_AUTHCODE_ENTITIES" configuration="FW_CACHE_CONFIG"/>
+		<replicated-cache name="GENERIC_PARAMETER_PARENTCODE_ENTITIES" configuration="FW_CACHE_CONFIG"/>
+		<replicated-cache name="GENERIC_PARAMETER_TYPE_ENTITIES" configuration="FW_CACHE_CONFIG"/>
+		<replicated-cache name="ORGANIZATION_BRANCH_INFO_CACHE" configuration="FW_CACHE_CONFIG"/>
+		<replicated-cache name="PROCESSING_STAGE_FOR_STAGE_AND_CONFIGTYPE" configuration="FW_CACHE_CONFIG"/>
+		<replicated-cache name="FORM_BEAN_CACHE_FOR_STAGE_AND_WORKFLOW_CONFIG_TYPE" configuration="FW_CACHE_CONFIG"/>
+		<replicated-cache name="USERNAME_USERS_ID_CACHE" configuration="FW_CACHE_CONFIG"/>
+		<replicated-cache name="AUTHCODE_AUTHORITY_ID_CACHE" configuration="FW_CACHE_CONFIG"/>
+		<replicated-cache name="USERID_USERPROFILE_ID_CACHE" configuration="FW_CACHE_CONFIG"/>
+		<replicated-cache name="FW_COMMON_CACHE" configuration="FW_CACHE_CONFIG"/>
+		<replicated-cache name="USER_MAIL_NOTIFICATION_COUNT_CACHE" configuration="FW_CACHE_CONFIG"/>
+		<replicated-cache name="FW_HOTKEY_CACHE" configuration="FW_CACHE_CONFIG"/>
+		<replicated-cache name="FC_CACHE" configuration="FW_CACHE_CONFIG"/>
+		<replicated-cache name="PHONE_TAG_DATA" configuration="FW_CACHE_CONFIG"/>
+		<replicated-cache name="SSO_PHRASE_MAP" configuration="FW_CACHE_CONFIG"/>
+		<replicated-cache name="SERVICE_TICKET_TO_SESSION_CACHE" configuration="FW_CACHE_CONFIG"/>
+		<replicated-cache name="SESSION_ID_TO_SERVICE_TICKET_CACHE" configuration="FW_CACHE_CONFIG"/>
+		<replicated-cache name="LICENSE_DETAIL_CACHE" configuration="FW_CACHE_CONFIG"/>
+	</cache-container>
+</infinispan>

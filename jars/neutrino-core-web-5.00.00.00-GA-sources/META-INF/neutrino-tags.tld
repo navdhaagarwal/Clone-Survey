@@ -1,0 +1,758 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<taglib xmlns="http://java.sun.com/xml/ns/j2ee"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee/web-jsptaglibrary_2_0.xsd"
+    version="2.0">
+
+	<tlib-version>1.0</tlib-version>
+	<short-name>neutrino-tags</short-name>
+	<uri>http://www.nucleussoftware.com/neutrino/web/taglib</uri>
+
+	<function>
+		<name>binder</name> <!-- Will be used to call your El Function: ${neutrino:binder(String)} inside 
+		your JSP page .This function is used to execute getData() method of AbstractWebDataBinder -->
+		<function-class>com.nucleus.web.WebDataBinderElClass</function-class>
+		<function-signature>java.lang.Object getWebDataBinderData(java.lang.String)
+		</function-signature>
+	</function>
+	<function>
+		<name>idBinder</name> <!-- Will be used to call your El Function: ${neutrino:binder(String,String)} 
+		inside your JSP page. This function is used to execute getData(Object obj) 
+		method of AbstractWebDataBinder -->
+		<function-class>com.nucleus.web.WebDataBinderElClass</function-class>
+		<function-signature>java.lang.Object getWebDataBinderDataForId(java.lang.String, java.lang.String)
+		</function-signature>
+	</function>
+	<function>
+		<name>typeBinder</name> <!-- Same as idBinder. TO BE REMOVED -->
+		<function-class>com.nucleus.web.WebDataBinderElClass</function-class>
+		<function-signature>java.lang.Object getWebDataBinderDataForType(java.lang.String, java.lang.String)
+		</function-signature>
+	</function>
+	<tag>
+		<name>neutrino-select</name>
+		<tag-class>com.nucleus.web.tagHandler.SelectTagHandlerApplicantEntry</tag-class>
+		<body-content>empty</body-content>
+		<dynamic-attributes>true</dynamic-attributes>
+		<attribute>
+			<name>placeHolderKey</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>id</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>genericParameterType</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>genericParameterPath</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>colSpan</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>label</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>selectBoxColSpan</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>validationClass</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>selectedGenericParameterId</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>onChange</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>mandatory</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>viewMode</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>toolTip</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>tabindex</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>parentCode</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>pathPrepender</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>sortBy</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>comparatorType</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>modificationAllowed</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>parentCodeNullFlag</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+	</tag>
+	
+	
+	<tag-file>
+		<name>input</name>
+		<path>/META-INF/tags/input.tag</path>
+	</tag-file>
+	
+	<tag-file>
+		<name>hidden</name>
+		<path>/META-INF/tags/neutrinoHidden.tag</path>
+	</tag-file>
+	
+	<tag-file>
+		<name>regionalHidden</name>
+		<path>/META-INF/tags/regionalHidden.tag</path>
+	</tag-file>
+	
+	<tag-file>
+		<name>regionalInput</name>
+		<path>/META-INF/tags/regionalInput.tag</path>
+	</tag-file>
+	
+	<tag-file>
+		<name>regionalDatepicker</name>
+		<path>/META-INF/tags/regionalDatepicker.tag</path>
+	</tag-file>
+
+	<tag-file>
+		<name>regionalMoney</name>
+		<path>/META-INF/tags/regionalMoney.tag</path>
+	</tag-file>
+
+	<tag-file>
+		<name>regionalButton</name>
+		<path>/META-INF/tags/regionalButton.tag</path>
+	</tag-file>
+	
+	<tag-file>
+		<name>regionalCascadeSelect</name>
+		<path>/META-INF/tags/regionalCascadeSelect.tag</path>
+	</tag-file>
+
+	<tag-file>
+		<name>regionalAutoComplete</name>
+		<path>/META-INF/tags/regionalAutoCompleteSelect.tag</path>
+	</tag-file>
+	
+
+	<tag-file>
+		<name>regionalSelect</name>
+		<path>/META-INF/tags/regionalSelect.tag</path>
+	</tag-file>	
+	
+	<tag-file>
+		<name>regionalTextarea</name>
+		<path>/META-INF/tags/regionalTextarea.tag</path>
+	</tag-file>
+	
+	<tag-file>
+		<name>tree</name>
+		<path>/META-INF/tags/tree.tag</path>
+	</tag-file>
+	<tag-file>
+		<name>address_withMap</name>
+		<path>/META-INF/tags/address_withMap.tag</path>
+	</tag-file>
+	<tag-file>
+		<name>address_withoutMap</name>
+		<path>/META-INF/tags/address_withoutMap.tag</path>
+	</tag-file>
+	<tag-file>
+		<name>select</name>
+		<path>/META-INF/tags/select.tag</path>
+	</tag-file>
+	<tag-file>
+		<name>fileUpload</name>
+		<path>/META-INF/tags/fileUpload.tag</path>
+	</tag-file>
+
+	<tag-file>
+		<name>radio</name>
+		<path>/META-INF/tags/radio.tag</path>
+	</tag-file>
+
+	<tag-file>
+		<name>checkBox</name>
+		<path>/META-INF/tags/checkBox.tag</path>
+	</tag-file>
+
+	<tag-file>
+		<name>money</name>
+		<path>/META-INF/tags/money.tag</path>
+	</tag-file>
+
+	<tag-file>
+		<name>datepicker</name>
+		<path>/META-INF/tags/datepicker.tag</path>
+	</tag-file>
+	
+	<tag-file>
+		<name>fieldLabel</name>
+		<path>/META-INF/tags/fieldLabel.tag</path>
+	</tag-file>
+	
+	<tag-file>
+		<name>form</name>
+		<path>/META-INF/tags/form.tag</path>
+	</tag-file>
+
+	<tag-file>
+		<name>autocomplete</name>
+		<path>/META-INF/tags/autocomplete-select.tag</path>
+	</tag-file>
+	<tag-file>
+		<name>datastore-resource</name>
+		<path>/META-INF/tags/datastore-resource.tag</path>
+	</tag-file>
+
+	<tag-file>
+		<name>textarea</name>
+		<path>/META-INF/tags/textarea.tag</path>
+	</tag-file>
+
+	<tag-file>
+		<name>cascadeSelect</name>
+		<path>/META-INF/tags/cascadeSelect.tag</path>
+	</tag-file>
+
+	<tag-file>
+		<name>multiSelectBox</name>
+		<path>/META-INF/tags/multiselectBox.tag</path>
+	</tag-file>
+
+	<tag-file>
+		<name>multiItemSelect</name>
+		<path>/META-INF/tags/multiItemSelect.tag</path>
+	</tag-file>
+	
+	<tag-file>
+		<name>multiselect</name>
+		<path>/META-INF/tags/multiselect.tag</path>
+	</tag-file>
+	
+	<tag-file>
+		<name>table</name>
+		<path>/META-INF/tags/table.tag</path>
+	</tag-file>
+	
+	<tag-file>
+		<name>column</name>
+		<path>/META-INF/tags/column.tag</path>
+	</tag-file>
+	
+	<tag-file>
+		<name>lmstable</name>
+		<path>/META-INF/tags/lmstable.tag</path>
+	</tag-file>
+	
+	<tag-file>
+		<name>lmscolumn</name>
+		<path>/META-INF/tags/lmscolumn.tag</path>
+	</tag-file>
+	<tag-file>
+		<name>lmsaction</name>
+		<path>/META-INF/tags/lmsaction.tag</path>
+	</tag-file>
+	
+	<tag-file>
+		<name>lov</name>
+		<path>/META-INF/tags/lov.tag</path>
+	</tag-file>
+	
+	<tag-file>
+		<name>phone</name>
+		<path>/META-INF/tags/phone.tag</path>
+	</tag-file>
+	
+	<tag-file>
+		<name>dateFormat</name>
+		<path>/META-INF/tags/dateFormat.tag</path>
+	</tag-file>
+	
+	<tag-file>
+		<name>searchAttribute</name>
+		<path>/META-INF/tags/searchAttribute.tag</path>
+	</tag-file>
+	
+	<tag-file>
+		<name>formField</name>
+		<path>/META-INF/tags/formField.tag</path>
+	</tag-file>
+	
+	<tag-file>
+		<name>dynamicFormTableRow</name>
+		<path>/META-INF/tags/dynamicFormTableRow.tag</path>
+	</tag-file>
+	<tag-file>
+		<name>templateFormField</name>
+		<path>/META-INF/tags/templateFormField.tag</path>
+	</tag-file>
+
+	<tag-file>
+		<name>dynamicForm</name>
+		<path>/META-INF/tags/panelDefinition.tag</path>
+	</tag-file>
+	
+	<tag-file>
+		<name>searchCriteria</name>
+		<path>/META-INF/tags/searchCriteria.tag</path>
+	</tag-file>
+	
+	<tag-file>
+		<name>button</name>
+		<path>/META-INF/tags/button.tag</path>
+	</tag-file>
+	
+	<tag-file>
+		<name>dynamicElement</name>
+		<path>/META-INF/tags/dynamicElement.tag</path>
+	</tag-file>
+	
+	<tag-file>
+		<name>taskWidget</name>
+		<path>/META-INF/tags/taskWidget.tag</path>
+	</tag-file>
+	<tag-file>
+		<name>ruleError</name>
+		<path>/META-INF/tags/ruleError.tag</path>
+	</tag-file>
+	<tag>
+		<name>user</name>
+		<tag-class>com.nucleus.web.tagHandler.UserTagHandler</tag-class>
+		<body-content>empty</body-content>
+		<attribute>
+			<name>userId</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>userIdUri</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+	</tag>
+	<!-- <tag-file>
+		<name>rangeslider</name>
+		<path>/META-INF/tags/range-slider.tag</path>
+	</tag-file> -->
+	
+	<tag>
+    <name>rangeslider</name>
+	  <tag-class>com.nucleus.web.tagHandler.CustomJQRangeSlider</tag-class>
+	  <body-content>empty</body-content>
+	    <attribute>
+	      <name>id</name>
+	      <required>true</required>
+	      <rtexprvalue>true</rtexprvalue>
+	    </attribute>
+	    
+	    <attribute>
+	      <name>slider</name>
+	      <required>true</required>
+	      <rtexprvalue>true</rtexprvalue>
+	    </attribute>
+	    
+	    <attribute>
+	      <name>minBound</name>
+	      <required>false</required>
+	      <rtexprvalue>true</rtexprvalue>
+	    </attribute>
+	    
+	    <attribute>
+	      <name>maxBound</name>
+	      <required>false</required>
+	      <rtexprvalue>true</rtexprvalue>
+	    </attribute>
+	    
+	    <attribute>
+	      <name>minDateBound</name>
+	      <required>false</required>
+	      <rtexprvalue>true</rtexprvalue>
+	    </attribute>
+	    
+	    <attribute>
+	      <name>maxDateBound</name>
+	      <required>false</required>
+	      <rtexprvalue>true</rtexprvalue>
+	    </attribute>
+	    
+	    <attribute>
+	      <name>arrows</name>
+	      <required>true</required>
+	      <rtexprvalue>true</rtexprvalue>
+	    </attribute>
+	    
+	    <attribute>
+	      <name>defaultMin</name>
+	      <required>false</required>
+	      <rtexprvalue>true</rtexprvalue>
+	    </attribute>
+	    
+	    <attribute>
+	      <name>defaultMax</name>
+	      <required>false</required>
+	      <rtexprvalue>true</rtexprvalue>
+	    </attribute>
+	    
+	    <attribute>
+	      <name>defaultDateMin</name>
+	      <required>false</required>
+	      <rtexprvalue>true</rtexprvalue>
+	    </attribute>
+	    
+	    <attribute>
+	      <name>defaultDateMax</name>
+	      <required>false</required>
+	      <rtexprvalue>true</rtexprvalue>
+	    </attribute>
+	    
+	    <attribute>
+	      <name>delayOut</name>
+	      <required>false</required>
+	      <rtexprvalue>true</rtexprvalue>
+	    </attribute>
+	    
+	    <attribute>
+	      <name>durationIn</name>
+	      <required>false</required>
+	      <rtexprvalue>true</rtexprvalue>
+	    </attribute>
+	    
+	    <attribute>
+	      <name>durationOut</name>
+	      <required>false</required>
+	      <rtexprvalue>true</rtexprvalue>
+	    </attribute>
+	    
+	    <attribute>
+	      <name>rangeMin</name>
+	      <required>false</required>
+	      <rtexprvalue>true</rtexprvalue>
+	    </attribute>
+	    
+	    <attribute>
+	      <name>rangeMax</name>
+	      <required>false</required>
+	      <rtexprvalue>true</rtexprvalue>
+	    </attribute>
+	    
+	    <attribute>
+	      <name>step</name>
+	      <required>false</required>
+	      <rtexprvalue>true</rtexprvalue>
+	    </attribute>
+	    
+	    <attribute>
+	      <name>dateStep</name>
+	      <required>false</required>
+	      <rtexprvalue>true</rtexprvalue>
+	    </attribute>
+	    
+	    <attribute>
+	      <name>type</name>
+	      <required>false</required>
+	      <rtexprvalue>true</rtexprvalue>
+	    </attribute>
+	    
+	    <attribute>
+	      <name>valueLabels</name>
+	      <required>false</required>
+	      <rtexprvalue>true</rtexprvalue>
+	    </attribute>
+	    
+	    <attribute>
+	      <name>wheelMode</name>
+	      <required>false</required>
+	      <rtexprvalue>true</rtexprvalue>
+	    </attribute>
+	    
+	    <attribute>
+	      <name>wheelSpeed</name>
+	      <required>false</required>
+	      <rtexprvalue>true</rtexprvalue>
+	    </attribute>
+	</tag>
+	
+	<tag>
+		<description>Renders an HTML 'input' tag with type 'text' using the masked bound value.</description>
+		<name>maskedinput</name>
+		<tag-class>com.nucleus.web.tagHandler.ExtendedFormInputTag</tag-class>
+		<body-content>empty</body-content>
+		<attribute>
+			<description>Path to property for data binding</description>
+			<name>path</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<description>Path to property for data binding</description>
+			<name>maskingPolicyCode</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<description>HTML Standard Attribute</description>
+			<name>id</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<description>Enable/disable HTML escaping of rendered values.</description>
+			<name>htmlEscape</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<description>Equivalent to "class" - HTML Optional Attribute</description>
+			<name>cssClass</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<description>Equivalent to "class" - HTML Optional Attribute.
+			Used when the bound field has errors.</description>
+			<name>cssErrorClass</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<description>Equivalent to "style" - HTML Optional Attribute</description>
+			<name>cssStyle</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<description>HTML Standard Attribute</description>
+			<name>lang</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<description>HTML Standard Attribute</description>
+			<name>title</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<description>HTML Standard Attribute</description>
+			<name>dir</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<description>HTML Standard Attribute</description>
+			<name>tabindex</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<description>HTML Optional Attribute. Setting the value of this attribute to 'true'
+			will disable the HTML element.</description>
+			<name>disabled</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<description>HTML Event Attribute</description>
+			<name>onclick</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<description>HTML Event Attribute</description>
+			<name>ondblclick</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<description>HTML Event Attribute</description>
+			<name>onmousedown</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<description>HTML Event Attribute</description>
+			<name>onmouseup</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<description>HTML Event Attribute</description>
+			<name>onmouseover</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<description>HTML Event Attribute</description>
+			<name>onmousemove</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<description>HTML Event Attribute</description>
+			<name>onmouseout</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<description>HTML Event Attribute</description>
+			<name>onkeypress</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<description>HTML Event Attribute</description>
+			<name>onkeyup</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<description>HTML Event Attribute</description>
+			<name>onkeydown</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<description>HTML Event Attribute</description>
+			<name>onfocus</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<description>HTML Event Attribute</description>
+			<name>onblur</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<description>HTML Event Attribute</description>
+			<name>onchange</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<description>HTML Standard Attribute</description>
+			<name>accesskey</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<description>HTML Optional Attribute</description>
+			<name>size</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<description>HTML Optional Attribute</description>
+			<name>maxlength</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<description>HTML Optional Attribute</description>
+			<name>alt</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<description>HTML Event Attribute</description>
+			<name>onselect</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<description>HTML Optional Attribute. Setting the value of this attribute to 'true'
+			will make the HTML element readonly.</description>
+			<name>readonly</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<description>Common Optional Attribute</description>
+			<name>autocomplete</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<dynamic-attributes>true</dynamic-attributes>
+	</tag>
+	<tag-file>
+		<name>userSelect</name>
+		<path>/META-INF/tags/userSelect.tag</path>
+	</tag-file>
+	
+	<tag-file>
+		<name>moneyFormat</name>
+		<path>/META-INF/tags/moneyFormat.tag</path>
+	</tag-file>
+	
+	<tag-file>
+		<name>tatTimer</name>
+		<path>/META-INF/tags/tatTimer.tag</path>
+	</tag-file>
+	
+	<tag-file>
+		<name>creditCard</name>
+		<path>/META-INF/tags/creditCard.tag</path>
+	</tag-file>
+	<tag-file>
+		<name>email</name>
+		<path>/META-INF/tags/email.tag</path>
+	</tag-file>
+		<tag-file>
+		<name>viewList</name>
+		<path>/META-INF/tags/viewList.tag</path>
+	</tag-file>
+
+	<tag-file>
+		<name>multiSelectWithAjax</name>
+		<path>/META-INF/tags/multiselectWithAjax.tag</path>
+	</tag-file>
+</taglib>

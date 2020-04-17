@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns="http://schema.base.ws.pro.finnone.nucleus.com" targetNamespace="http://schema.base.ws.pro.finnone.nucleus.com"
+	elementFormDefault="qualified">
+
+	<xsd:simpleType name="IntegerType">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">java.math.BigInteger
+				Type</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:integer" />
+	</xsd:simpleType>
+
+	<xsd:simpleType name="UnsignedIntegerType">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">java primitive long
+				Type</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:unsignedInt" />
+	</xsd:simpleType>
+
+
+	<xsd:simpleType name="IntType">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">java primitive int Type
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:int" />
+	</xsd:simpleType>
+
+	<xsd:simpleType name="ShortType">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">java primitive short Type
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:short" />
+	</xsd:simpleType>
+
+	<xsd:simpleType name="DecimalType">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">java.math.BigDecimal
+				Type</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:decimal" />
+	</xsd:simpleType>
+
+	<xsd:simpleType name="DoubleType">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">java primitive double
+				Type</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:double" />
+	</xsd:simpleType>
+
+	<xsd:simpleType name="LongType">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">java primitive long
+				Type</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:long" />
+	</xsd:simpleType>
+
+	<xsd:simpleType name="FloatType">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">java primitive float
+				Type</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:float" />
+	</xsd:simpleType>
+
+</xsd:schema>

@@ -1,0 +1,381 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-mappings version="2.0"
+	xmlns="http://java.sun.com/xml/ns/persistence/orm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm http://java.sun.com/xml/ns/persistence/orm_2_0.xsd">
+
+	<named-query name="dynamicForm.getFormByModelName">
+		<query>
+          Select uiMetaData.uiMetaData FROM FormConfigurationMapping uiMetaData WHERE uiMetaData.uiMetaData.modelName = :modelName
+			AND uiMetaData.masterLifeCycleData.approvalStatus IN (0,3,4,6) AND uiMetaData.activeFlag = true
+        </query>
+	</named-query>
+	
+	<named-query name="dynamicForm.getAllApprovedUiMetaData">
+		<query>
+          Select uiMetaData.uiMetaData FROM FormConfigurationMapping uiMetaData WHERE uiMetaData.masterLifeCycleData.approvalStatus IN :approvalStatus
+			and( uiMetaData.entityLifeCycleData.persistenceStatus!=:persistenceStatus or uiMetaData.entityLifeCycleData.persistenceStatus is null)
+			and uiMetaData.activeFlag = true
+        </query>
+	</named-query>
+
+	<named-query name="dynamicForm.getModelMetaDataByModelName">
+		<query>
+           SELECT modelMetaData FROM ModelMetaData modelMetaData WHERE modelMetaData.name = :modelName order by modelMetaData.entityLifeCycleData.creationTimeStamp desc
+        </query>
+	</named-query>
+
+	<named-query name="dynamicForm.getUIMetaDataByInvocationPoint">
+		<query>
+          Select fcm FROM FormConfigurationMapping fcm WHERE fcm.invocationPoint = :invocationPoint
+			and fcm.masterLifeCycleData.approvalStatus IN (0,3,4,6) AND fcm.activeFlag = true
+        </query>
+	</named-query>
+
+	<named-query name="dynamicForm.getFormConfigData">
+		<query>
+          Select fcd FROM FormConfigEntityData fcd WHERE fcd.entityName = :entityName 
+        </query>
+	</named-query>
+	
+	<named-query name="dynamicForm.getFormConfigData1">
+		<query>
+          Select fcd FROM FormConfigEntityData fcd WHERE fcd.entityName = :entityName AND fcd.parent.id =:parent 
+        </query>
+	</named-query>
+
+	<named-query name="dynamicForm.fetchFormBasedOnFormNameAndSourceProduct">
+		<query>
+          Select umd.uiMetaData FROM FormConfigurationMapping umd WHERE umd.uiMetaData.formName = :formName and umd.uiMetaData.sourceProductId=:sourceProductId
+			AND umd.masterLifeCycleData.approvalStatus NOT IN (1,5,10) order by umd.entityLifeCycleData.creationTimeStamp desc
+        </query>
+	</named-query>
+
+	<named-query name="getDynamicFormMappingDtlByDynamicForm">
+		<query>
+          Select formMappingDtl FROM DynamicFormScreenMappingDetail formMappingDtl  WHERE formMappingDtl.formConfigurationMapping.uiMetaData.id = :uiMetaDataId
+        </query>
+	</named-query>
+
+
+	<named-query name="getPersistentFormDataByFormUri">
+		<query>
+          Select formData FROM PersistentFormData formData   WHERE formData.formUri = :uiMetaDataUri
+        </query>
+	</named-query>
+
+	
+	<named-query name="dynamicForm.fetchDynamicFormFilterBasedOnFormNameAndSourceProduct">
+		<query>
+          Select dff FROM DynamicFormFilter dff  WHERE dff.name = :filterName and dff.sourceProduct.id=:sourceProductId and dff.masterLifeCycleData.approvalStatus in (:approvalStatusList) order by dff.entityLifeCycleData.creationTimeStamp desc
+        </query>
+	</named-query>
+   
+   <named-query name="findDuplicateKeysForUiMetaData">
+              <query>
+          Select DISTINCT u.uiMetaData.formName FROM FormConfigurationMapping u left join u.uiMetaData.panelDefinitionList p left join p.fieldDefinitionList f
+				  where (p.panelKey=:fieldKey or  f.fieldKey =:fieldKey) and u.uiMetaData.formName!=:formName and u.uiMetaData.sourceProduct.id=:sourceProductId
+				  and (u.entityLifeCycleData.persistenceStatus!=:persistenceStatus or u.entityLifeCycleData.persistenceStatus is null)
+				  and u.masterLifeCycleData.approvalStatus not in (1,5,10)
+        </query>
+   </named-query>
+   
+	<named-query name="dynamicForm.fetchUiMetaDataAccordingToPersistenceStatus">
+		<query>
+          Select umd.uiMetaData FROM FormConfigurationMapping umd WHERE (umd.uiMetaData.entityLifeCycleData.persistenceStatus!=:persistenceStatus or umd.uiMetaData.entityLifeCycleData.persistenceStatus is null)
+			and umd.masterLifeCycleData.approvalStatus in (0,3,4,6) and umd.activeFlag = true
+        </query>
+	</named-query>
+
+	
+	<named-query name="dynamicForm.validateFormName">
+		<query>
+          Select umd.uiMetaData FROM FormConfigurationMapping umd WHERE umd.uiMetaData.formName = :formName AND umd.activeFlag = true
+			AND umd.masterLifeCycleData.approvalStatus in (0,3,4,6) order by umd.entityLifeCycleData.creationTimeStamp desc
+        </query>
+	</named-query>
+
+	<named-query name="dynamicFormFilter.getAllServiceFieldFilterMappingByServiceCode">
+		<query>
+          Select sffm FROM ServiceFieldFilterMapping sffm left join fetch sffm.fieldFilterMappings ffm  WHERE sffm.serviceIdentifier.code = :serviceCode and sffm.masterLifeCycleData.approvalStatus IN :approvalStatus and sffm.serviceIdentifier.sourceProduct.code=:sourceProductCode and sffm.activeFlag=true
+        </query>
+	</named-query>
+	
+	<named-query name="dynamicFormFilter.getAllServicePlaceholderFilterMappingByServiceCode">
+		<query>
+          Select spfm FROM ServicePlaceholderFilterMapping spfm left join fetch spfm.placeholderFilterMappings ffm  WHERE spfm.serviceIdentifier.code = :serviceCode and spfm.masterLifeCycleData.approvalStatus IN :approvalStatus and spfm.serviceIdentifier.sourceProduct.code=:sourceProductCode 
+        </query>
+	</named-query>
+	
+	<named-query name="getServicePlaceholderMappingByServiceCode">
+		<query>
+          Select spm FROM ServicePlaceholderMapping spm left join fetch spm.screenId   WHERE spm.serviceIdentifier.code = :serviceCode and spm.serviceIdentifier.sourceProduct.code=:sourceProductCode 
+        </query>
+	</named-query>
+
+
+
+
+	<named-query name="dynamicForm.loadFormConfigByUiMetaData">
+		<query>
+          Select fcm FROM FormConfigurationMapping fcm WHERE fcm.uiMetaData.id = :id
+			AND (fcm.entityLifeCycleData.persistenceStatus = 0 or fcm.entityLifeCycleData.persistenceStatus is null)
+			AND fcm.masterLifeCycleData.approvalStatus NOT IN (1,5,10)
+        </query>
+	</named-query>
+
+	<named-query name="dynamicForm.loadFormConfigByUiMetaDataForFilter">
+		<query>
+			Select fcm FROM FormConfigurationMapping fcm WHERE fcm.uiMetaData.id in
+			(Select id FROM UIMetaData where formName = :formName)
+			AND fcm.masterLifeCycleData.approvalStatus NOT IN (1,5,10) AND fcm.activeFlag = true
+		</query>
+	</named-query>
+
+	<named-query name="dynamicForm.loadFieldMetaaDataByFieldKey">
+		<query>
+          Select mmd FROM ModelMetaData mmd inner join mmd.fields fmd WHERE mmd.id = :id and fmd.fieldKey = :fieldKey
+        </query>
+	</named-query>
+
+	<named-query name="dynamicForm.loadModelByFormName">
+		<query>
+          Select mmd FROM ModelMetaData mmd where mmd.name = :name
+        </query>
+	</named-query>
+
+	<named-query name="dynamicForm.getModelMetaDataByFormName">
+		<query>
+         Select umd.uiMetaData.modelName FROM FormConfigurationMapping umd , ModelMetaData mmd where umd.uiMetaData.formName = :formName and umd.uiMetaData.formuuid = mmd.modeluuid and umd.uiMetaData.formVersion = mmd.modelVersion
+			and umd.masterLifeCycleData.approvalStatus in (0,3,4,6) and umd.activeFlag = true
+        </query>
+	</named-query>
+
+	<named-query name="dynamicForm.getFormConfigDataByPackageName">
+		<query>
+          Select fcd FROM FormConfigEntityData fcd WHERE fcd.packageName = :packageName
+        </query>
+	</named-query>
+
+	<named-query name="dynamicForm.getUniqueLatestForms">
+		<query>
+          SELECT u.uiMetaData FROM FormConfigurationMapping u
+			where u.entityLifeCycleData.creationTimeStamp = (select max(um.entityLifeCycleData.creationTimeStamp) from UIMetaData um
+			where u.uiMetaData.formName = um.formName) and u.masterLifeCycleData.approvalStatus in (0,3,4,6) and u.activeFlag = true
+        </query>
+	</named-query>
+	
+	<named-query name="dynamicForm.loadUniqueLatestFormsBasedOnSourceProduct">
+		<query>
+          SELECT u.uiMetaData FROM FormConfigurationMapping u where u.uiMetaData.sourceProductId = :sourceProductId and  u.masterLifeCycleData.approvalStatus in (:approvalStatusList)
+			and u.uiMetaData.entityLifeCycleData.creationTimeStamp = (select max(um.entityLifeCycleData.creationTimeStamp) from UIMetaData um
+			where u.uiMetaData.formName = um.formName) and u.activeFlag = true
+        </query>
+	</named-query>
+	
+	<named-query name="dynamicForm.getUniqueFormsBasedOnSourceProductAndPersistantStatus">
+		<query>
+          SELECT fcm.uiMetaData FROM FormConfigurationMapping fcm
+			where (fcm.entityLifeCycleData.persistenceStatus!=:persistenceStatus or fcm.entityLifeCycleData.persistenceStatus is null)
+			and  fcm.uiMetaData.sourceProductId = :sourceProductId
+			and  fcm.uiMetaData.entityLifeCycleData.creationTimeStamp =
+			(select max(um.entityLifeCycleData.creationTimeStamp) from UIMetaData um where fcm.uiMetaData.formName = um.formName)
+			AND fcm.masterLifeCycleData.approvalStatus IN (0,3,4,6) AND fcm.activeFlag = true
+        </query>
+	</named-query>
+	
+	<named-query name="dynamicForm.getSelectedDynamicForms">
+		<query>
+          SELECT u FROM FormConfigurationMapping u where u.id in :formConfigIds
+			and u.masterLifeCycleData.approvalStatus in (0,3,4,6) and u.activeFlag = true
+        </query>
+	</named-query>
+	
+	<named-query name="dynamicForm.getUniqueDynamicForms">
+		<query>
+			SELECT u FROM FormConfigurationMapping u where u.uiMetaData.id in (select a.id from UIMetaData a where a.id in (
+			SELECT umd1.id FROM UIMetaData umd1 where umd1.formName NOT IN (SELECT distinct(umd.formName)
+			FROM UIMetaData umd inner join umd.panelDefinitionList pd where (pd.panelType= :panelType or pd.allowPanelSave=true) AND umd.formName IS NOT NULL
+			AND umd.entityLifeCycleData.creationTimeStamp IN (
+			Select max(umd3.entityLifeCycleData.creationTimeStamp) from UIMetaData umd3 where umd3.masterLifeCycleData.approvalStatus = 0 
+		  	and umd3.activeFlag = true group by umd3.formName
+			))))
+			and u.masterLifeCycleData.approvalStatus in (0,3,4,6) and u.activeFlag = true
+        </query>
+	</named-query>
+	
+	<named-query name="dynamicForm.getUniqueDynamicFormsBasedOnSourceProduct">
+		<query>
+          SELECT u FROM FormConfigurationMapping u where u.uiMetaData.id in (select a.id from UIMetaData a where a.masterLifeCycleData.approvalStatus not in (:approvalStatusList) and a.id in (SELECT umd1.id FROM UIMetaData umd1 where umd1.masterLifeCycleData.approvalStatus!= :approvalStatusNotEqualTo AND umd1.formName NOT IN (SELECT distinct(umd.formName)
+		  FROM UIMetaData umd inner join umd.panelDefinitionList pd where (pd.panelType= :panelType or pd.allowPanelSave=true) AND umd.formName IS NOT NULL
+		  and umd.entityLifeCycleData.creationTimeStamp IN (
+		  Select max(umd3.entityLifeCycleData.creationTimeStamp) from UIMetaData umd3 where umd3.masterLifeCycleData.approvalStatus = 0 and umd3.activeFlag = true group by umd3.formName
+		  )
+		  ))) and u.sourceProductId = :sourceProductId
+          and u.id in (select f.id from FormConfigurationMapping f where f.entityLifeCycleData.creationTimeStamp in 
+          (select max(fcm.entityLifeCycleData.creationTimeStamp) from FormConfigurationMapping fcm
+			where fcm.masterLifeCycleData.approvalStatus in (0,3,4,6) and fcm.activeFlag = true group by fcm.uiMetaData)
+			and f.masterLifeCycleData.approvalStatus in (0,3,4,6) and f.activeFlag = true)
+			and u.masterLifeCycleData.approvalStatus in (0,3,4,6) and u.activeFlag = true
+        </query>
+	</named-query>
+
+	<named-query name="dynamicForm.getLatestFormsByFormuuid">
+		<query>
+        SELECT umd.uiMetaData FROM FormConfigurationMapping umd where umd.uiMetaData.formuuid = :formuuid
+			and umd.masterLifeCycleData.approvalStatus in (0,3,4,6) and umd.activeFlag = true order by umd.entityLifeCycleData.creationTimeStamp desc
+        </query>
+	</named-query>
+
+	<named-query name="dynamicForm.getformsGroupByuuid">
+		<query>		
+        SELECT new Map(umd.uiMetaData.formName as formName, umd.uiMetaData.formuuid as uuid)   FROM FormConfigurationMapping  umd
+			where (umd.entityLifeCycleData.persistenceStatus=0 or umd.entityLifeCycleData.persistenceStatus is null)
+			and umd.masterLifeCycleData.approvalStatus in (0,3,4,6) and umd.activeFlag = true group by umd.uiMetaData.formuuid, umd.uiMetaData.formName
+        </query>
+	</named-query>
+
+	<named-query name="dynamicForm.getFormNameByuuid">
+		<query>		
+        SELECT umd.uiMetaData.formName FROM FormConfigurationMapping umd where umd.masterLifeCycleData.approvalStatus in (0,3,4,6) and umd.activeFlag = true group by umd.uiMetaData.formName
+			having umd.uiMetaData.formName In ( Select u.uiMetaData.formName From FormConfigurationMapping u where u.uiMetaData.formuuid = :formuuid  )
+        </query>
+	</named-query>
+
+	<named-query name="dynamicForm.getFormByNameVersion">
+		<query>
+         Select umd.uiMetaData FROM FormConfigurationMapping umd where umd.uiMetaData.formName = :formName and umd.uiMetaData.formVersion = :formVersion
+			and umd.masterLifeCycleData.approvalStatus in (0,3,4,6) and umd.activeFlag = true
+        </query>
+	</named-query>
+	<named-query name="dynamicForm.getFormByModelUri">
+		<query>
+          Select uiMetaData.uiMetaData FROM FormConfigurationMapping uiMetaData WHERE uiMetaData.uiMetaData.modelUri = :modelUri
+			and uiMetaData.masterLifeCycleData.approvalStatus in (0,3,4,6) and uiMetaData.activeFlag = true
+        </query>
+	</named-query>
+	<named-query name="dynamicForm.getAllFormsByModelUri">
+		<query>
+          Select uiMetaData.uiMetaData FROM FormConfigurationMapping uiMetaData WHERE uiMetaData.uiMetaData.modelUri = :modelUri
+        </query>
+	</named-query>
+    <named-query name="dynamicForm.getScreenIdbyScreenCode">
+     	<query>
+          Select s.id FROM ScreenId s WHERE s.screenCode = :screenCode
+        </query>
+    </named-query>
+
+	<named-query name="ServicePlaceholderMapping.getServicePlaceholderMappingListFromServiceIdentifier">
+              <query>
+          Select spm FROM ServicePlaceholderMapping spm where spm.serviceIdentifier.id =:id 
+        </query>
+       </named-query>
+       <named-query name="ServiceIdentifier.getUnmappedServiceIdentifiersListForFields">
+              <query>
+          Select si FROM ServiceIdentifier si where si.id not in (select sffm.serviceIdentifier from ServiceFieldFilterMapping sffm where sffm.masterLifeCycleData.approvalStatus not in (:approvalStatusList)) 
+        </query>
+       </named-query>
+       
+       <!--the next one i need to  make -->
+       <named-query name="ServiceIdentifier.getUnmappedServiceIdentifiersListForPlaceholders">
+              <query>
+          Select si FROM ServiceIdentifier si where si.id not in (select spfm.serviceIdentifier from ServicePlaceholderFilterMapping spfm where spfm.masterLifeCycleData.approvalStatus not in (:approvalStatusList)) 
+        </query>
+       </named-query>
+
+       <named-query name="ServiceIdentifier.getServiceIdentifierByCode">
+        <query>
+          Select si FROM ServiceIdentifier si where si.code =:code and si.masterLifeCycleData.approvalStatus not in (:approvalStatusList)) 
+        </query>
+       </named-query>
+
+
+	<named-query name="dynamicForm.getCascadeFormConfigData">
+		<query>
+          Select fd FROM FormConfigEntityData fd where fd.id IN (Select fcd.parent FROM FormConfigEntityData fcd where fcd.parent IS NOT NULL)
+        </query>
+	</named-query>
+	<named-query name="dynamicForm.getCascadeChildFormConfigData">
+		<query>
+			Select fcd from FormConfigEntityData fcd where fcd.parent.id IN (Select fd.id from FormConfigEntityData fd where fd.entityName =:entityName)
+		</query>
+	</named-query>
+	<named-query name="dynamicForm.getItemLabelAndItemName">
+		<query>
+			SELECT new Map(form.itemLabel as itemLabel, form.itemValue as itemValue) FROM FormConfigEntityData form WHERE form.entityName =:entityName AND form.url =:url
+		</query>
+	</named-query>
+	<named-query name="dynamicForm.getPlaceHolderIdsMappedToSourceProductForAutoComplete">
+		<query>
+			SELECT new Map(sID.id as id,sID.screenCode as screenCode,sID.name as screenName) from ScreenId sID where sID.sourceProductId=:sourceProductId and (lower(sID.screenCode) LIKE :value or lower(sID.name) LIKE :value1) and sID.id NOT IN (select dfm.screenIdValue from DynamicFormScreenMapping dfm where  dfm.masterLifeCycleData.approvalStatus in (:approvalStatusList)  AND dfm.activeFlag=true)  order by lower(sID.screenCode),lower(sID.screenName)
+		</query>
+	</named-query>
+	<named-query name="dynamicForm.getDescriptionOfPlaceHolderIdsMappedToSourceProductForAutoComplete">
+		<query>
+			SELECT sID.description from ScreenId sID where sID.id=:value
+		</query>
+	</named-query>
+	<named-query name="SpecialTable.getAllMetaData">
+		<query>
+			FROM SpecialTable
+		</query>
+	</named-query>
+
+	<named-query name="SpecialTable.getSpecialTable">
+		<query>
+			FROM SpecialTable st WHERE st.keyy =:key
+		</query>
+	</named-query>
+	<named-query name="ProductScheme.getProductSchemeMetaData">
+		<query>
+			FROM ProductSchemeMetaData pd WHERE pd.fieldReference =:formComponentType and pd.keyy not like 'Assignment%'
+		</query>
+	</named-query>
+	<named-query name="ProductScheme.getProductSchemeMetaDataForAssignmentMatrix">
+		<query>
+			FROM ProductSchemeMetaData pd WHERE pd.fieldReference =:formComponentType and pd.keyy like 'Assignment%'
+		</query>
+	</named-query>
+	<named-query name="ProductScheme.getProductScheme">
+		<query>
+			FROM ProductSchemeMetaData pd WHERE pd.keyy =:key AND pd.fieldReference =:formComponentType
+		</query>
+	</named-query>
+	
+	<named-query name="dynamicForm.getFieldConfigFromFormNameFieldNameAndEntityType">
+		<query>
+			select fd from FormConfigurationMapping fcm 
+			inner join fcm.uiMetaData.panelDefinitionList pd
+			inner join pd.fieldDefinitionList fd 
+			where fcm.uiMetaData.formName = :formName and fd.fieldKey = :fieldKey and fd.entityName like :entityName and fd.binderName= :binderName and fcm.masterLifeCycleData.approvalStatus in (:approvalStatusList) and fcm.activeFlag = true
+		</query>
+	</named-query>
+
+	<named-query name="getProductTypeByShortNameOrCode">
+		<query>
+			select productType from ProductType productType WHERE productType.shortName = :masterId or productType.code = :code
+
+		</query>
+	</named-query>
+
+	<named-query name="getDynamicFormsMappedToScreenIdAndProductType">
+		<query>
+			select a from DynamicFormScreenMapping b,DynamicFormScreenMappingDetail a where b.id=a.dynamicFormMappingId and b.screenIdValue=:screenId and b.sourceProductId=:sourceProductId and a.productTypes LIKE :productType and  b.masterLifeCycleData.approvalStatus in (:approvalStatusList) and b.activeFlag = true and a.formConfigurationMapping.masterLifeCycleData.approvalStatus in (:approvalStatusList) and a.formConfigurationMapping.activeFlag = true order by a.formSequence
+
+		</query>
+	</named-query>
+
+	<named-query name="getAllDynamicFormsMappedToScreenId">
+		<query>
+			select a from DynamicFormScreenMapping b,DynamicFormScreenMappingDetail a where b.id=a.dynamicFormMappingId and b.screenIdValue=:screenId and b.sourceProductId=:sourceProductId  and  b.masterLifeCycleData.approvalStatus in (:approvalStatusList) and b.activeFlag = true order by a.formSequence
+
+		</query>
+	</named-query>
+	
+		
+   <named-query name="dynamicForm.findLabelForKey">
+              <query>
+          Select f.fieldLabel FROM UIMetaData u inner join u.panelDefinitionList p inner join p.fieldDefinitionList f where u.id=:uimetaDataId and f.fieldKey = :fieldKey
+        </query>
+   </named-query>
+
+</entity-mappings>

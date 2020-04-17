@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-mappings version="2.0"
+	xmlns="http://java.sun.com/xml/ns/persistence/orm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm http://java.sun.com/xml/ns/persistence/orm_2_0.xsd">
+
+	<!-- NAMED QUERIES for generic operations -->
+
+	<named-query name="Generic.AllCommentsForEntity">
+		<query>
+          FROM Comment c WHERE c.ownerEntityUri = :ownerEntityUri AND TYPE(c) IN (Comment)
+        </query>
+	</named-query>
+
+	<named-query name="Generic.FindTypeByCode">
+		<query>
+          FROM GenericParameter gp WHERE gp.code = :typeCode
+        </query>
+	</named-query>
+
+
+	<named-query name="Generic.getUnseenNotificationFromUserUri">
+		<query>
+          Select n FROM Notification n WHERE n.notificationUserUri = :userUri and n.seen=false and n.eventType in (:notifyEvents)
+        </query>
+	</named-query>
+	
+	
+	
+	<named-query name="Generic.getLastEventCreatedTime">
+		<query>
+			SELECT new MAP(ge.entityLifeCycleData.creationTimeStamp as eventCreationTimeStamp, mde.dataValue as eventDataValue) FROM GenericEvent ge INNER JOIN ge.eventMetadata.metadataEntries mde WHERE ge.eventType=:eventType AND ge.eventMetadata.ownerUri=:ownerEntityUri AND mde.dataKey=:dataKey
+        </query>
+	</named-query>
+	
+	
+	<named-query name="Generic.getUnseenNotificationCountFromUserUri">
+		<query>
+          Select count(id) FROM Notification n WHERE n.notificationUserUri like :userUri and n.seen=false
+        </query>
+	</named-query>
+
+	<named-query name="Generic.getNewNotificationFromUserUriByCreationTimestamp">
+		<query>
+			Select n.id FROM Notification n WHERE n.notificationUserUri = :userUri and n.seen=false and n.eventType in (:notifyEvents)
+			ORDER BY n.entityLifeCycleData.creationTimeStamp DESC
+		</query>
+	</named-query>
+
+
+	<named-query name="Generic.updateUnseenNotificationFromUserUriByCreationTimestamp">
+		<query>
+			update Notification n set n.markedSeenBySystem = true, n.seen = true WHERE n.notificationUserUri = :userUri and n.seen=false and n.eventType in (:notifyEvents)
+			and n.id not in (:newNotificationIds)
+		</query>
+	</named-query>
+
+
+	<named-query name="Generic.getLastNotificationFromUserUri">
+		<query>
+          Select n FROM Notification n WHERE n.notificationUserUri like :userUri ORDER BY n.entityLifeCycleData.creationTimeStamp DESC
+        </query>
+	</named-query>
+
+	<named-query name="Generic.getEventsByOwnerEntityUri">
+		<query>
+         Select ge FROM GenericEvent ge WHERE  ge.eventMetadata.ownerUri=:ownerEntityUri ORDER BY ge.entityLifeCycleData.creationTimeStamp DESC
+        </query>
+	</named-query>
+
+
+	<named-query name="Generic.getEventsByTypeAndAssociatedUserUri">
+		<query>
+         Select ge FROM GenericEvent ge WHERE ge.eventType in :eventTypeList AND ge.associatedUserUri=:associatedUserUri ORDER BY ge.entityLifeCycleData.creationTimeStamp DESC
+        </query>
+	</named-query>
+
+	<named-query name="Generic.getEventsByWatcherUserUri">
+		<query>
+     	select e from GenericEvent e where e.eventMetadata.ownerUri 
+		IN(select wi.entityUri from WatchedItem wi ,IN(wi.userUris) uu where uu=:watcherUserUri )
+		ORDER BY e.entityLifeCycleData.creationTimeStamp DESC
+        </query>
+	</named-query>
+
+	<named-query name="Generic.getEventsByUserUri">
+		<query>
+     	select e from GenericEvent e where (e.eventMetadata.ownerUri 
+		IN(select wi.entityUri from WatchedItem wi ,IN(wi.userUris) uu where uu=:associatedUserUri )
+		or e.associatedUserUri=:associatedUserUri) ORDER BY e.entityLifeCycleData.creationTimeStamp DESC
+        </query>
+	</named-query>
+
+	<named-query name="Generic.getEventsByUserUriWithExclude">
+		<query>
+     	select e from GenericEvent e where (e.eventMetadata.ownerUri 
+		IN(select wi.entityUri from WatchedItem wi ,IN(wi.userUris) uu where uu=:associatedUserUri )
+		or e.associatedUserUri=:associatedUserUri) and e.eventType not in :excludeEventTypeList ORDER BY e.entityLifeCycleData.creationTimeStamp DESC
+        </query>
+	</named-query>
+	
+	<named-query name="Generic.getEventsByUserUriWithEventsToInclude">
+		<query>
+     	select e from GenericEvent e where (e.eventMetadata.ownerUri 
+		IN(select wi.entityUri from WatchedItem wi ,IN(wi.userUris) uu where uu=:associatedUserUri )
+		or e.associatedUserUri=:associatedUserUri) and e.eventType in :eventsToInclude ORDER BY e.entityLifeCycleData.creationTimeStamp DESC
+        </query>
+	</named-query>
+
+	<named-query name="Generic.getAssociatedEventsByUserUriWithExclude">
+		<query>
+         Select ge FROM GenericEvent ge WHERE ge.eventType not in :excludeEventTypeList AND ge.associatedUserUri=:associatedUserUri ORDER BY ge.entityLifeCycleData.creationTimeStamp DESC
+        </query>
+	</named-query>
+
+	<named-query name="Generic.getAssociatedEventsByUserUri">
+		<query>
+         Select ge FROM GenericEvent ge WHERE ge.associatedUserUri=:associatedUserUri ORDER BY ge.entityLifeCycleData.creationTimeStamp DESC
+        </query>
+	</named-query>
+
+
+	<named-query name="Generic.getCommentsForEntitiesWatchedByUser">
+		<query>
+          FROM Comment c WHERE c.ownerEntityUri IN (select wi.entityUri from WatchedItem wi ,IN(wi.userUris) uu where uu=:watcherUserUri) AND TYPE(c) IN (Comment) AND (c.entityLifeCycleData.snapshotRecord IS NULL OR c.entityLifeCycleData.snapshotRecord = false) ORDER BY c.entityLifeCycleData.creationTimeStamp DESC
+        </query>
+	</named-query>
+
+	<named-query name="Generic.getEventsByUserUriWithIncludeAfterGivenEvent">
+		<query>
+     	select e from GenericEvent e where (e.eventMetadata.ownerUri 
+		IN(select wi.entityUri from WatchedItem wi ,IN(wi.userUris) uu where uu=:associatedUserUri )
+		or e.associatedUserUri=:associatedUserUri) and e.eventType in :eventsToInclude 
+		and e.entityLifeCycleData.creationTimeStamp >(select ge.entityLifeCycleData.creationTimeStamp from GenericEvent ge where ge.id=:lastEventId )
+		ORDER BY e.entityLifeCycleData.creationTimeStamp DESC
+        </query>
+	</named-query>
+
+	<named-query name="Generic.getCommentsForEntitiesWatchedByUserAfterComment">
+		<query>
+          FROM Comment c WHERE c.ownerEntityUri IN (select wi.entityUri from WatchedItem wi ,IN(wi.userUris) uu where uu=:watcherUserUri) AND TYPE(c) IN (Comment) 
+          AND (c.entityLifeCycleData.snapshotRecord IS NULL OR c.entityLifeCycleData.snapshotRecord = false) and c.entityLifeCycleData.creationTimeStamp >(select gc.entityLifeCycleData.creationTimeStamp from Comment gc where gc.id=:lastCommentId )
+          ORDER BY c.entityLifeCycleData.creationTimeStamp DESC
+        </query>
+	</named-query>
+
+	<named-query name="Generic.getUserEventsBeforeDate">
+		<query>
+     	select g from GenericEvent g where g.associatedUserUri=:associatedUserUri and g.entityLifeCycleData.creationTimeStamp <![CDATA[<=]]> :beforeDate  
+        </query>
+	</named-query>
+	<named-query name="Configuration.getPropertyValueFromPropertyKey">
+	<query>
+	select propertyValue from Configuration c where c.propertyKey=:propertyKey
+	</query>
+	</named-query>
+	
+	<named-query name="Configuration.getObjectFromPropertyKey">
+	<query>
+	select c from Configuration c where c.propertyKey=:propertyKey
+	</query>
+	</named-query>
+	
+
+</entity-mappings>

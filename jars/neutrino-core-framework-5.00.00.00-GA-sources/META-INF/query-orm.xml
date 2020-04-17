@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-mappings version="2.0"
+	xmlns="http://java.sun.com/xml/ns/persistence/orm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm http://java.sun.com/xml/ns/persistence/orm_2_0.xsd">
+	<named-query name="Query.ObjectGraphTypeByObjectGraph">
+		<query>
+          Select ogt FROM QueryObjectGraphTypes ogt WHERE ogt.objectGraph = :objectGraph
+        </query>
+	</named-query>
+	
+	<named-query name="Query.RuleByName">
+		<query>
+          Select ru FROM QueryRule ru WHERE ru.name = :name
+        </query>
+	</named-query>
+
+	<named-query name="Query.ConditionByName">
+		<query>
+          Select con FROM QueryCondition con WHERE con.name = :name
+        </query>
+	</named-query>
+
+	<named-query name="Query.ParameterByName">
+		<query>
+          Select par FROM QueryParam par WHERE par.name = :name
+        </query>
+	</named-query>
+
+	<named-query name="Query.ApprovedRuleByName">
+		<query>
+          Select ru FROM QueryRule ru WHERE ru.name like :name
+        </query>
+	</named-query>
+
+	<named-query name="Query.ApprovedConditionByName">
+		<query>
+          Select con FROM QueryCondition con WHERE con.name like :name
+        </query>
+	</named-query>
+
+	<named-query name="Query.ApprovedParameterByName">
+		<query>
+          Select par FROM QueryParam par WHERE par.name like :name 
+        </query>
+	</named-query>
+
+	<named-query name="Query.ApprovedNumericParameters">
+		<query>
+          Select par FROM QueryParam par WHERE par.dataType IN ('1','2' )
+        </query>
+	</named-query>
+
+	<named-query name="Query.ApprovedConditions.BasedOnProductSelected">
+		<query>
+          Select con FROM QueryCondition con WHERE con.name like :name AND con.sourceProduct= :productId
+        </query>
+	</named-query>
+
+	<named-query name="Query.ApprovedParameters.BasedOnProductSelected">
+		<query>
+          Select par FROM QueryParam par WHERE par.name like :name AND par.sourceProduct= :productId 
+        </query>
+	</named-query>
+	
+	<named-query name="Query.ApprovedObjectGraph.BasedOnProductSelected">
+		<query>
+          Select ogt FROM QueryObjectGraphTypes ogt WHERE ogt.sourceProduct= :productId
+        </query>
+	</named-query>
+	
+	<named-query name="Query.ApprovedParameters.BasedOnDataTypeProductSelected">
+		<query>
+          Select par FROM QueryParam par WHERE par.name like :name AND par.sourceProduct= :productId AND  par.dataType = :dataType  
+        </query>
+	</named-query>
+	
+</entity-mappings>

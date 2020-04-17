@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-mappings version="2.0"
+	xmlns="http://java.sun.com/xml/ns/persistence/orm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm http://java.sun.com/xml/ns/persistence/orm_2_0.xsd">
+
+	<!-- NAMED QUERIES for generic operations -->
+
+	<named-query name="Document.ApprovedGroupDocuments">
+		<query>
+          select dd from DocumentDefinition dd where dd.masterLifeCycleData.approvalStatus = :approvalStatus and dd.documentType.code = :code AND (dd.entityLifeCycleData.snapshotRecord IS NULL OR dd.entityLifeCycleData.snapshotRecord = false) ORDER BY dd.name ASC
+        </query>
+	</named-query>
+
+	<named-query name="Document.ApprovedGroupDocumentsForBinder">
+		<query>
+          select new Map(dd.id as id,dd.name as name) from DocumentDefinition dd where dd.masterLifeCycleData.approvalStatus = :approvalStatus  AND dd.activeFlag = true and  dd.documentType.code = :code AND (dd.entityLifeCycleData.snapshotRecord IS NULL OR dd.entityLifeCycleData.snapshotRecord = false) ORDER BY dd.name ASC
+        </query>
+	</named-query>
+
+	<named-query
+		name="DocumentService.getDocumentDefinitionByClassificationType">
+		<query>
+          FROM DocumentDefinition dd where dd.documentClassificationType.id=:classificationType AND dd.activeFlag = true AND (dd.entityLifeCycleData.snapshotRecord IS NULL OR dd.entityLifeCycleData.snapshotRecord = false) AND dd.masterLifeCycleData.approvalStatus IN :statusList ORDER BY dd.name ASC
+        </query>
+	</named-query>
+
+	<named-query name="DocumentService.getDocumentByDocumentStoreId">
+		<query>
+          SELECT doc FROM Document doc where doc.documentStoreId=:documentStoreId
+        </query>
+	</named-query>
+
+	<named-query
+		name="DocumentService.getActiveDocumentDefinitionByClassificationType">
+		<query>
+         select new Map(dd.id as id,dd.description as description) from DocumentDefinition dd  where dd.documentClassificationType.id=:classificationType AND dd.activeFlag = true AND (dd.entityLifeCycleData.snapshotRecord IS NULL OR dd.entityLifeCycleData.snapshotRecord = false) AND dd.masterLifeCycleData.approvalStatus IN :statusList ORDER BY dd.name ASC
+        </query>
+	</named-query>
+	<named-query name="DocumentUsage.getGroupDocument">
+		<query>
+		select d1 from DocumentDefinition d1 inner join d1.groupedDocuments d2 where d2.id=:id AND d1.documentType.code ='DocumentTypeGroupDocument'
+		</query>
+	</named-query>
+	<named-query name="DocumentUsage.getChecklist">
+		<query>
+		select dc from DocumentChecklist dc inner join dc.documents doc where doc.document.id=:id
+		</query>
+	</named-query>
+	<named-query name="DocumentService.getDocumentChecklistFromDocumentChecklistDefinitionId">
+		<query>
+		select dc from DocumentChecklist dc inner join dc.documents doc where doc.id=:docCheckDefId
+		</query>
+	</named-query>
+</entity-mappings>

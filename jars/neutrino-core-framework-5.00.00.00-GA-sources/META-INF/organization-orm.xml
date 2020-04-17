@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-mappings version="2.0"
+	xmlns="http://java.sun.com/xml/ns/persistence/orm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm http://java.sun.com/xml/ns/persistence/orm_2_0.xsd">
+
+	<named-query name="Organization.getOrganizationBranch">
+		<query>
+            Select o FROM Organization o inner join o.organizationType orgType WHERE orgType.levelInHierarchy in (:levelInHirarchy) AND (o.entityLifeCycleData.snapshotRecord IS NULL OR o.entityLifeCycleData.snapshotRecord = false) AND o.masterLifeCycleData.approvalStatus IN :statusList ORDER BY o.name
+        </query>
+	</named-query>
+	<named-query name="Organization.getAllChildBranches">
+		<query>
+            FROM OrganizationBranch o where o.parentBranchIds like (:branchID) AND o.masterLifeCycleData.approvalStatus IN :approvalStatus AND (o.entityLifeCycleData.snapshotRecord IS NULL OR o.entityLifeCycleData.snapshotRecord = false) ORDER BY o.name
+        </query>
+	</named-query>
+	
+	<named-query name="Organization.getBranchChildCount">
+		<query>
+            select count(o.id) from OrganizationBranch o where o.parentBranchIds like (:branchID) AND (o.entityLifeCycleData.snapshotRecord IS NULL OR o.entityLifeCycleData.snapshotRecord = false) AND o.activeFlag = true
+        </query>
+	</named-query>	
+	<named-query name="Organization.getTopOrgBranches">
+		<query>
+            SELECT NEW com.nucleus.user.OrgBranchInfo(o.id,o.name,o.organizationType.code,(Select COUNT(childorg.id) from OrganizationBranch childorg inner join childorg.parentBranchMapping pbm where childorg.masterLifeCycleData.approvalStatus IN :approvalStatus AND pbm.parentBranch.id = o.id AND pbm.moduleName.code = :systemName AND childorg.activeFlag = true)) FROM OrganizationBranch o where o.parentBranchMapping IS EMPTY AND o.masterLifeCycleData.approvalStatus IN :approvalStatus AND (o.entityLifeCycleData.snapshotRecord IS NULL OR o.entityLifeCycleData.snapshotRecord = false) AND o.activeFlag = true order by o.name
+        </query>
+	</named-query>
+	<named-query name="Organization.getTopOrgBranchesAmongBranchIds">
+		<query>
+            SELECT NEW com.nucleus.user.OrgBranchInfo(o.id,o.name,o.organizationType.code,(Select COUNT(childorg.id) from OrganizationBranch childorg inner join childorg.parentBranchMapping pbm where childorg.masterLifeCycleData.approvalStatus IN :approvalStatus AND pbm.parentBranch.id = o.id AND pbm.moduleName.code = :systemName AND childorg.activeFlag = true))
+			FROM OrganizationBranch o where o.id in (:branchIds) and
+			o.parentBranchMapping IS EMPTY AND o.masterLifeCycleData.approvalStatus IN :approvalStatus AND (o.entityLifeCycleData.snapshotRecord IS NULL OR o.entityLifeCycleData.snapshotRecord = false) AND o.activeFlag = true order by o.name
+        </query>
+	</named-query>	 
+	<named-query name="Organization.getChildOrgBranches">
+		<query>
+            SELECT NEW com.nucleus.user.OrgBranchInfo(o.id,o.name,o.organizationType.code,(Select COUNT(childorg.id) from OrganizationBranch childorg inner join childorg.parentBranchMapping pbm where childorg.masterLifeCycleData.approvalStatus IN :approvalStatus AND pbm.parentBranch.id = o.id AND pbm.moduleName.code = :systemName AND childorg.activeFlag = true)) FROM OrganizationBranch o inner join o.parentBranchMapping opbm where o.masterLifeCycleData.approvalStatus IN :approvalStatus AND opbm.parentBranch.id =:parentOrgId AND opbm.moduleName.code = :systemName  AND (o.entityLifeCycleData.snapshotRecord IS NULL OR o.entityLifeCycleData.snapshotRecord = false) AND o.activeFlag = true order by o.name
+        </query>
+	</named-query>
+	
+	<named-query name="Organization.getUniqueChildOrgBranches">
+		<query>
+            SELECT distinct NEW com.nucleus.user.OrgBranchInfo(o.id,o.name,o.organizationType.code,(Select COUNT(childorg.id) from OrganizationBranch childorg inner join childorg.parentBranchMapping pbm where childorg.masterLifeCycleData.approvalStatus IN :approvalStatus AND pbm.parentBranch.id = o.id AND pbm.moduleName.code = :systemName AND childorg.activeFlag = true)) FROM OrganizationBranch o inner join o.parentBranchMapping opbm where o.masterLifeCycleData.approvalStatus IN :approvalStatus AND opbm.parentBranch.id =:parentOrgId AND opbm.moduleName.code = :systemName  AND (o.entityLifeCycleData.snapshotRecord IS NULL OR o.entityLifeCycleData.snapshotRecord = false) AND o.activeFlag = true order by o.name
+        </query>
+	</named-query>
+	
+	<named-query name="Organization.getOrgBranchesOfBranchType">
+		<query>
+        SELECT new Map(s.id as id,s.name as name) FROM OrganizationBranch s WHERE s.masterLifeCycleData.approvalStatus IN :approvalStatus  AND s.activeFlag = true AND s.organizationType.code=:orgType AND (s.entityLifeCycleData.snapshotRecord is null OR s.entityLifeCycleData.snapshotRecord = false)
+        </query>
+	</named-query>
+	
+	<named-query name="Organization.getOrgBranchesOfBranchTypeLike">
+		<query>
+        SELECT new Map(s.id as id,s.name as name) FROM OrganizationBranch s WHERE s.masterLifeCycleData.approvalStatus IN :approvalStatus  AND s.activeFlag = true AND s.organizationType.code=:orgType AND lower(s.name) LIKE :value AND (s.entityLifeCycleData.snapshotRecord is null OR s.entityLifeCycleData.snapshotRecord = false) ORDER BY lower(s.name)
+        </query>
+	</named-query>
+	
+	<named-query name="Organization.getOrgBranchesForLoggedInUser">
+		<query>
+            SELECT NEW com.nucleus.user.OrgBranchInfo(uobm.organizationBranch.id,uobm.organizationBranch.name,(Select COUNT(organizationBranch) from OrganizationBranch organizationBranch inner join organizationBranch.parentBranchMapping opbm  where opbm.parentBranch.id = uobm.organizationBranch.id AND organizationBranch.activeFlag = true)) FROM UserOrgBranchMapping uobm where uobm.associatedUser.id = :userId AND uobm.isBranchAdmin=true AND (uobm.organizationBranch.entityLifeCycleData.snapshotRecord IS NULL OR uobm.organizationBranch.entityLifeCycleData.snapshotRecord = false)
+        </query>
+	</named-query>	
+	<named-query name="Organization.getChildOrgBranchesForLoggedInUser">
+		<query>
+            SELECT NEW com.nucleus.user.OrgBranchInfo(uobm.organizationBranch.id,uobm.organizationBranch.name,(Select COUNT(organizationBranch) from OrganizationBranch organizationBranch inner join organizationBranch.parentBranchMapping obpbm where obpbm.parentBranch.id = uobm.organizationBranch.id AND organizationBranch.activeFlag = true)) FROM UserOrgBranchMapping uobm inner join uobm.organizationBranch.parentBranchMapping opbm   where opbm.parentBranch.id =:parentOrgId  AND uobm.associatedUser.id = :userId AND uobm.isBranchAdmin=true AND (uobm.organizationBranch.entityLifeCycleData.snapshotRecord IS NULL OR uobm.organizationBranch.entityLifeCycleData.snapshotRecord = false)
+        </query>
+	</named-query>
+	
+	<named-query name="Organization.getOrgBranchesByCity">
+		<query>
+          SELECT ob FROM OrganizationBranch ob where ob.contactInfo.address.city.id = :cityId AND (ob.entityLifeCycleData.snapshotRecord IS NULL OR ob.entityLifeCycleData.snapshotRecord = false) AND ob.activeFlag = true
+        </query>
+	</named-query>
+	<named-query name="Organization.getIdAndNameOFOrgBranchesByCity">
+		<query>
+          SELECT ob.id,ob.name FROM OrganizationBranch ob where ob.contactInfo.address.city.id = :cityId AND (ob.entityLifeCycleData.snapshotRecord IS NULL OR ob.entityLifeCycleData.snapshotRecord = false) AND ob.activeFlag = true
+        </query>
+	</named-query>
+	
+	<named-query name="Organization.getAllChildBranchesId">
+		<query>
+       SELECT o.id FROM OrganizationBranch o where o.parentBranchIds like (:branchID) AND (o.entityLifeCycleData.snapshotRecord IS NULL OR o.entityLifeCycleData.snapshotRecord = false) AND o.activeFlag = true
+        </query>
+	</named-query>
+	
+	<named-query name="Organization.getAllChildBranchesIdOfBranchType">
+		<query>
+		    SELECT o.id FROM OrganizationBranch o where o.parentBranchIds like (:branchID) And (o.organizationType.id=:idOfBranchTypeOrganization) AND (o.entityLifeCycleData.snapshotRecord IS NULL OR o.entityLifeCycleData.snapshotRecord = false) AND o.activeFlag = true
+        </query>
+	</named-query>
+	
+	<named-query name="Organization.getOrgBranchesOfBranchTypeRO">
+		<query>
+        SELECT new Map(s.id as id,s.name as name) FROM OrganizationBranch s WHERE s.masterLifeCycleData.approvalStatus IN :approvalStatus  AND s.activeFlag = true AND s.organizationType.code=:orgType AND (s.entityLifeCycleData.snapshotRecord is null OR s.entityLifeCycleData.snapshotRecord = false)
+        </query>
+	</named-query>
+	
+	<named-query name="Organization.getOrgBranchesByServedCity">
+		<query>
+          SELECT ob FROM OrganizationBranch ob join ob.servedCities servedCity where servedCity.id = :cityId AND (ob.entityLifeCycleData.snapshotRecord IS NULL OR ob.entityLifeCycleData.snapshotRecord = false) AND ob.masterLifeCycleData.approvalStatus IN :approvalStatus AND ob.activeFlag = true ORDER BY lower(ob.name)
+        </query>
+	</named-query>
+	
+	<named-query name="Organization.getAllApprovedAndActiveOrganizationBranches">
+		<query>
+			SELECT NEW com.nucleus.user.OrgBranchInfo(o.id,o.name) FROM OrganizationBranch o where (o.entityLifeCycleData.snapshotRecord IS NULL OR o.entityLifeCycleData.snapshotRecord = false) AND o.masterLifeCycleData.approvalStatus IN :approvalStatus  AND o.activeFlag = true AND o.organizationType.code = :organizationTypeCode
+		</query>
+	</named-query>
+	
+	<named-query name="Organization.getOrgBranchByBranchCode">
+		<query>
+          SELECT ob FROM OrganizationBranch ob where upper(trim(ob.branchCode)) = upper(trim(:branchCode)) AND (ob.entityLifeCycleData.snapshotRecord IS NULL OR ob.entityLifeCycleData.snapshotRecord = false) AND ob.masterLifeCycleData.approvalStatus IN :approvalStatus AND ob.activeFlag = true
+        </query>
+	</named-query>
+	
+	<named-query name="Organization.getApprovedAndActiveOrgBranches">
+		<query>
+          select ob.id,ob.name from OrganizationBranch ob where lower(ob.name) like :searchTerm and ob.masterLifeCycleData.approvalStatus in :approvalStatus and activeFlag = true
+        </query>
+	</named-query>
+
+	<named-query name="Organization.getOrgBranchByBranchCodeAndBranchType">
+		<query>
+			SELECT ob FROM OrganizationBranch ob where ob.organizationType.code=:orgType and upper(trim(ob.branchCode)) = upper(trim(:branchCode)) AND (ob.entityLifeCycleData.snapshotRecord IS NULL OR ob.entityLifeCycleData.snapshotRecord = false) AND ob.masterLifeCycleData.approvalStatus IN :approvalStatus AND ob.activeFlag = true
+		</query>
+	</named-query>
+	
+	
+</entity-mappings>

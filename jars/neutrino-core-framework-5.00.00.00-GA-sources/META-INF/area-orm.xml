@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-mappings version="2.0"
+				 xmlns="http://java.sun.com/xml/ns/persistence/orm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				 xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm http://java.sun.com/xml/ns/persistence/orm_2_0.xsd">
+
+	<!-- NAMED QUERIES for generic operations -->
+
+	<named-query name="ZipCode.ZipCodesByCityId">
+		<query>
+			select zp FROM ZipCode zp WHERE zp.city.id = :cityId AND zp.masterLifeCycleData.approvalStatus IN :approvalStatus
+			AND(zp.entityLifeCycleData.snapshotRecord IS NULL OR zp.entityLifeCycleData.snapshotRecord = false) order by lower(zp.zipCode)
+		</query>
+	</named-query>
+
+	<named-query name="ZipCode.ZipCodesByVillageId">
+		<query>
+			select zp FROM ZipCode zp INNER JOIN zp.village village WHERE village.id =:villageId AND zp.masterLifeCycleData.approvalStatus IN :approvalStatus
+			AND(zp.entityLifeCycleData.snapshotRecord IS NULL OR zp.entityLifeCycleData.snapshotRecord = false) order by lower(zp.zipCode)
+        </query>
+	</named-query>
+
+	<named-query name="Area.AreaByCityId">
+		<query>
+			from Area a where a.city.id =:cityId AND a.masterLifeCycleData.approvalStatus IN :approvalStatus AND a.activeFlag = true
+			AND(a.entityLifeCycleData.snapshotRecord IS NULL OR a.entityLifeCycleData.snapshotRecord = false)
+		</query>
+	</named-query>
+
+	<named-query name="Area.AreaByVillageId">
+		<query>
+			from Area a where a.village.id =:villageId AND a.masterLifeCycleData.approvalStatus IN :approvalStatus AND a.activeFlag = true
+			AND(a.entityLifeCycleData.snapshotRecord IS NULL OR a.entityLifeCycleData.snapshotRecord = false)
+		</query>
+	</named-query>
+</entity-mappings>

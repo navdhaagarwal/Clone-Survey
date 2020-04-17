@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-mappings version="2.0"
+	xmlns="http://java.sun.com/xml/ns/persistence/orm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm http://java.sun.com/xml/ns/persistence/orm_2_0.xsd">
+
+	<named-query name="chat.getHistoryByPeriod">
+		<query>
+           select cm from ChatMessage cm inner join cm.chat c where c.id != :chatId and c.chatType IS NULL and cm.time &gt;= :date and (upper(cm.fromUser.username)  = upper(:fromUser) or upper(cm.fromUser.username) = upper(:toUser)) and (cm.fromUser.masterLifeCycleData.approvalStatus in (:approvalStatusList)) order by cm.time
+        </query>
+	</named-query>
+
+
+</entity-mappings>
+

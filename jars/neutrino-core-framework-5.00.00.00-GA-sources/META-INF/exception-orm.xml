@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-mappings version="2.0"
+	xmlns="http://java.sun.com/xml/ns/persistence/orm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm http://java.sun.com/xml/ns/persistence/orm_2_0.xsd">
+	
+	<named-query name="Exception.byType">
+		<query>
+       		Select e FROM NeutrinoExceptionEntity e where e.exceptionType in (:exceptionType)
+        </query>
+	</named-query>
+	<named-query name="Exception.byTypeWithNode">
+		<query>
+			Select e FROM NeutrinoExceptionEntity e where e.node = :node AND e.exceptionType in (:exceptionType)
+		</query>
+	</named-query>
+	<named-query name="Exception.uniqueType">
+		<query>
+       		Select DISTINCT e.exceptionType FROM NeutrinoExceptionEntity e
+        </query>
+	</named-query>
+	<named-query name="Exception.byLoggedInUser">
+		<query>
+       		Select e FROM NeutrinoExceptionEntity e WHERE e.loggedInUserUri in (:loggedInUserUri)
+        </query>
+	</named-query>
+	<named-query name="Exception.byLoggedInUserWithNode">
+		<query>
+			Select e FROM NeutrinoExceptionEntity e WHERE e.node=:node AND e.loggedInUserUri in (:loggedInUserUri)
+		</query>
+	</named-query>
+	<named-query name="Exception.uniqueUser">
+		<query>
+       		Select DISTINCT e.loggedInUserUri FROM NeutrinoExceptionEntity e
+        </query>
+	</named-query>
+	<named-query name="Exception.uniqueNode">
+		<query>
+			Select DISTINCT e.node FROM NeutrinoExceptionEntity e where e.node is not null
+		</query>
+	</named-query>
+	<named-query name="Exception.byMethodName">
+		<query>
+       		Select e FROM NeutrinoExceptionEntity e WHERE e.methodName = :methodName
+        </query>
+	</named-query>
+
+	<named-query name="Exception.byNode">
+		<query>
+			Select e FROM NeutrinoExceptionEntity e WHERE e.node = :node
+		</query>
+	</named-query>
+
+	<named-query name="Exception.exceptionCountOfEachNode">
+		<query>
+			SELECT new Map(node as node, exceptionType as exceptionType, COUNT(exceptionType) as count)  FROM NeutrinoExceptionEntity where
+			node in (:nodeList) GROUP BY exceptionType , node order by node asc
+		</query>
+	</named-query>
+
+	<named-query name="Exception.getUniqueExceptionData">
+		<query>
+			select e from NeutrinoExceptionEntity e where casTransactionId in (select max(casTransactionId) from NeutrinoExceptionEntity
+			where exceptionType = :exceptionType and node = :node group by fileName , methodName)
+		</query>
+	</named-query>
+
+	<named-query name="Exception.exceptionsAndCountOfNode">
+	<query>
+		SELECT new Map(node as node, exceptionType as exceptionType, COUNT(exceptionType) as count)  FROM NeutrinoExceptionEntity where
+		node = :node GROUP BY exceptionType , node order by node asc
+	</query>
+	</named-query>
+
+	<named-query name="Exception.exceptionCountOfNodeGroup">
+		<query>
+			SELECT new Map(node as node, COUNT(exceptionType) as count)  FROM NeutrinoExceptionEntity where
+			node in (:nodeList) GROUP BY node order by node asc
+		</query>
+	</named-query>
+
+	<named-query name="Exception.all">
+		<query>
+       		Select e FROM NeutrinoExceptionEntity e
+        </query>
+	</named-query>
+	<named-query name="Exception.byDateAndType">
+		<query>
+       		Select e FROM NeutrinoExceptionEntity e WHERE e.creationDate =:exceptionOccuredTimestamp AND e.exceptionType = :exceptionType
+        </query>
+	</named-query>
+	<named-query name="Exception.byDate">
+		<query>
+       		Select e FROM NeutrinoExceptionEntity e WHERE e.creationDate =:exceptionOccuredDate
+        </query>
+	</named-query>
+	<named-query name="Exception.byTimeStamp">
+		<query>
+       		Select e FROM NeutrinoExceptionEntity e WHERE e.entityLifeCycleData.creationTimeStamp =:exceptionOccuredTimestamp
+        </query>
+	</named-query>
+	<named-query name="Exception.byClassName">
+		<query>
+       		Select e FROM NeutrinoExceptionEntity e WHERE e.className = :className
+        </query>
+	</named-query>
+	<named-query name="Exception.betweenDates">
+		<query>
+       		Select e FROM NeutrinoExceptionEntity e WHERE e.entityLifeCycleData.creationTimeStamp BETWEEN :startDate AND :endDate
+        </query>
+	</named-query>
+    <named-query name="Exception.betweenDatesWithNode">
+        <query>
+            Select e FROM NeutrinoExceptionEntity e WHERE e.node= :node AND e.entityLifeCycleData.creationTimeStamp BETWEEN :startDate AND :endDate
+        </query>
+    </named-query>
+	<named-query name="Exception.deleteForDays">
+		<query>
+       		DELETE FROM NeutrinoExceptionEntity e WHERE e.entityLifeCycleData.creationTimeStamp BETWEEN :startDate AND :endDate
+        </query>
+	</named-query>
+
+	<named-query name="Exception.configurationByPropertyKey">
+		<query>
+			Select e FROM Configuration e WHERE PROPERTY_KEY = :propertyKey
+		</query>
+	</named-query>
+	
+
+
+</entity-mappings>

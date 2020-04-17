@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns="http://schema.base.ws.pro.finnone.nucleus.com" targetNamespace="http://schema.base.ws.pro.finnone.nucleus.com"
+	xmlns:base="http://schema.base.ws.pro.finnone.nucleus.com"
+	elementFormDefault="qualified">
+
+
+ <xsd:include schemaLocation="StringTypes.xsd" />
+
+	
+
+	
+	<xsd:element name="detail" type="base:ExceptionDetailType" />
+
+	<xsd:element name="applicationException" type="base:ExceptionType" />
+	<xsd:element name="systemException" type="base:ExceptionType" />
+	<xsd:element name="faultReason" type="base:String_4000Type" />
+	<xsd:element name="faultMessage" type="base:String_4000Type" />
+
+
+
+	<xsd:complexType name="FaultType">
+		<xsd:annotation>
+			<xsd:documentation>Common Application/System FaultType
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element ref="base:detail" minOccurs="0" maxOccurs="1" />
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="ExceptionDetailType">
+		<xsd:annotation>
+			<xsd:documentation>Common Application/System Fault Detail
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence minOccurs="1" maxOccurs="1">
+			<xsd:choice>
+				<xsd:element ref="base:applicationException" minOccurs="0"
+					maxOccurs="1" />
+				<xsd:element ref="base:systemException" minOccurs="0"
+					maxOccurs="1" />
+			</xsd:choice>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="ExceptionType">
+		<xsd:annotation>
+			<xsd:documentation>Common Application/System FaultType
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element ref="base:faultReason" minOccurs="1" maxOccurs="1" />
+			<xsd:element ref="base:faultMessage" minOccurs="1" maxOccurs="1" />
+		</xsd:sequence>
+	</xsd:complexType> 
+	
+<xsd:element name="Fault" type="FaultType" />
+
+</xsd:schema>

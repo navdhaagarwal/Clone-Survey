@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans   http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="processEngine" class="org.activiti.spring.ProcessEngineFactoryBean">
+	   <property name="processEngineConfiguration" ref="processEngineConfiguration" />
+	 </bean>
+	 
+	<bean id="processDiagramGenerator" class="org.activiti.image.impl.DefaultProcessDiagramGenerator">
+	</bean>
+	
+	<bean id="repositoryService" factory-bean="processEngine"
+		factory-method="getRepositoryService" />
+	<bean id="runtimeService" factory-bean="processEngine"
+		factory-method="getRuntimeService" />
+	<bean id="taskService" factory-bean="processEngine"
+		factory-method="getTaskService" />
+	<bean id="historyService" factory-bean="processEngine"
+		factory-method="getHistoryService" />
+	<bean id="managementService" factory-bean="processEngine"
+		factory-method="getManagementService" />
+
+	<!-- Abstract bean which allows plug in mechanism for bpmn files to be defined 
+		later by client projects -->
+	<bean id="bpmnResourcePluginBeanPostProcessor" class="com.nucleus.core.spring.PluginBeanFactoryPostProcessor"
+		abstract="true">
+         <property name="extensionBeanName" value="processEngineConfiguration" />
+         <property name="propertyName" value="deploymentResources" />
+     </bean>
+     
+     <bean parent="bpmnResourcePluginBeanPostProcessor">
+         <property name="pluginBeanName" value="masterApprovalBpmnFileBean" />
+     </bean>
+     
+     <bean id="masterApprovalBpmnFileBean" class="java.lang.String">
+		<constructor-arg
+			value="classpath*:/com/nucleus/process/bpmn/MasterApprovalProcess.bpmn20.xml" />
+     </bean>
+     
+     <bean parent="bpmnResourcePluginBeanPostProcessor">
+         <property name="pluginBeanName" value="autoApprovalBpmnFileBean" />
+     </bean>
+
+     <bean id="autoApprovalBpmnFileBean" class="java.lang.String">
+		<constructor-arg
+			value="classpath*:/com/nucleus/process/bpmn/AutoApprovalProcess.bpmn20.xml" />
+     </bean>
+     
+     <bean parent="bpmnResourcePluginBeanPostProcessor">
+         <property name="pluginBeanName" value="genericMakerCheckerBpmnFileBean" />
+     </bean>
+
+     <bean id="genericMakerCheckerBpmnFileBean" class="java.lang.String">
+		<constructor-arg
+			value="classpath*:/com/nucleus/process/bpmn/GenericMakerCheckerProcess.bpmn20.xml" />
+     </bean>
+     
+     <bean id="neutrinoFailedJobCommandFactory" class="com.nucleus.core.jobexecutor.NeutrinoFailedJobCommandFactory">
+     </bean>
+     
+     <bean id="asyncExecutor"
+			class="com.nucleus.core.async.executor.ContextAwareAsyncJobExecutor">
+			<property name="corePoolSize" value="${activiti.asyncexecutor.corePoolSize}" />
+			<property name="maxPoolSize" value="${activiti.asyncexecutor.maxPoolSize}" />
+			<property name="keepAliveTime" value="${activiti.asyncexecutor.keepAliveTime}" />
+			<property name="queueSize" value="${activiti.asyncexecutor.queueSize}" />
+			<property name="maxTimerJobsPerAcquisition" value="${activiti.asyncexecutor.maxTimerJobsPerAcquisition}" />
+			<property name="maxAsyncJobsDuePerAcquisition" value="${activiti.asyncexecutor.maxAsyncJobsDuePerAcquisition}" />
+			<property name="defaultAsyncJobAcquireWaitTimeInMillis" value="${activiti.asyncexecutor.defaultAsyncJobAcquireWaitTimeInMillis}" />
+			<property name="defaultTimerJobAcquireWaitTimeInMillis" value="${activiti.asyncexecutor.defaultTimerJobAcquireWaitTimeInMillis}" />
+			<property name="timerLockTimeInMillis" value="${activiti.asyncexecutor.timerLockTimeInMillis}" />
+			<property name="asyncJobLockTimeInMillis" value="${activiti.asyncexecutor.asyncJobLockTimeInMillis}" />
+	</bean>
+	
+	 <bean id="neutrinoDbIdGenerator" class="com.nucleus.activiti.sequence.generator.NeutrinoDbIdGenerator">
+	 	<property name="dataSource" ref="dataSource"/>
+	 	<!-- Putting ignoreAllFailures to be true so that repeated execution of 
+			sql does not result into errors -->
+	 	<property name="ignoreAllFailures" value="true"/>
+		<property name="resources">
+			<bean parent="frameworkConfigResourceFactoryBean">
+				<property name="resourceName"
+					value="sql/${database.type}/sequence-tables-${database.type}.sql" />
+			</bean>
+		</property>
+	 </bean>
+	
+	
+	
+	 <beans profile="!app-server-provided">
+		 <bean id="processEngineConfiguration" class="com.nucleus.activiti.spring.config.NeutrinoSpringProcessEngineConfiguration">		   <property name="dataSource" ref="dataSource" />
+		   <property name="transactionManager" ref="transactionManager" />
+		   <property name="jpaEntityManagerFactory" ref="entityManagerFactory" />
+			<property name="databaseSchemaUpdate" value="${activiti.database.schema.update}" />
+		   <property name="mailServerHost" value="localhost" />
+		   <property name="mailServerPort" value="5025" />
+		   <property name="jobExecutorActivate" value="${activiti.default.executor.jobExecutorActivate}" />
+		   <property name="createDiagramOnDeploy" value="false" />
+		   <property name="databaseSchema" value="${database.app.schemaname}" />
+		   <property name="deploymentResources">
+				<list>
+					<!-- files to be added via plug-in mechanism -->
+				 </list>
+		   </property>
+
+			<!-- Add custom factory to disable table growth -->
+			 <property name="customSessionFactories">
+				 <list>
+					 <bean class="com.nucleus.activiti.spring.config.CasDefaultHistoryManagerFactory" />
+				 </list>
+			 </property>
+
+			 <!-- Rohit for Async commn -->
+			<property name="asyncExecutorEnabled" value="${activiti.async.executor.asyncExecutorEnabled}" />
+			<property name="asyncExecutorActivate" value="${activiti.async.executor.asyncExecutorActivate}" />
+			<property name="asyncExecutor" ref="asyncExecutor" />
+			<property name="failedJobCommandFactory" ref="neutrinoFailedJobCommandFactory" />
+		</bean>
+	 </beans>
+	 
+
+
+
+
+	 <beans profile="app-server-provided">
+		 <bean id="processEngineConfiguration" class="com.nucleus.activiti.spring.config.NeutrinoSpringProcessEngineConfiguration">		   
+		   <property name="dataSource" ref="dataSource" />
+		   <property name="transactionManager" ref="transactionManager" />
+		   <property name="jpaEntityManagerFactory" ref="entityManagerFactory" />
+			<property name="databaseSchemaUpdate" value="${activiti.database.schema.update}" />
+		   <property name="mailServerHost" value="localhost" />
+		   <property name="mailServerPort" value="5025" />
+		   <property name="jobExecutorActivate" value="${activiti.default.executor.jobExecutorActivate}" />
+		   <!-- <property name="jobExecutor" ref="springJobExecutor" /> -->
+		   <property name="createDiagramOnDeploy" value="false" />
+		   <property name="transactionsExternallyManaged" value="true"/>
+		   <property name="jpaCloseEntityManager" value="false"/>
+		   <property name="jpaHandleTransaction" value="false"/>
+		   <property name="databaseSchema" value="${database.app.schemaname}" />	
+		   <property name="deploymentResources">
+				<list>
+					<!-- files to be added via plug-in mechanism -->
+				 </list>
+		   </property> 
+		   
+		    <!-- Add custom factory to disable table growth -->
+		   <property name="customSessionFactories">
+				 <list>
+					 <bean class="com.nucleus.activiti.spring.config.CasDefaultHistoryManagerFactory" />
+				 </list>
+			 </property>
+		   
+		   <!-- Rohit for Async commn -->
+			<property name="asyncExecutorEnabled" value="${activiti.async.executor.asyncExecutorEnabled}" />
+			<property name="asyncExecutorActivate" value="${activiti.async.executor.asyncExecutorActivate}" />
+			<property name="asyncExecutor" ref="asyncExecutor" />
+			<property name="failedJobCommandFactory" ref="neutrinoFailedJobCommandFactory" />
+		</bean>	
+	</beans>
+	
+	
+	
+		
+	
+</beans>

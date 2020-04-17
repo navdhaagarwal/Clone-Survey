@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<infinispan xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xmlns="urn:infinispan:config:9.2"
+            xsi:schemaLocation="urn:infinispan:config:9.2 http://www.infinispan.org/schemas/infinispan-config-9.2.xsd">
+
+   <jgroups>
+      <stack-file name="hibernate-jgroups" path="neutrino-jgroups.xml"/>
+   </jgroups>
+
+   <cache-container name="HibernateL2CacheManager" statistics="false" default-cache="the-default-cache" shutdown-hook="REGISTER">
+      <transport stack="hibernate-jgroups" cluster="neutrino-hibernate-cluster"/>
+      <jmx duplicate-domains="true"/>
+
+      <local-cache-configuration name="the-default-cache" statistics="false" />
+
+      <replicated-cache-configuration name="entity" mode="ASYNC" statistics="false" statistics-available="false">
+		 <state-transfer  enabled="true" timeout="30000000"/>
+         <locking isolation="READ_COMMITTED" concurrency-level="1000" acquire-timeout="15000" striping="false"/>
+         <transaction mode="NONE" auto-commit="false" locking="OPTIMISTIC"/>
+		 <eviction size="-1" strategy="NONE"/>
+         <expiration max-idle="-1" interval="6000" lifespan="-1" />
+		 <partition-handling enabled="true" when-split="DENY_READ_WRITES" merge-policy="PREFERRED_ALWAYS"/>
+      </replicated-cache-configuration>
+	  
+      <replicated-cache-configuration name="replicated-entity" mode="ASYNC" statistics="false" statistics-available="false">
+		<state-transfer  enabled="false" timeout="20000000"/>
+         <locking isolation="READ_COMMITTED" concurrency-level="1000" acquire-timeout="15000" striping="false"/>
+         <transaction mode="NONE" auto-commit="false" locking="OPTIMISTIC"/>
+		 <eviction size="-1" strategy="NONE"/>
+         <expiration max-idle="-1" interval="5000" lifespan="-1" />
+		 <partition-handling enabled="true" when-split="DENY_READ_WRITES" merge-policy="PREFERRED_ALWAYS"/>
+      </replicated-cache-configuration>
+
+      
+	  <replicated-cache-configuration name="local-query" mode="ASYNC" statistics="false" statistics-available="false">
+		 <state-transfer  enabled="true" timeout="20000000"/>
+         <locking isolation="READ_COMMITTED" concurrency-level="1000" acquire-timeout="15000" striping="false"/>
+         <transaction mode="NONE" auto-commit="false" locking="OPTIMISTIC"/>
+		 <eviction size="-1" strategy="NONE"/>
+         <expiration max-idle="-1" interval="5000" lifespan="-1" />
+		 <partition-handling enabled="true" when-split="DENY_READ_WRITES" merge-policy="PREFERRED_ALWAYS"/>
+      </replicated-cache-configuration>
+
+      
+	  <replicated-cache-configuration name="replicated-query" mode="ASYNC" statistics="false" statistics-available="false">
+		 <state-transfer  enabled="true" timeout="20000000"/>
+         <locking isolation="READ_COMMITTED" concurrency-level="1000" acquire-timeout="15000" striping="false"/>
+         <transaction mode="NONE" auto-commit="false" locking="OPTIMISTIC"/>
+		 <eviction size="-1" strategy="NONE"/>
+         <expiration max-idle="-1" interval="5000" lifespan="-1" />
+		 <partition-handling enabled="true" when-split="DENY_READ_WRITES" merge-policy="PREFERRED_ALWAYS"/>
+      </replicated-cache-configuration>
+	  
+      <replicated-cache-configuration name="timestamps" mode="ASYNC" statistics="false" statistics-available="false">
+         <state-transfer  enabled="true" timeout="20000000"/>
+		 <locking isolation="READ_COMMITTED" concurrency-level="1000" acquire-timeout="15000" striping="false"/>
+		 <transaction mode="NONE" locking="OPTIMISTIC" />
+         <eviction size="-1" strategy="NONE"/>
+         <expiration max-idle="-1" interval="5000" lifespan="-1" />
+		 <partition-handling enabled="true" when-split="DENY_READ_WRITES" merge-policy="PREFERRED_ALWAYS"/>
+      </replicated-cache-configuration>
+
+      <local-cache-configuration name="pending-puts" simple-cache="true" statistics="false" statistics-available="false">
+         <transaction mode="NONE"/>
+         <expiration max-idle="60000" />
+      </local-cache-configuration>
+   </cache-container>
+
+</infinispan>

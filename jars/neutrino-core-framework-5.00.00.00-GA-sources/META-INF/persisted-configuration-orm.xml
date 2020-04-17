@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-mappings version="2.0" xmlns="http://java.sun.com/xml/ns/persistence/orm" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm http://java.sun.com/xml/ns/persistence/orm_2_0.xsd">
+    
+    <named-query name="Configuration.getConfigurationForAssociatedConfigurationGroupAndKey">
+        <query>
+            Select c FROM ConfigurationGroup cg inner join cg.configuration c WHERE cg.associatedEntityUri = :entityUri AND c.propertyKey = :key
+        </query>
+    </named-query>
+    
+    <named-query name="Configuration.getConfigurationGroupForAssociatedEntity">
+        <query>
+           Select distinct configGroup FROM ConfigurationGroup configGroup left outer join fetch configGroup.configuration WHERE configGroup.associatedEntityUri = :entityUri
+        </query>
+    </named-query>
+    
+    <named-query name="Configuration.getConfigurationGroupUriForId">
+        <query>
+           Select distinct configGroup FROM ConfigurationGroup configGroup left outer join fetch configGroup.configuration WHERE configGroup.id = :configurationGroupId
+        </query>
+    </named-query>
+    
+    <named-query name="Configuration.getConfigurationForDistinctPropertyKey">
+        <query>
+           Select distinct config.propertyKey FROM Configuration config 
+        </query>
+    </named-query>
+    
+     <named-query name="Configuration.getDistinctUserModifiablePropertyKeys">
+        <query>
+           Select distinct config.propertyKey FROM Configuration config where config.userModifiable=true
+        </query>
+    </named-query>
+    
+    <named-query name="Configuration.getConfigurationForAssociatedEntityAndDistinctPropertyKey">
+        <query>
+           Select c FROM ConfigurationGroup cg inner join cg.configuration c WHERE cg.associatedEntityUri = :entityUri AND c.propertyKey in (:distinctProperty)
+        </query>
+    </named-query>
+    
+     <named-query name="Configuration.getAllConfigurationGroup">
+        <query>
+          Select distinct configGroup FROM ConfigurationGroup configGroup left outer join fetch configGroup.configuration
+        </query>
+    </named-query>
+    
+     <named-query name="Configuration.getDistinctEventsForNotification">
+        <query>
+          Select ev from GenericEvent ev
+        </query>
+    </named-query>
+    
+</entity-mappings>

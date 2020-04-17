@@ -1,0 +1,16 @@
+<html>
+	<body style="font-family: Calibri;">
+		<div>
+			Dear ${userName},<br>
+		</div>
+		<div>
+			<br>
+			   
+			   ${otp} is your OTP for login verification into FinnOne Neo. This OTP is valid for ${otp_validity_minites} minutes.Do not share it to anyone.
+		</div>
+		<div>
+		<br>
+		 <b>Note: </b>- Do not reply on this mail as this is an auto generated from NEO System. Please contact System Administrator for further details.
+		</div>
+	</body>
+</html>

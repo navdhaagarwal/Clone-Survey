@@ -1,0 +1,536 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-mappings version="2.0"
+	xmlns="http://java.sun.com/xml/ns/persistence/orm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm http://java.sun.com/xml/ns/persistence/orm_2_0.xsd">
+
+	<named-query name="Users.userByAuthority">
+		<query>
+          Select ua.associatedUser FROM UserAuthority ua inner join ua.authorities ath WHERE ath.authCode = :authCode and (ua.associatedUser.masterLifeCycleData.approvalStatus in (0,3))
+        </query>
+	</named-query>
+
+	<named-query name="Users.userByAuthorityOnRoles">
+		<query>
+           select u from Role r inner join r.authorities ath inner join r.users u WHERE ath.authCode = :authCode and (u.masterLifeCycleData.approvalStatus in (:approvalStatusList)) AND r.activeFlag = true
+        </query>
+	</named-query>
+
+	<named-query name="Users.userNameByAuthorityOnRoles">
+		<query>
+      
+       select DISTINCT new Map(u.username  as username, u.id as id)  from Role r inner join r.users u where r.id in (select role.id from Role role inner join role.authorities auth where auth.authCode = :authCode AND role.activeFlag = :activeFlag) and (u.masterLifeCycleData.approvalStatus in (:approvalStatusList)) AND r.activeFlag = true
+       </query>
+	</named-query>
+
+
+	<named-query name="Users.userIdsByAuthorityOnRoles">
+		<query>
+           select u.id from Role r inner join r.authorities ath inner join r.users u WHERE ath.authCode = :authCode and (u.masterLifeCycleData.approvalStatus in (:approvalStatusList)) AND r.activeFlag = :activeFlag
+        </query>
+	</named-query>
+
+	<named-query name="Users.userAuthorities">
+		<query>
+          Select ath FROM UserAuthority ua inner join ua.authorities ath WHERE ua.associatedUser.id = :userId AND (ua.associatedUser.userStatus in (:userStatus))
+        </query>
+	</named-query>
+	<named-query name="Users.systemNamesByRolesList">
+		<query>		
+	 select distinct au.sysName.code from Role r inner join r.authorities au where  r.id in (:roleIds ) AND r.activeFlag = true
+	    </query>
+	</named-query>
+	
+	<named-query name="Users.authoritiesByUserRoles">
+		<query>
+          Select ra FROM Role r 
+          inner join r.authorities ra 
+          inner join r.users u 
+          WHERE u.id = :userId AND (u.userStatus in (:userStatus)) AND r.activeFlag = :activeFlag
+        </query>
+	</named-query>
+	
+	<named-query name="Users.authoritiesByUserRolesActive">
+		<query>
+          Select ra FROM Role r 
+          inner join r.authorities ra 
+          inner join r.users u 
+          WHERE u.id = :userId AND (u.userStatus in (:userStatus)) AND r.activeFlag = :activeFlag AND ((r.isDisabled IS NULL OR r.isDisabled = false) OR (r.disabledFrom IS NOT NULL AND r.disabledFrom > :currentDate) OR (r.disabledTo IS NOT NULL AND r.disabledTo &lt; :currentDate))
+        </query>
+	</named-query>
+	
+	<named-query name="Users.allowedModuleCodesByUsername">
+		<query>
+          Select distinct sp FROM Role r 
+          inner join r.authorities ra 
+          inner join r.users u 
+          inner join ra.sysName sp 
+          WHERE u.username = :username AND (u.userStatus in (:userStatus)) AND r.activeFlag = :activeFlag
+
+        </query>
+	</named-query>
+
+	<named-query name="Users.authoritiesByUserRolesDegreeOfAccess">
+		<query>
+          Select ra FROM Role r 
+          inner join r.authorities ra 
+          inner join r.users u 
+          WHERE u.id = :userId AND (u.userStatus in (:userStatus)) AND (ra.degreeOfAccess &lt;=:degreeOfAccess OR ra.degreeOfAccess=null) AND r.activeFlag = :activeFlag AND ((r.isDisabled IS NULL OR r.isDisabled = false) OR (r.disabledFrom IS NOT NULL AND r.disabledFrom > :currentDate) OR (r.disabledTo IS NOT NULL AND r.disabledTo &lt; :currentDate))
+        </query>
+	</named-query>
+	<named-query name="Users.authoritiesByUserGroups">
+		<query>
+          Select ug.authorities FROM UserGroup ug inner join ug.users u WHERE u.id = :userId AND (u.userStatus in (:userStatus))
+        </query>
+	</named-query>
+
+	<named-query name="Users.allUserProfiles">
+		<query>
+          Select p FROM UserProfile p where p.associatedUser.userStatus = :userStatus and ( p.associatedUser.masterLifeCycleData.approvalStatus in (:approvalStatusList))
+        </query>
+	</named-query>
+
+	<named-query name="Users.allUsers">
+		<query>
+          Select u FROM User u WHERE u.masterLifeCycleData.approvalStatus in (:statusList)
+        </query>
+	</named-query>
+	
+	<named-query name="Users.getSystemUser">
+		<query>
+          Select u FROM User u WHERE u.username = 'system' and u.masterLifeCycleData.approvalStatus in (0,3,4,6)
+        </query>
+	</named-query>
+
+	<named-query name="Users.allAuthorities">
+		<query>
+          Select au FROM Authority au where au.entityLifeCycleData.persistenceStatus = 0 ORDER By au.name
+        </query>
+	</named-query>
+
+	<named-query name="Users.allRoles">
+		<query>
+          Select ro FROM Role ro where ro.productDescriminator =:productDescriminator AND ro.activeFlag = true
+        </query>
+	</named-query>
+		<named-query name="Users.userbasedRoles">
+		<query>
+          select ro FROM Role ro left outer join ro.users u where (ro.masterLifeCycleData.approvalStatus in (0,3,4,6)) AND (u.id = :userId OR ro.name IN (:roleNames)) AND ro.activeFlag = true
+        </query>
+	</named-query>
+		 
+
+	<named-query name="Users.allUserGroups">
+		<query>
+          Select ug FROM UserGroup ug
+        </query>
+	</named-query>
+
+	<named-query name="Users.allRolesFromUser">
+		<query>		
+         Select r FROM Role r inner join r.users u WHERE u.id = :userId AND (u.userStatus in (0,1,2) ) AND r.activeFlag = true
+        </query>
+	</named-query>
+
+	<named-query name="Users.allUserGroupsFromUser">
+		<query>		
+         Select ug FROM UserGroup ug inner join ug.users u WHERE u.id = :userId AND (u.userStatus in (:userStatus))
+        </query>
+	</named-query>
+
+	<named-query name="Users.allUserAuthoritiesFromUser">
+		<query>		
+         Select ua FROM UserAuthority ua inner join ua.associatedUser u WHERE u.id = :userId AND (u.userStatus in (:userStatus))
+        </query>
+	</named-query>
+
+	<named-query name="Users.userByUsername">
+		<query>		
+         Select u from User u where u.username = :username AND (u.userStatus in (:userStatus)) and (u.masterLifeCycleData.approvalStatus in (:approvalStatusList))
+        </query>
+	</named-query>
+
+	<named-query name="Users.userSourceSystemByUsername">
+		<query>		
+         Select u.sourceSystem from User u where u.username = :username AND (u.userStatus in (0, 1, 2)) and (u.masterLifeCycleData.approvalStatus in (0,3))
+        </query>
+	</named-query>
+	
+	<named-query name="Users.usersCountByProductName">
+		<query>		
+	 select count (distinct u.id) from Role r inner join r.authorities au inner join r.users u where au.sysName.code=:sysName and (u.userStatus in (:userStatus)) and (u.masterLifeCycleData.approvalStatus in (:approvalStatusList)) and (u.isLoginEnabled = :isLoginEnabled) and u.entityLifeCycleData.uuid!=:uuid AND u.activeFlag = :activeFlag
+	    </query>
+	</named-query>
+	<named-query name="Users.userByUsernameForLdap">
+		<query>		
+         Select u from User u where (u.username = :username OR u.username = :username1 OR u.username = :username2) AND (u.userStatus = 0 OR u.userStatus = 2) and (u.masterLifeCycleData.approvalStatus in (0,3))
+        </query>
+	</named-query>
+
+	<named-query name="Users.userByUsernameAndMailId">
+		<query>		
+         Select u from User u where u.username = :username AND lower(u.mailId) = :mailId and (u.masterLifeCycleData.approvalStatus in (:approvalStatusList))
+        </query>
+	</named-query>
+
+	<named-query name="Users.getAuthority">
+		<query>
+          Select au FROM Authority au WHERE au.authCode=:authCode
+        </query>
+	</named-query>
+
+	<named-query name="Users.authoritiesByUserRoleNames">
+		<query>
+          Select r.authorities FROM Role r WHERE r.name IN  :roleNames AND r.activeFlag = true
+        </query>
+	</named-query>
+	<!-- Commented to start server -->
+	<!-- <named-query name="Users.loginDetails"> <query> SELECT u FROM UserSecurityTrail 
+		u where u.username=:username and u.eventType='1' ORDER BY u.timestamp DESC 
+		</query> </named-query> <named-query name="Users.lastTenActivityDetails"> 
+		<query> SELECT u FROM UserSecurityTrail u where u.username=:username ORDER 
+		BY u.timestamp DESC </query> </named-query> -->
+
+	<named-query name="Users.userByPasswordResetTimeToken">
+		<query>
+          SELECT u FROM User u  inner join u.passwordResetToken prat where prat.tokenId=:timeToken
+        </query>
+	</named-query>
+
+	<named-query name="Users.userByApproveLinkTimeToken">
+		<query>
+          SELECT u.id, at FROM User u, ApprovalLinkToken at inner join u.approvalLinkToken alt where alt.tokenId=:timeToken and at.tokenId=:timeToken
+        </query>
+	</named-query>
+
+	<named-query name="Users.userByUUid">
+		<query>
+          SELECT u FROM User u inner join u.entityLifeCycleData ued where ued.uuid=:uuid and (u.masterLifeCycleData.approvalStatus in (0,3))
+        </query>
+	</named-query>
+
+	<named-query name="Users.getUserProfileFromUserId">
+		<query>
+          SELECT u FROM UserProfile u where u.associatedUser.id=:userId
+        </query>
+	</named-query>
+	
+	<named-query name="Users.getUserPhotoUrlByUserId">
+		<query>
+          SELECT u.photoUrl FROM UserProfile u where u.associatedUser.id=:userId
+        </query>
+	</named-query>
+
+	<named-query name="Users.getAllUsersByUserStatus">
+		<query>
+          SELECT u FROM User u where u.userStatus=:userStatus and (u.masterLifeCycleData.approvalStatus in (:approvalStatusList))
+        </query>
+	</named-query>
+
+	<named-query name="Users.getMappedBusinessPartners">
+		<query>		
+         Select uBPm FROM UserBPMapping uBPm  WHERE uBPm.associatedUser.id = :userId 
+        </query>
+	</named-query>
+	<named-query name="Roles.getRolesByRoleName">
+		<query>		
+         Select role FROM Role role WHERE role.name = :roleName AND role.activeFlag = true
+        </query>
+	</named-query>
+	<named-query name="Users.InCurrentBranch">
+		<query>		
+          SELECT u.associatedUser FROM UserOrgBranchMapping u where u.organizationBranch.id = :organizationBranch and (u.associatedUser.masterLifeCycleData.approvalStatus in (:approvalStatusList))
+        </query>
+	</named-query>
+	<named-query name="Users.getUserMobilityInfo">
+		<query>		
+          SELECT u.userMobileInfo FROM User u where u.id = :userId
+        </query>
+	</named-query>
+
+
+
+	
+	<named-query name="Users.getUserMobileNumber">
+		<query>		
+         SELECT u.simpleContactInfo.mobileNumber FROM UserProfile u WHERE u.associatedUser.id = :userId
+        </query>
+	</named-query>
+
+	<named-query name="Users.getUserFullNameFromUserId">
+		<query>
+          SELECT u.fullName FROM UserProfile u where u.associatedUser.id=:userId
+        </query>
+	</named-query>
+
+	<named-query name="UserProfile.getAllNameAndId">
+		<query>
+          Select new Map(p.associatedUser.id as id , concat(p.associatedUser.username, ' [ ', p.fullName, ']') as fullName) FROM UserProfile p where p.associatedUser.userStatus = 0 and (p.associatedUser.masterLifeCycleData.approvalStatus in (0,3))
+        </query>
+	</named-query>
+	<named-query name="UserProfile.getAllNameAndIdForBinderList">
+		<query>
+          Select new Map(p.associatedUser.id as id , concat(p.associatedUser.username, ' [ ', p.fullName, ']') as username) FROM UserProfile p where p.associatedUser.userStatus = 0 and (p.associatedUser.masterLifeCycleData.approvalStatus in (0,3))
+        </query>
+	</named-query>
+
+    <named-query name="user.getSourceSystem">
+		<query>
+          Select u.sourceSystem from User u where u.id = :userId
+        </query>
+	</named-query>
+	
+	
+	
+	<named-query name="user.getSourceSystemByName">
+		<query>
+          Select u.sourceSystem from User u where u.username = :userName and (u.masterLifeCycleData.approvalStatus in (0,3))
+        </query>
+	</named-query>
+	
+	
+	<named-query name="user.getDeviationLevel">
+		<query>
+          Select u.deviationLevel from User u where u.id=:userId
+        </query>
+	</named-query>
+
+	<named-query name="user.getUserSecurityQuestions">
+		<query>
+          Select usqa.question from User u inner join u.securityQuestionAnswers usqa where u.username = :username and (u.masterLifeCycleData.approvalStatus in (0,3))
+        </query>
+	</named-query>
+
+	<named-query name="user.getUserSecurityQuestionAnswers">
+		<query>
+          Select new Map(uq.id as quesId,usqa.answer as answer) from User u inner join u.securityQuestionAnswers usqa inner join usqa.question uq
+          where u.username = :username and (u.masterLifeCycleData.approvalStatus in (:approvalStatusList))
+        </query>
+	</named-query>
+	
+	<named-query name="user.getUserSecurityQuestionAnswersList">
+		<query>
+          Select usqa from User u inner join u.securityQuestionAnswers usqa where u.username = :username
+        </query>
+	</named-query>
+	
+	<named-query name="user.getSanctionLimit">
+		<query>
+          Select u.sanctionedLimit from User u where u.id=:userId
+        </query>
+	</named-query>
+	
+	<named-query name="user.getAllActiveUsersId">
+		<query>
+          Select u from User u where u.userStatus = :userStatus and (u.masterLifeCycleData.approvalStatus in (:approvalStatusList))
+        </query>
+	</named-query>
+
+	<named-query name="User.getAccessToAllBranchesForUser">
+		<query>
+          Select orgMapping.organizationBranch from UserOrgBranchMapping orgMapping where orgMapping.associatedUser.id = :userId 
+          and orgMapping.entityLifeCycleData.persistenceStatus = 0 AND (orgMapping.entityLifeCycleData.snapshotRecord IS NULL OR orgMapping.entityLifeCycleData.snapshotRecord = false) 
+          AND orgMapping.activeFlag = true AND orgMapping.masterLifeCycleData.approvalStatus in :statusList
+        </query>
+	</named-query>
+	
+	<named-query name="user.forceResetPass">
+		<query>
+          Select u.forcePasswordResetOnLogin from User u where u.id = :userId
+        </query>
+	</named-query>
+	
+	<named-query name="user.getUserIdByUserName">
+		<query>
+          Select u.id from User u where u.username = :userName AND u.userStatus = 0 AND (u.entityLifeCycleData.snapshotRecord IS NULL OR u.entityLifeCycleData.snapshotRecord = false) and (u.masterLifeCycleData.approvalStatus in (0,3))
+        </query>
+	</named-query>
+	
+	<named-query name="User.getAllSuperAdmin">
+		<query>		
+         Select u from User u where u.isSuperAdmin = :isSuperAdmin AND (u.userStatus = :userStatus) and (u.masterLifeCycleData.approvalStatus in (:approvalStatusList))
+        </query>
+	</named-query>
+	<named-query name="User.isUserSuperAdmin">
+		<query>	
+         Select u.isSuperAdmin from User u where u.id=:userId AND (u.userStatus = 0)
+        </query>
+	</named-query>
+	<named-query name="Users.userNameByAuthorityOnRolesAndLevel">
+	<query>
+	select DISTINCT u  from Role r inner join r.users u  where r.id= :role AND  u.id in (select u.id from Role r inner join r.authorities ath inner join r.users u WHERE ath.authCode = :authCode AND r.activeFlag = :activeFlag)
+	and u.masterLifeCycleData.approvalStatus in (:approvalStatusList) AND r.activeFlag = :activeFlag
+
+	</query>
+	</named-query>
+	
+	<named-query name="User.getIsBranchAccessibleForUser">
+		<query>
+          Select orgMapping.id from UserOrgBranchMapping orgMapping where orgMapping.associatedUser.id = :userId  and orgMapping.organizationBranch.id=:branchId
+          and orgMapping.entityLifeCycleData.persistenceStatus = 0 AND (orgMapping.entityLifeCycleData.snapshotRecord IS NULL OR orgMapping.entityLifeCycleData.snapshotRecord = false) 
+          AND orgMapping.activeFlag = true AND orgMapping.masterLifeCycleData.approvalStatus in :statusList
+        </query>
+	</named-query>
+	
+	<named-query name="Users.getUserFromDisplayName">
+	<query>
+	Select user.username from User user where id in (select userProfile.associatedUser.id from UserProfile userProfile where userProfile.fullName = :displayName) and
+	(user.entityLifeCycleData.snapshotRecord IS NULL OR user.entityLifeCycleData.snapshotRecord = false) and (user.masterLifeCycleData.approvalStatus in (0,3))
+
+	</query>
+	</named-query>
+	<named-query name="Users.getRoleNameFromUser">
+		<query>		
+         Select role.name FROM Role role inner join role.users user WHERE user.id = :userId AND (user.userStatus in (:userStatus)) AND role.activeFlag = :activeFlag
+        </query>
+	</named-query>
+	
+	<named-query name="Users.getRoleFromUser">
+		<query>		
+         Select role FROM Role role inner join role.users user WHERE user.id = :userId AND (user.userStatus in (:userStatus))
+        </query>
+	</named-query>
+	<named-query name="User.getUserAuditLogOfUser">
+		<query>		
+         Select userAuditLog FROM UnapprovedEntityData userAuditLog WHERE userAuditLog.refUUId = :uuid ORDER By userAuditLog.entityLifeCycleData.creationTimeStamp ASC
+        </query>
+	</named-query>
+	<named-query name="User.getLatestVersionOfUserAuditLog">
+		<query>		
+         Select max(userAuditLog.version) FROM UserAuditLog userAuditLog WHERE userAuditLog.userId = :userId
+        </query>
+	</named-query>
+	<named-query name="User.getUserAuditLogOfUserForComparison">
+		<query>		
+         Select userAuditLog FROM UserAuditLog userAuditLog WHERE userAuditLog.userId = :userId and userAuditLog.version = :version
+        </query>
+	</named-query>
+	<named-query name="Users.userById">
+		<query>
+          SELECT u FROM User u inner join u.entityLifeCycleData ued where u.id=:userId
+        </query>
+	</named-query>
+	<named-query name="Users.UserIdAndApprovalStatusByUUid">
+		<query>
+		select DISTINCT new Map(u.id as id, u.masterLifeCycleData.approvalStatus  as approvalStatus)  from User u inner join u.entityLifeCycleData ued where ued.uuid=:uuid AND (u.userStatus = :userStatus)
+        </query>
+	</named-query>
+	<named-query name="User.hasAuthorityByAuthCode">
+		<query>
+		select role.id from Role role inner join role.users users inner join role.authorities auth where auth.authCode = :authCode AND users.id= :userId AND role.activeFlag = true
+        </query>
+	</named-query>
+	<named-query name="Users.getUserProfileIPAddressRange">
+		<query>
+          SELECT u.addressRange FROM UserProfile u where u.associatedUser.id=:userId
+        </query>
+	</named-query>
+	
+	<named-query name="Users.allUsersByUsername">
+		<query>		
+         Select u from User u where u.username = :username
+        </query>
+	</named-query>
+	<named-query name="User.getUserAuditLogOfUserWithReason">
+		<query>
+			Select userAuditLog FROM UserAuditLog userAuditLog WHERE userAuditLog.userId = :userId AND (userAuditLog.inactiveReason IS NOT NULL OR userAuditLog.blockReason IS NOT NULL OR userAuditLog.activeReason IS NOT NULL) ORDER By userAuditLog.entityLifeCycleData.creationTimeStamp DESC
+		</query>
+	</named-query>
+
+	<named-query name="User.getDaysToBlockByUserId">
+		<query>
+			Select u.daysToBlock from User u where u.id = :userId
+		</query>
+	</named-query>
+
+
+	<named-query name="Users.findSecuredIpInMaster">
+		<query>
+			Select securedIp from IpAddress securedIp WHERE securedIp.ipAddress=:ip AND (securedIp.entityLifeCycleData.snapshotRecord IS NULL OR securedIp.entityLifeCycleData.snapshotRecord = false) and (securedIp.masterLifeCycleData.approvalStatus in (:approvalStatusList))
+		</query>
+	</named-query>
+	
+	<named-query name="User.getUserCalendarById">
+		<query>
+			Select userCalendar from User u where u.id = :userId
+		</query>
+	</named-query>
+
+	<named-query name="Users.findIpAddressInMaster">
+		<query>
+			Select ip from IpAddress ip WHERE ip.accessType.code IN :accessType AND ip.masterLifeCycleData.approvalStatus IN :approvalStatus AND ip.activeFlag = true
+		</query>
+	</named-query>
+	
+	<named-query name="User.getMappedMenuForUserAndProduct">
+		<query>
+			select udum.menuEntity from UserDefaultUrlMapping udum where udum.mappedUser.id=:userId and udum.sourceProduct.id=:sourceProductId
+		</query>
+	</named-query>
+
+	<named-query name="User.getAllUrlMappingsOfUser">
+		<query>
+			select udum from UserDefaultUrlMapping udum where udum.mappedUser.id=:userId
+		</query>
+	</named-query>
+
+	<named-query name="User.deleteAllMappedDefaultUrl">
+		<query>
+			delete from UserDefaultUrlMapping udum where udum.mappedUser.id=:userId
+		</query>
+	</named-query>
+
+	<named-query name="User.deleteMappedDefaultUrlByIds">
+		<query>
+			delete from UserDefaultUrlMapping udum where udum.id in (:deletedMappings)
+		</query>
+	</named-query>
+
+	<named-query name="User.countMappedDefaultUrlById">
+		<query>
+			select count(*) from UserDefaultUrlMapping udum where udum.mappedUser.id=:userId
+		</query>
+	</named-query>
+
+	<named-query name="User.isBotUserByUserName">
+		<query>
+			select isBotUser from User u where lower(u.username)=lower(:username) and masterLifeCycleData.approvalStatus IN :approvalStatus
+		</query>
+	</named-query>
+
+	<named-query name="Users.usersCountByProductId">
+		<query>
+			select count (distinct u.id) from Role r inner join r.authorities au inner join r.users u where au.sourceProductId=:sourceProductId and (u.userStatus in (:userStatus)) and (u.masterLifeCycleData.approvalStatus in (:approvalStatusList)) and (u.isLoginEnabled = :isLoginEnabled) and u.entityLifeCycleData.uuid!=:uuid AND u.activeFlag = :activeFlag
+		</query>
+	</named-query>
+
+	<named-query name="User.getCurrentBlockReason">
+		<query>
+			Select userAuditLog.blockReason FROM UserAuditLog userAuditLog WHERE userAuditLog.userId = :userId AND userAuditLog.version = (Select max(userAuditLog.version) FROM UserAuditLog userAuditLog WHERE userAuditLog.userId = :userId AND (userAuditLog.blockReason IS NOT NULL))
+		</query>
+	</named-query>
+
+	<named-query name="user.getAllActiveAndBlockedUsers">
+		<query>
+			Select u from User u where u.userStatus in (:userStatusList) and (u.masterLifeCycleData.approvalStatus in (:approvalStatusList))
+		</query>
+	</named-query>
+
+	<named-query name="User.getHighPriorityBlockReasonForUsers">
+		<query>
+			Select userAuditLog.blockReason FROM UserAuditLog userAuditLog WHERE userAuditLog.userId = :userId AND userAuditLog.version = (Select max(userAuditLog.version) FROM UserAuditLog userAuditLog WHERE userAuditLog.userId = :userId AND (userAuditLog.blockReason IS NOT NULL))
+		</query>
+	</named-query>
+
+	<named-query name="User.getUserStatusByUserId">
+		<query>
+			Select u.userStatus from User u where u.id=:userId
+		</query>
+	</named-query>
+
+	<named-query name="User.getUserStatusCountByUserId">
+		<query>
+			Select u.id from User u where u.id in (:userIdList) and u.userStatus =:userStatus)
+		</query>
+	</named-query>
+
+</entity-mappings>

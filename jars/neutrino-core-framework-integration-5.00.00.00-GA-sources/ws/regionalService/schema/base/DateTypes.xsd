@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns="http://schema.base.ws.pro.finnone.nucleus.com"
+            targetNamespace="http://schema.base.ws.pro.finnone.nucleus.com"
+            elementFormDefault="qualified">
+   <xsd:simpleType name="DateType">
+    <xsd:annotation>
+        <xsd:documentation xml:lang="en">Common Date Type</xsd:documentation>
+    </xsd:annotation>
+  <xsd:restriction base="xsd:date" />
+  </xsd:simpleType>
+   <xsd:simpleType name="DateTimeType">
+    <xsd:annotation>
+        <xsd:documentation xml:lang="en">Common Date Time Type</xsd:documentation>
+    </xsd:annotation>
+  <xsd:restriction base="xsd:dateTime" />
+  </xsd:simpleType>
+</xsd:schema>

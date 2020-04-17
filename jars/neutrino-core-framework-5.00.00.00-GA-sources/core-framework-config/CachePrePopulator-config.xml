@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cachePrePopulatorConfig>
+	<excludeClass>com.nucleus.core.bank.entity.ExternalBankBranch</excludeClass>
+	<excludeClass>com.nucleus.core.formsConfiguration.PersistentFormData</excludeClass>
+	<excludeClass>com.nucleus.core.messageSource.MessageResource</excludeClass>
+	<excludeClass>com.nucleus.core.organization.entity.BankingLocation</excludeClass>
+	<excludeClass>com.nucleus.customer.CustomerGroup</excludeClass>
+	<excludeClass>com.nucleus.rules.model.assignmentMatrix.AssignmentFieldMetaData</excludeClass>
+	<excludeClass>com.nucleus.rules.model.scoringEngine.ScoreCardAudit</excludeClass>
+	<excludeClass>com.nucleus.rules.model.scoringEngine.SectionAttribute</excludeClass>
+	<excludeClass>com.nucleus.rules.model.scoringEngine.SectionAttributeAudit</excludeClass>
+	<excludeClass>com.nucleus.rules.model.scoringEngine.SectionAttributeExpressionAudit</excludeClass>
+	<excludeClass>com.nucleus.rules.model.scoringEngine.SectionAudit</excludeClass>
+	<excludeClass>com.nucleus.businessmapping.entity.UserOrgBranchMapping</excludeClass>
+	<excludeClass>com.nucleus.cas.businessmapping.BPOrgBranchProdMapping</excludeClass>
+	<excludePackage>com.nucleus.finnone.pro</excludePackage>	
+</cachePrePopulatorConfig>

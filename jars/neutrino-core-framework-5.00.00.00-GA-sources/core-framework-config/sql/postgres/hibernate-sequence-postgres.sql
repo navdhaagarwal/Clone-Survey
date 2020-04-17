@@ -1,0 +1,1 @@
+select NAME from BASE_TENANT

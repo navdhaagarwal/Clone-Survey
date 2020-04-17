@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns="http://schema.base.ws.pro.finnone.nucleus.com"
+            targetNamespace="http://schema.base.ws.pro.finnone.nucleus.com"
+            elementFormDefault="qualified">
+  
+  <!-- Base Data Type Definition Including -->
+  <xsd:include  schemaLocation="StringTypes.xsd" />
+  <xsd:include  schemaLocation="NumberTypes.xsd" />
+  <xsd:include  schemaLocation="MiscTypes.xsd" />
+  <xsd:include  schemaLocation="DateTypes.xsd" />
+  <xsd:include schemaLocation="CommonBaseTypes.xsd"/>
+</xsd:schema>

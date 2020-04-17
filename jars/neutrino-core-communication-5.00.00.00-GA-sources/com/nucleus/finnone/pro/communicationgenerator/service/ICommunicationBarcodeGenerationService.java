@@ -1,0 +1,9 @@
+package com.nucleus.finnone.pro.communicationgenerator.service;
+
+import com.nucleus.finnone.pro.communicationgenerator.domainobject.CommunicationGenerationDetailHistory;
+
+public interface ICommunicationBarcodeGenerationService {
+
+	public CommunicationGenerationDetailHistory getCommunicationHistoryByUniqueBarcodeReferenceNumber(String barcodeReferenceNumber);
+
+}

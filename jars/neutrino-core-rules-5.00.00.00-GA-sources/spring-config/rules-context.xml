@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:task="http://www.springframework.org/schema/task"
+	
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+      http://www.springframework.org/schema/beans/spring-beans.xsd
+      
+      http://www.springframework.org/schema/task 
+    http://www.springframework.org/schema/task/spring-task.xsd">
+
+	<import resource="rules-services-context.xml"/>
+
+	<bean id="coreRulesConfigResourceLoader" parent="rootConfigResourceLoader">
+		<property name="moduleName" value="core-rules-config" />
+	</bean>
+
+	<bean id="coreRulesMasterConfigurationLoader" class="com.nucleus.makerchecker.MasterConfigurationLoader">
+		<property name="resourceLoader" ref="coreRulesConfigResourceLoader" />
+	</bean>
+
+
+	<bean id="coreRulesConfigResourceFactoryBean"
+		class="com.nucleus.core.initialization.NeutrinoResourceFactoryBean"
+		abstract="true">
+		<property name="resourceLoader" ref="coreRulesConfigResourceLoader" />
+	</bean>
+
+	<bean id="rulesPropertyPlaceholderConfigurer"
+		class="org.jasypt.spring31.properties.EncryptablePropertySourcesPlaceholderConfigurer">
+		<constructor-arg ref="stringEncryptor" />
+		<property name="ignoreUnresolvablePlaceholders" value="true" />
+		<property name="locations">
+			<list>
+				<bean parent="coreRulesConfigResourceFactoryBean">
+					<property name="resourceName" value="rules-database-seed-file-config.properties" />
+				</bean>
+				<bean parent="coreRulesConfigResourceFactoryBean">
+					<property name="resourceName" value="rules-database-seed-operation-config.properties" />
+				</bean>
+			</list>
+		</property>
+	</bean>
+
+	<!--<bean id="ruleDatabaseSeed" parent="mastersSeedDatabaseBean">
+		<property name="resource">
+			<bean parent="coreRulesConfigResourceFactoryBean">
+				<property name="resourceName" value="db-init/${rules.seed.xls}" />
+			</bean>
+		</property>
+		<property name="operation" value="${rules.database.seed.operation}" />
+	</bean>
+	
+	<bean id="ruleMessageResourceDatabaseSeed" parent="mastersSeedDatabaseBean">
+		<property name="resource">
+			<bean parent="coreRulesConfigResourceFactoryBean">
+				<property name="resourceName" value="db-init/${rules.message_resource.xls}" />
+			</bean>
+		</property>
+		<property name="operation" value="${rules.message_resource.database.seed.operation}" />
+	</bean>-->
+
+	<bean id="ruleUsageDataService" class="com.nucleus.rules.usage.RuleUsageDataService">
+		<property name="ruleUsageDataExtractorList">
+			<list>
+
+			</list>
+		</property>
+	</bean>
+
+	<bean id="usagePluginBean" class="com.nucleus.core.spring.PluginBeanFactoryPostProcessor"
+		abstract="true">
+		<property name="extensionBeanName" value="ruleUsageDataService" />
+		<property name="propertyName" value="ruleUsageDataExtractorList" />
+	</bean>
+
+	<bean id="eventMappingUsageDataExtractor"
+		class="com.nucleus.rules.usage.eventMapping.EventMappingUsageDataExtractor">
+		<property name="key" value="eventMappingList" />
+	</bean>
+
+	<bean parent="usagePluginBean">
+		<property name="pluginBeanName" value="eventMappingUsageDataExtractor" />
+	</bean>
+
+	<bean id="ruleSimulationService"
+		class="com.nucleus.rules.simulation.service.RuleSimulationServiceImpl">
+		<property name="ruleSimulationProcesses">
+			<list>
+
+			</list>
+		</property>
+	</bean>
+	<bean id="defaultColumnDataHandler"
+		class="com.nucleus.rules.taskAssignmentMaster.DefaultColumnDataHandler">
+	</bean>
+
+	<bean id="userColumnDataHandler"
+		class="com.nucleus.rules.taskAssignmentMaster.UserColumnDataHandler">
+	</bean>
+	
+	<bean id="teamColumnDataHandler"
+		class="com.nucleus.rules.taskAssignmentMaster.TeamColumnDataHandler">
+	</bean>
+
+	<bean id="columnDataService"
+		class="com.nucleus.rules.taskAssignmentMaster.ColumnDataService">
+		<property name="columnDataHandlers">
+			<list>
+				<ref bean="userColumnDataHandler" />
+				<ref bean="teamColumnDataHandler" />
+				<ref bean="defaultColumnDataHandler" />
+			</list>
+		</property>
+	</bean>
+
+	<!-- PluginBean Post Processor for rule Simulation Service -->
+	<bean id="ruleSimulationProcessPluginBeanPostProcessor" class="com.nucleus.core.spring.PluginBeanFactoryPostProcessor"
+		abstract="true">
+		<property name="extensionBeanName" value="ruleSimulationService" />
+		<property name="propertyName" value="ruleSimulationProcesses" />
+	</bean>
+
+
+  <task:scheduled-tasks scheduler="neutrinoSpringMangedScheduler" >
+		 <task:scheduled ref="rulesAuditLogDataPurgingScheduler" method="execute" initial-delay="3600000"  fixed-delay="${fix.delay.rule.audit.data.purging.scheduler}"/>
+  </task:scheduled-tasks>
+
+</beans>

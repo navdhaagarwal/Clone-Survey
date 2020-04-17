@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:sws="http://www.springframework.org/schema/web-services"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:security="http://www.springframework.org/schema/security"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+  http://www.springframework.org/schema/web-services http://www.springframework.org/schema/web-services/web-services-2.0.xsd
+   http://www.springframework.org/schema/context
+    http://www.springframework.org/schema/context/spring-context.xsd
+    http://www.springframework.org/schema/util
+    http://www.springframework.org/schema/util/spring-util-3.1.xsd
+    http://www.springframework.org/schema/security
+   		http://www.springframework.org/schema/security/spring-security.xsd">
+
+    <bean id="ruleAssignmentPreProcessorResourceLoader"
+          class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+        <property name="locations">
+            <list>
+
+            </list>
+        </property>
+    </bean>
+
+    <bean id="rulesworkEntityApprovalPreProcessorResourceLoader"
+          class="com.nucleus.core.spring.PluginBeanFactoryPostProcessor"
+          abstract="true">
+        <property name="extensionBeanName" value="ruleAssignmentPreProcessorResourceLoader" />
+        <property name="propertyName" value="locations" />
+    </bean>
+
+    <bean parent="rulesworkEntityApprovalPreProcessorResourceLoader">
+        <property name="pluginBeanName" value="ruleAssignmentLocation" />
+    </bean>
+
+    <bean id="ruleAssignmentLocation" class="java.lang.String">
+        <constructor-arg
+                value="classpath*:core-rules-config/rule-entityapprovalpreprocessor-config.properties" />
+    </bean>
+
+</beans>

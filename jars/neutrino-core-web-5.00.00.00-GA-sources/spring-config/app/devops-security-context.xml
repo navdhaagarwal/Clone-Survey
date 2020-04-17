@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:security="http://www.springframework.org/schema/security"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/util
+    http://www.springframework.org/schema/util/spring-util.xsd
+  	http://www.springframework.org/schema/security
+  	http://www.springframework.org/schema/security/spring-security.xsd">
+
+
+	<bean id="devopsSecurityChain" class="org.springframework.security.web.FilterChainProxy" >
+		<constructor-arg>
+			<list>
+				<security:filter-chain filters="springSecurityFilterChain" 
+					pattern="/**" />
+			</list> 
+		</constructor-arg>
+	</bean>
+	<bean id="devopsAuthenticationEntryPoint"
+		class="org.springframework.security.web.authentication.www.BasicAuthenticationEntryPoint">
+		<property name="realmName" value="DevOps login" />
+	</bean>
+
+	<bean id="devUserService"
+		class="com.nucleus.infinispan.console.security.DevOpsUserDetailsServiceImpl">
+	</bean>
+
+	
+	<security:http pattern="/cluster/**" authentication-manager-ref="devOpsAuthManager" auto-config="true">
+		<security:http-basic entry-point-ref="devopsAuthenticationEntryPoint" />
+		<security:intercept-url pattern="/cluster/clusterConsole/generateCredentials/**" access="permitAll"/>
+		<security:intercept-url pattern="/cluster/clusterConsole/base/**" access="permitAll"/>
+		<security:intercept-url pattern="/cluster/clusterConsole/getClusterStatusRemotely/**" access="permitAll"/>
+		<security:intercept-url pattern="/cluster/clusterConsole/markCacheActiveRemotely/**" access="permitAll"/>
+		<security:intercept-url pattern="/cluster/clusterConsole/evictHibernateCacheRemotely/**" access="permitAll"/>
+		<security:intercept-url pattern="/cluster/clusterConsole/getClusterEventsListRemotely/**" access="permitAll"/>
+		
+		<security:intercept-url pattern="/cluster/**" access="isAuthenticated()"/>
+	</security:http>
+	<security:authentication-manager id="devOpsAuthManager">
+		<security:authentication-provider user-service-ref="devUserService" >
+		</security:authentication-provider>
+	</security:authentication-manager>
+	
+
+</beans>

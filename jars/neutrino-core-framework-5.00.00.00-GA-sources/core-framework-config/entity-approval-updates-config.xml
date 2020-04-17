@@ -1,0 +1,101 @@
+<com.nucleus.makerchecker.EntityUpdateMapper>
+  <mappedEntityInfoList>
+    
+    <com.nucleus.makerchecker.MappedEntityInfo>
+      <masterEntityName>Country</masterEntityName>
+      <EntityUpdateInfoList>
+        <com.nucleus.makerchecker.EntityUpdateInfo>
+          <updateFieldName>country</updateFieldName>
+          <updateEntityName>City</updateEntityName>
+          <includeApprovalStatuses>0</includeApprovalStatuses>
+          <softReference>true</softReference>
+        </com.nucleus.makerchecker.EntityUpdateInfo>
+        <com.nucleus.makerchecker.EntityUpdateInfo>
+          <updateFieldName>country</updateFieldName>
+          <updateEntityName>State</updateEntityName>
+          <includeApprovalStatuses>0</includeApprovalStatuses>
+          <softReference>true</softReference>
+        </com.nucleus.makerchecker.EntityUpdateInfo>
+      </EntityUpdateInfoList>
+      <autoAuthorizationFlag>Y</autoAuthorizationFlag>
+    </com.nucleus.makerchecker.MappedEntityInfo>
+    
+    <com.nucleus.makerchecker.MappedEntityInfo>
+      <masterEntityName>CustomerCategory</masterEntityName>
+      <EntityUpdateInfoList>
+      </EntityUpdateInfoList>
+      <autoAuthorizationFlag>N</autoAuthorizationFlag>
+    </com.nucleus.makerchecker.MappedEntityInfo>
+    
+    <com.nucleus.makerchecker.MappedEntityInfo>
+      <masterEntityName>CustomerConstitution</masterEntityName>
+      <EntityUpdateInfoList>
+      </EntityUpdateInfoList>
+      <autoAuthorizationFlag>N</autoAuthorizationFlag>
+    </com.nucleus.makerchecker.MappedEntityInfo>
+    
+      <com.nucleus.makerchecker.MappedEntityInfo>
+      <masterEntityName>ObjectGraphParameter</masterEntityName>
+      <EntityUpdateInfoList>
+      </EntityUpdateInfoList>
+      <autoAuthorizationFlag>Y</autoAuthorizationFlag>
+    </com.nucleus.makerchecker.MappedEntityInfo>
+    
+     <com.nucleus.makerchecker.MappedEntityInfo>
+      <masterEntityName>QueryParameter</masterEntityName>
+      <EntityUpdateInfoList>
+      </EntityUpdateInfoList>
+      <autoAuthorizationFlag>Y</autoAuthorizationFlag>
+    </com.nucleus.makerchecker.MappedEntityInfo>
+    
+    <com.nucleus.makerchecker.MappedEntityInfo>
+      <masterEntityName>ConstantParameter</masterEntityName>
+      <EntityUpdateInfoList>
+      </EntityUpdateInfoList>
+      <autoAuthorizationFlag>Y</autoAuthorizationFlag>
+    </com.nucleus.makerchecker.MappedEntityInfo>
+           
+     <com.nucleus.makerchecker.MappedEntityInfo>
+      <masterEntityName>ReferenceParameter</masterEntityName>
+      <EntityUpdateInfoList>
+      </EntityUpdateInfoList>
+      <autoAuthorizationFlag>Y</autoAuthorizationFlag>
+    </com.nucleus.makerchecker.MappedEntityInfo>
+    
+     <com.nucleus.makerchecker.MappedEntityInfo>
+      <masterEntityName>CompoundParameter</masterEntityName>
+      <EntityUpdateInfoList>
+      </EntityUpdateInfoList>
+      <autoAuthorizationFlag>Y</autoAuthorizationFlag>
+    </com.nucleus.makerchecker.MappedEntityInfo>
+    
+     <com.nucleus.makerchecker.MappedEntityInfo>
+      <masterEntityName>Condition</masterEntityName>
+      <EntityUpdateInfoList>
+      </EntityUpdateInfoList>
+      <autoAuthorizationFlag>Y</autoAuthorizationFlag>
+    </com.nucleus.makerchecker.MappedEntityInfo>
+    
+     <com.nucleus.makerchecker.MappedEntityInfo>
+      <masterEntityName>PlaceHolderParameter</masterEntityName>
+      <EntityUpdateInfoList>
+      </EntityUpdateInfoList>
+      <autoAuthorizationFlag>Y</autoAuthorizationFlag>
+    </com.nucleus.makerchecker.MappedEntityInfo>
+    
+     <com.nucleus.makerchecker.MappedEntityInfo>
+      <masterEntityName>ScriptParameter</masterEntityName>
+      <EntityUpdateInfoList>
+      </EntityUpdateInfoList>
+      <autoAuthorizationFlag>Y</autoAuthorizationFlag>
+    </com.nucleus.makerchecker.MappedEntityInfo>
+    
+    <com.nucleus.makerchecker.MappedEntityInfo>
+      <masterEntityName>DerivedParameter</masterEntityName>
+      <EntityUpdateInfoList>
+      </EntityUpdateInfoList>
+      <autoAuthorizationFlag>Y</autoAuthorizationFlag>
+    </com.nucleus.makerchecker.MappedEntityInfo>
+    
+  </mappedEntityInfoList>
+</com.nucleus.makerchecker.EntityUpdateMapper>

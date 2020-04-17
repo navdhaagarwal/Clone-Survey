@@ -1,0 +1,115 @@
+<?xml version='1.0' encoding='UTF-8'?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:util="http://www.springframework.org/schema/util" xmlns:jpa="http://www.springframework.org/schema/data/jpa"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:redisson="http://redisson.org/schema/redisson"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/context
+    http://www.springframework.org/schema/context/spring-context.xsd
+    http://www.springframework.org/schema/task 
+    http://www.springframework.org/schema/task/spring-task.xsd
+    http://redisson.org/schema/redisson
+    http://redisson.org/schema/redisson/redisson.xsd">
+
+	<bean id="fstCodec" class="org.redisson.codec.FstCodec" />
+
+	<beans profile="redis-sentinel">
+
+		<redisson:client id="redissonSentinel" name="redissonSentinel"
+			codec-ref="fstCodec">
+			<redisson:sentinel-servers
+				idle-connection-timeout="${redis.server.idle.connection.timeout}"
+				ping-timeout="${redis.server.ping.timeout}" connect-timeout="${redis.server.connect.timeout}"
+				timeout="${redis.server.timeout}" retry-attempts="${redis.server.retry.attempts}"
+				retry-interval="${redis.server.retry.interval}"
+				subscriptions-per-connection="${redis.server.subscription.per.connection}"
+				client-name="${redis.sentinel.client.master.name}"
+				load-balancer-ref="RoundRobinLoadBalancer"
+				subscription-connection-minimum-idle-size="${redis.server.subscription.connection.min.idle.size}"
+				subscription-connection-pool-size="${redis.server.subscription.connection.pool.size}"
+				slave-connection-minimum-idle-size="${redis.sentinel.slave.connection.min.idle.size}"
+				slave-connection-pool-size="${redis.sentinel.slave.connection.pool.size}"
+				master-connection-minimum-idle-size="${redis.sentinel.master.connection.min.idle.size}"
+				master-connection-pool-size="${redis.sentinel.master.connection.pool.size}"
+				read-mode="SLAVE" subscription-mode="SLAVE"
+				master-name="${redis.sentinel.master.name}" database="${redis.server.database.id}"
+				password="${redis.server.password}">
+
+				<redisson:sentinel-address value="${redis.sentinel.addressA}" />
+				<redisson:sentinel-address value="${redis.sentinel.addressB}" />
+				<redisson:sentinel-address value="${redis.sentinel.addressC}" />
+			</redisson:sentinel-servers>
+		</redisson:client>
+
+		<bean id="RoundRobinLoadBalancer"
+			class="org.redisson.connection.balancer.RoundRobinLoadBalancer" />
+
+		<bean id="CACHE_MANAGER"
+			class="com.nucleus.finnone.pro.cache.common.redis.CacheManagerRedisImpl">
+			<constructor-arg index="0" ref="redissonSentinel" />
+			<constructor-arg index="1" value="30" />
+			<constructor-arg index="2" value="30" />
+			<constructor-arg index="3" value="10" />
+			<constructor-arg index="4" value="5" />
+			<constructor-arg index="5" value="60" />
+		</bean>
+		
+		<bean id="pubSubService" class="com.nucleus.pubsub.redis.PubSubServiceRedisImpl">
+		<constructor-arg index="0" ref="redissonSentinel" />
+		</bean>
+		
+		<bean id="queueProviderService" class="com.nucleus.finnone.pro.queue.RedisQueueProviderService">
+		<constructor-arg index="0" ref="redissonSentinel" />
+		</bean>
+		
+		<bean id="priorityQueueProviderService" class="com.nucleus.finnone.pro.queue.RedisPriorityQueueProviderService">
+		<constructor-arg index="0" ref="redissonSentinel" />
+		</bean>
+
+	</beans>
+
+	<beans profile="!redis-sentinel">
+
+		<redisson:client id="redissonClient" name="redissonClient"
+			codec-ref="fstCodec">
+			<redisson:single-server
+				idle-connection-timeout="${redis.server.idle.connection.timeout}"
+				ping-timeout="${redis.server.ping.timeout}" connect-timeout="${redis.server.connect.timeout}"
+				timeout="${redis.server.timeout}" retry-attempts="${redis.server.retry.attempts}"
+				retry-interval="${redis.server.retry.interval}"
+				subscriptions-per-connection="${redis.server.subscription.per.connection}"
+				client-name="${redis.server.client.name}" address="${redis.server.address}"
+				subscription-connection-minimum-idle-size="${redis.server.subscription.connection.min.idle.size}"
+				subscription-connection-pool-size="${redis.server.subscription.connection.pool.size}"
+				connection-minimum-idle-size="${redis.server.connection.min.idle.size}"
+				connection-pool-size="${redis.server.connection.pool.size}"
+				database="${redis.server.database.id}" password="${redis.server.password}" />
+		</redisson:client>
+
+		<bean id="CACHE_MANAGER"
+			class="com.nucleus.finnone.pro.cache.common.redis.CacheManagerRedisImpl">
+			<constructor-arg index="0" ref="redissonClient" />
+			<constructor-arg index="1" value="30" />
+			<constructor-arg index="2" value="30" />
+			<constructor-arg index="3" value="10" />
+			<constructor-arg index="4" value="5" />
+			<constructor-arg index="5" value="60" />
+		</bean>
+		
+		<bean id="pubSubService" class="com.nucleus.pubsub.redis.PubSubServiceRedisImpl">
+		<constructor-arg index="0" ref="redissonClient" />
+		</bean>
+		
+		<bean id="queueProviderService" class="com.nucleus.finnone.pro.queue.RedisQueueProviderService">
+		<constructor-arg index="0" ref="redissonClient" />
+		</bean>
+		
+		<bean id="priorityQueueProviderService" class="com.nucleus.finnone.pro.queue.RedisPriorityQueueProviderService">
+		<constructor-arg index="0" ref="redissonClient" />
+		</bean>
+	</beans>	
+
+</beans>

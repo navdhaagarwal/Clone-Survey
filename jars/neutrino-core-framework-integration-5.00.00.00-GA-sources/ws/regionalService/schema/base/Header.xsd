@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns="http://schema.base.ws.pro.finnone.nucleus.com" targetNamespace="http://schema.base.ws.pro.finnone.nucleus.com"
+	xmlns:base="http://schema.base.ws.pro.finnone.nucleus.com"
+	elementFormDefault="qualified">
+	
+
+	<xsd:include schemaLocation="StringTypes.xsd" />
+	<xsd:include  schemaLocation="NumberTypes.xsd" />
+	<xsd:include  schemaLocation="User.xsd" />
+	<xsd:include  schemaLocation="Tenant.xsd" />
+
+	<xsd:complexType name="Header">
+		<xsd:sequence>
+			<xsd:element name="version" type="base:String_0016Type" nillable="false" minOccurs="1" />
+			<xsd:element name="requestId" type="base:String_0255Type" nillable="false" minOccurs="1" />
+			<xsd:element name="serviceId" type="base:String_0016Type" nillable="false" minOccurs="1" />
+      		<xsd:element name="operationId" type="base:String_0016Type" nillable="false" minOccurs="1" />
+      		<xsd:element name="transmissionPrimitive" type="base:String_0032Type" minOccurs="0"/>
+      		<xsd:element ref="languageCode"  minOccurs="1" maxOccurs="1"/>
+      		<xsd:element ref="tenantId"  minOccurs="1" maxOccurs="1"/>
+      		<xsd:element ref="tenantName"  minOccurs="0" maxOccurs="1" />
+      		<xsd:element name="transactionId" type="base:String_0016Type"   minOccurs="0" />
+      		<xsd:element name="userDetail" type="UserInfoType" minOccurs="1" maxOccurs="1"/>   
+		</xsd:sequence>
+	</xsd:complexType>
+	
+	
+<xsd:element name="Header" type="Header" />
+
+
+
+ 	<xsd:complexType name="UserInfoType">
+    <xsd:annotation>
+        <xsd:documentation xml:lang="en">This is a User Detail</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>    
+       	<xsd:element ref="userCode"    minOccurs="1" maxOccurs="1"/>
+       	<xsd:element ref="userName"    minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="userRole"    minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="branchCode"  minOccurs="1" maxOccurs="1"/>
+        <xsd:element ref="branchName"  minOccurs="0" maxOccurs="1"/> 
+        <xsd:element ref="branchId"  minOccurs="1" maxOccurs="1"/>
+          
+   </xsd:sequence>
+ </xsd:complexType>
+ 
+ 
+ 
+  
+ 
+  
+
+
+</xsd:schema>

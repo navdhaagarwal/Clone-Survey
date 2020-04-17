@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+      http://www.springframework.org/schema/beans/spring-beans.xsd
+      http://www.springframework.org/schema/util
+      http://www.springframework.org/schema/util/spring-util.xsd"
+      >
+
+	
+	<bean id="md5PasswordEncoderBean" class="org.springframework.security.crypto.password.MessageDigestPasswordEncoder">
+		<constructor-arg value="MD5"></constructor-arg>
+	</bean>
+	<bean id="bcryptEncoder" class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder">
+	</bean>
+	
+    <util:map id="passwordEncoders">
+    	<entry key="bcrypt" value-ref="bcryptEncoder"></entry>
+    </util:map>
+	<bean id="neutrinoPasswordEncoder"
+		class="org.springframework.security.crypto.password.DelegatingPasswordEncoder" >
+		<constructor-arg value="bcrypt" index="0"></constructor-arg>
+		<constructor-arg ref="passwordEncoders" index="1"></constructor-arg>
+		<property name="defaultPasswordEncoderForMatches" ref="md5PasswordEncoderBean"></property>		
+	</bean>	
+	<bean id="sessionRegistry"
+			class="com.nucleus.security.core.session.NeutrinoSessionRegistryImpl" depends-on="CACHE_MANAGER"/>
+			
+	
+	<bean id="maskingTypeFactory"
+		class="com.nucleus.security.masking.types.MaskingTypeFactory"	>
+		<property name="map">
+			<map>
+				<entry key="email">
+					<bean class="com.nucleus.security.masking.types.EmailMasking"/>
+				</entry>
+				<entry key="indexed">
+					<bean class="com.nucleus.security.masking.types.IndexBasedMasking"/>
+				</entry>
+				<entry key="pattern">
+					<bean class="com.nucleus.security.masking.types.PatternBasedMasking"/>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+</beans>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns="http://schema.base.ws.pro.finnone.nucleus.com" targetNamespace="http://schema.base.ws.pro.finnone.nucleus.com"
+	xmlns:base="http://schema.base.ws.pro.finnone.nucleus.com"
+	elementFormDefault="qualified">
+
+	<xsd:include schemaLocation="StringTypes.xsd" />
+	<xsd:include schemaLocation="NumberTypes.xsd" />
+	<xsd:include schemaLocation="Branch.xsd" />
+
+	<xsd:complexType name="User">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">This is a User Detail
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element ref="userCode" minOccurs="1" maxOccurs="1"/>
+			<xsd:element ref="userRole" minOccurs="1" maxOccurs="1" />
+			<xsd:element ref="userName" minOccurs="1" maxOccurs="1" />
+			<xsd:element ref="branchCode" minOccurs="1" maxOccurs="1" />
+			<xsd:element ref="branchName" minOccurs="1" maxOccurs="1" />
+		</xsd:sequence>
+	</xsd:complexType>
+
+
+	<xsd:element name="userCode" type="base:String_0048Type" />
+	<xsd:element name="userRole" type="base:String_0016Type" />
+	<xsd:element name="userName" type="base:String_0255Type" /> 
+
+</xsd:schema>

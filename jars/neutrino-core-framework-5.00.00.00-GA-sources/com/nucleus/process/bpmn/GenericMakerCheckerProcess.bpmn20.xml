@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.nucleussoftware.com/genericApprovalFlow">
+  <process id="GenericMakerCheckerProcess" name="Generic Maker Checker Process" isExecutable="true">
+    <startEvent id="startevent1" name="Start"></startEvent>
+    <userTask id="generic_maker" name="Maker"></userTask>
+    <serviceTask id="checker_assignee_task" name="Checker Assignee Task" activiti:expression="${genericMakerCheckerService.setCheckerVariables(execution)}"></serviceTask>
+    <userTask id="checker_generic_task" name="Checker" activiti:assignee="${assignee}"></userTask>
+    <serviceTask id="approved_generic_task" name="Approved" activiti:expression="${genericMakerCheckerService.completeApprovalProcess(execution)}"></serviceTask>
+    <serviceTask id="rejected_generic_task" name="Reject" activiti:expression="${genericMakerCheckerService.completeRejectProcess(execution)}"></serviceTask>
+    <serviceTask id="generic_sendback_task" name="SendBack" activiti:expression="${genericMakerCheckerService.completeSendBackProcess(execution)}"></serviceTask>
+    <exclusiveGateway id="exclusivegateway1" name="Exclusive Gateway"></exclusiveGateway>
+    <endEvent id="endevent1" name="End"></endEvent>
+    <sequenceFlow id="flow1" sourceRef="startevent1" targetRef="generic_maker"></sequenceFlow>
+    <sequenceFlow id="flow2" sourceRef="generic_maker" targetRef="checker_assignee_task"></sequenceFlow>
+    <sequenceFlow id="flow3" sourceRef="checker_assignee_task" targetRef="checker_generic_task"></sequenceFlow>
+    <sequenceFlow id="flow4" sourceRef="checker_generic_task" targetRef="exclusivegateway1"></sequenceFlow>
+    <sequenceFlow id="flow5" sourceRef="exclusivegateway1" targetRef="approved_generic_task">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${checkerDecision == "Approved"}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow6" sourceRef="exclusivegateway1" targetRef="rejected_generic_task">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${checkerDecision == "Reject"}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow7" sourceRef="exclusivegateway1" targetRef="generic_sendback_task">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${checkerDecision == "SendBack"}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow8" sourceRef="approved_generic_task" targetRef="endevent1"></sequenceFlow>
+    <sequenceFlow id="flow9" sourceRef="rejected_generic_task" targetRef="endevent1"></sequenceFlow>
+    <sequenceFlow id="flow10" sourceRef="generic_sendback_task" targetRef="endevent1"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_GenericMakerCheckerProcess">
+    <bpmndi:BPMNPlane bpmnElement="GenericMakerCheckerProcess" id="BPMNPlane_GenericMakerCheckerProcess">
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway1" id="BPMNShape_exclusivegateway1">
+        <omgdc:Bounds height="40.0" width="40.0" x="720.0" y="197.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent1" id="BPMNShape_endevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="1020.0" y="200.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="startevent1" id="BPMNShape_startevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="140.0" y="200.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="generic_maker" id="BPMNShape_generic_maker">
+        <omgdc:Bounds height="55.0" width="105.0" x="240.0" y="190.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="checker_assignee_task" id="BPMNShape_checker_assignee_task">
+        <omgdc:Bounds height="55.0" width="105.0" x="420.0" y="190.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="checker_generic_task" id="BPMNShape_checker_generic_task">
+        <omgdc:Bounds height="55.0" width="105.0" x="580.0" y="190.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="approved_generic_task" id="BPMNShape_approved_generic_task">
+        <omgdc:Bounds height="55.0" width="105.0" x="820.0" y="90.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="rejected_generic_task" id="BPMNShape_rejected_generic_task">
+        <omgdc:Bounds height="55.0" width="105.0" x="820.0" y="190.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="generic_sendback_task" id="BPMNShape_generic_sendback_task">
+        <omgdc:Bounds height="55.0" width="105.0" x="820.0" y="300.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+        <omgdi:waypoint x="175.0" y="217.0"></omgdi:waypoint>
+        <omgdi:waypoint x="240.0" y="217.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
+        <omgdi:waypoint x="345.0" y="217.0"></omgdi:waypoint>
+        <omgdi:waypoint x="420.0" y="217.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow3" id="BPMNEdge_flow3">
+        <omgdi:waypoint x="525.0" y="217.0"></omgdi:waypoint>
+        <omgdi:waypoint x="580.0" y="217.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow4" id="BPMNEdge_flow4">
+        <omgdi:waypoint x="685.0" y="217.0"></omgdi:waypoint>
+        <omgdi:waypoint x="720.0" y="217.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow5" id="BPMNEdge_flow5">
+        <omgdi:waypoint x="740.0" y="197.0"></omgdi:waypoint>
+        <omgdi:waypoint x="740.0" y="117.0"></omgdi:waypoint>
+        <omgdi:waypoint x="820.0" y="117.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow6" id="BPMNEdge_flow6">
+        <omgdi:waypoint x="760.0" y="217.0"></omgdi:waypoint>
+        <omgdi:waypoint x="820.0" y="217.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow7" id="BPMNEdge_flow7">
+        <omgdi:waypoint x="740.0" y="237.0"></omgdi:waypoint>
+        <omgdi:waypoint x="740.0" y="327.0"></omgdi:waypoint>
+        <omgdi:waypoint x="820.0" y="327.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow8" id="BPMNEdge_flow8">
+        <omgdi:waypoint x="925.0" y="117.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1037.0" y="117.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1037.0" y="200.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow9" id="BPMNEdge_flow9">
+        <omgdi:waypoint x="925.0" y="217.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1020.0" y="217.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow10" id="BPMNEdge_flow10">
+        <omgdi:waypoint x="925.0" y="327.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1037.0" y="327.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1037.0" y="235.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

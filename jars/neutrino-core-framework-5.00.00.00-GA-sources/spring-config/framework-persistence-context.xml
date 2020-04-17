@@ -1,0 +1,370 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:util="http://www.springframework.org/schema/util" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+      http://www.springframework.org/schema/beans/spring-beans.xsd
+      http://www.springframework.org/schema/util
+      http://www.springframework.org/schema/util/spring-util.xsd
+      http://www.springframework.org/schema/tx
+      http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+	<bean id="hibernateStringEncryptor"
+		class="org.jasypt.hibernate4.encryptor.HibernatePBEStringEncryptor">
+		<property name="registeredName" value="frameworkHibernateStringEncryptor" />
+		<property name="encryptor" ref="stringEncryptor" />
+	</bean>
+
+	<tx:annotation-driven transaction-manager="transactionManager" />
+
+	<bean
+		class="org.springframework.orm.jpa.support.PersistenceAnnotationBeanPostProcessor" />
+
+	<bean id="persistenceUnitManager" class="com.nucleus.persistence.MergingPersistenceUnitManager">
+		<property name="persistenceXmlLocations">
+			<list>
+				<value>classpath:META-INF/neutrino-persistence-root.xml</value>
+				<value>classpath*:META-INF/neutrino-persistence.xml</value>
+			</list>
+		</property>
+		<property name="persistenceUnitPostProcessors" ref="persistenceUnitPostProcessor" />
+		<property name="basePersistenceUnitName" ref="basePersistenceUnitName" />
+	</bean>
+
+	<bean id="basePersistenceUnitName" class="java.lang.String">
+		<constructor-arg type="String" value="neutrino-persistence" />
+	</bean>
+	
+	<!-- Cache Manager used in FW -->
+	<!-- <bean id="neutrinoCacheManager" class = "com.nucleus.finnone.pro.cache.common.CacheManager">
+		<property name="isRemote" value="false"></property>
+	</bean> -->
+
+	<bean id="neutrinoSequenceGenerator" class="${database.sequence.generator.class}"></bean>
+
+	<!-- We need to put depends-on for 'moneyInitializer' bean otherwise this 
+		won't get loaded correctly -->
+	<bean id="entityManagerFactory"
+		class="org.springframework.orm.jpa.CustomEntityManagerFactoryBean"
+		depends-on="moneyInitializer,timeZoneInitializer,transactionManager">
+		<property name="persistenceUnitName" ref="basePersistenceUnitName" />
+		<property name="persistenceUnitManager" ref="persistenceUnitManager" />
+		<property name="jpaVendorAdapter">
+			<bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
+				<property name="generateDdl" value="${jpa.generate.ddl}" />
+				<property name="showSql" value="${jpa.show.sql}" />
+			</bean>
+		</property>
+		<property name="jpaDialect">
+			<bean class="org.springframework.orm.jpa.vendor.HibernateJpaDialect" />
+		</property>
+		<property name="jpaProperties" ref="jpaProperties" />
+	</bean>
+	
+	<bean id="timeZoneInitializer" class = "com.nucleus.persistence.TimeZoneInitializer">
+		<property name="jpaProperties" ref="jpaProperties" />
+	</bean>
+	<bean id = "jpaPropertyValidationBeanPostProcessor" class = "com.nucleus.persistence.JPAPropertyValidationBeanPostProcessor"
+	lazy-init="false">
+		<property name="entityManagerFactory" ref="entityManagerFactory"/>
+	</bean>
+<!-- 	<bean id="fullTextSearchInitializer" class="com.nucleus.persistence.FullTextSearchInitializer"
+		depends-on="entityManagerFactory">
+		<property name="autoIndexOnStartup"
+			value="${neutrino.fullTextSearch.autoIndexOnStartup}" />
+	</bean> -->
+
+	<bean id="persistenceUnitPostProcessor" class="com.nucleus.persistence.JtaPersistenceUnitPostProcessor">
+		<property name="dataSource" ref="dataSource" />
+		<property name="jtaEnabled" value="${transaction.management.jtaEnabled}" />
+	</bean>
+<!-- 
+	<mongo:repositories base-package="com.nucleus" />
+
+	<bean id="mongoTemplate" class="org.springframework.data.mongodb.core.MongoTemplate">
+		<constructor-arg name="mongo" ref="mongo" />
+		<constructor-arg name="databaseName" value="${mongo.database.name}" />
+	</bean>
+
+	<bean id="mongo" class="org.springframework.data.mongodb.core.MongoFactoryBean">
+		<property name="host" value="${mongo.database.host}" />
+		<property name="port" value="${mogo.database.port}" />
+	</bean>
+ -->
+	<!-- choosing the datasource definition on the basis of environment -->
+	<!-- If deployed in EE application sever, then use its data source (which is backed by connection pooling) published in JNDI -->
+	<beans profile="app-server-provided">
+		<bean id="dataSource" class="org.springframework.jndi.JndiObjectFactoryBean">
+			<property name="jndiName" value="${database.dataSource.name}" />
+			<property name="proxyInterface" value="javax.sql.DataSource"/>
+		</bean>
+		<!--  If deployed in EE application server, use Spring to detect its transaction manager in standard JNDI locations-->
+		<bean id="transactionManager" class="${jta.transaction.manager.class}">
+        </bean>
+		
+		<util:properties id="jpaProperties">
+		
+		<prop key="hibernate.hbm2ddl.auto">${hibernate.hbm2ddl.auto}</prop>
+		<!-- <prop key="hibernate.ejb.naming_strategy">com.nucleus.core.generator.NeutrinoNamingStrategy</prop> -->
+		<prop key ="hibernate.implicit_naming_strategy">com.nucleus.core.generator.NeutrinoImplicitNamingStratergy</prop>
+		<prop key = "hibernate.physical_naming_strategy">com.nucleus.core.generator.NeutrinoNamingStrategy</prop>
+		<prop key="hibernate.format_sql">${hibernate.format_sql}</prop>
+		<prop key="hibernate.dialect">${hibernate.dialect}</prop>
+		<prop key="hibernate.cache.region.factory_class">${appserver.hibernate.cache.region.factory_class}</prop>
+		<!-- <prop key="hibernate.cache.infinispan.cachemanager">${infinispan.hibernate.cache.infinispan.cachemanager}</prop>  --> 
+		<prop key="hibernate.cache.provider_configuration">${ehcache.hibernate.cache.provider_configuration}</prop>
+		<prop key="net.sf.ehcache.configurationResourceName">${ehcache.hibernate.cache.provider_configuration}</prop>
+		<prop key="net.sf.ehcache.hibernate.cache_lock_timeout">${ehcache.hibernate.cache.lock_timeout}</prop>		
+		<prop key="hibernate.cache.redis.cfg">${hibernate.cache.redis.cfg}</prop>
+		<prop key="hibernate.cache.use_second_level_cache">${hibernate.use.second.level.cache}</prop>
+		<prop key="hibernate.cache.use_query_cache">${hibernate.cache.use_query_cache}</prop>
+		<prop key="hibernate.generate_statistics">${hibernate.generate.second.level.cache.stats}</prop>
+		<prop key="hibernate.session.events.log">${hibernate.session.events.log}</prop>
+		<prop key="hibernate.cache.infinispan.cfg">${infinispan.hibernate.cache.cfg}</prop>
+		<prop key="hibernate.id.new_generator_mappings">true</prop>
+		<prop key="hibernate.cache.region_prefix">${hibernate.cache.region_prefix}</prop>
+		<prop key="hibernate.use_sql_comments">${hibernate.use_sql_comments}</prop>
+		<prop key="hibernate.connection.characterEncoding">UTF-8</prop>
+		<prop key="hibernate.connection.useUnicode">true</prop>
+		<prop key="hibernate.connection.charSet">UTF-8</prop>
+		<prop key="hibernate.jdbc.batch_size">${hibernate.jdbc.batch_size}</prop>
+		<prop key="hibernate.order_inserts">${hibernate.order_inserts}</prop>
+      	<prop key="hibernate.order_updates">${hibernate.order_updates}</prop> 
+		<prop key="hibernate.transaction.jta.platform">${hibernate.transaction.jta.platform}</prop>
+	 	<prop key="hibernate.ejb.resource_scanner">${hibernate.ejb.resource_scanner}</prop>
+	 	<prop key="hibernate.query.startup_check">${hibernate.query.startup_check}</prop>
+	 	<prop key="hibernate.query.plan_cache_max_size">4096</prop>
+	 	<prop key="hibernate.cache.infinispan.statistics">${hibernate.cache.infinispan.statistics}</prop>
+	 	<prop key="hibernate.synonyms">true</prop>
+		<prop key="hibernate.default_schema">#{'${hibernate.hbm2ddl.auto}' == 'update'?'${hibernate.default_schema}':''}</prop>
+		<prop key="timezone.config.applicable">${timezone.config.applicable}</prop>
+		<prop key="hibernate.connection.handling_mode">${hibernate.connection.handling_mode}</prop>
+		<prop key="hibernate.ejb.interceptor">${hibernate.ejb.interceptor}</prop>
+<!--	<prop key="hibernate.multiTenancy">SCHEMA</prop>
+		<prop key="hibernate.tenant_identifier_resolver">com.nucleus.core.mutitenancy.CustomSchemaResolver</prop>
+		<prop key="hibernate.multi_tenant_connection_provider">com.nucleus.core.mutitenancy.CustomMultiTenantConnectionProvider</prop>
+-->
+	</util:properties>
+	</beans>
+	<beans profile="app-server-cluster-provided">
+		<bean id="dataSource" class="org.springframework.jndi.JndiObjectFactoryBean">
+			<property name="jndiName" value="${database.dataSource.name}" />
+			<property name="proxyInterface" value="javax.sql.DataSource"/>
+		</bean>
+		<!--  If deployed in EE application server, use Spring to detect its transaction manager in standard JNDI locations-->
+		<bean id="transactionManager" class="${jta.transaction.manager.class}">
+        </bean>
+		
+		<util:properties id="jpaProperties">
+		<prop key="hibernate.session_factory_name">MySessionFactory</prop>
+		<prop key="hibernate.session_factory_name_is_jndi">false</prop>
+		<prop key="hibernate.hbm2ddl.auto">${hibernate.hbm2ddl.auto}</prop>
+		<!-- <prop key="hibernate.ejb.naming_strategy">com.nucleus.core.generator.NeutrinoNamingStrategy</prop> -->
+		<prop key ="hibernate.implicit_naming_strategy">com.nucleus.core.generator.NeutrinoImplicitNamingStratergy</prop>
+		<prop key = "hibernate.physical_naming_strategy">com.nucleus.core.generator.NeutrinoNamingStrategy</prop>
+		<prop key="hibernate.format_sql">${hibernate.format_sql}</prop>
+		<prop key="hibernate.dialect">${hibernate.dialect}</prop>
+		<prop key="hibernate.cache.region.factory_class">${appserver.hibernate.cache.region.factory_class}</prop>
+		<!-- <prop key="hibernate.cache.infinispan.cachemanager">${infinispan.hibernate.cache.infinispan.cachemanager}</prop>  --> 
+		<prop key="hibernate.cache.provider_configuration">${ehcache.hibernate.cache.provider_configuration}</prop>
+		<prop key="net.sf.ehcache.configurationResourceName">${ehcache.hibernate.cache.provider_configuration}</prop>
+		<prop key="net.sf.ehcache.hibernate.cache_lock_timeout">${ehcache.hibernate.cache.lock_timeout}</prop>		
+		<prop key="hibernate.cache.redis.cfg">${hibernate.cache.redis.cfg}</prop>
+		<prop key="hibernate.cache.use_second_level_cache">${hibernate.use.second.level.cache}</prop>
+		<prop key="hibernate.cache.use_query_cache">${hibernate.cache.use_query_cache}</prop>
+		<prop key="hibernate.generate_statistics">${hibernate.generate.second.level.cache.stats}</prop>
+		<prop key="hibernate.session.events.log">${hibernate.session.events.log}</prop>
+		<prop key="hibernate.cache.infinispan.cfg">${infinispan.cluster.hibernate.cache.cfg}</prop>
+		<prop key="hibernate.id.new_generator_mappings">true</prop>
+		<prop key="hibernate.cache.region_prefix">${hibernate.cache.region_prefix}</prop>
+		<prop key="hibernate.use_sql_comments">${hibernate.use_sql_comments}</prop>
+		<prop key="hibernate.connection.characterEncoding">UTF-8</prop>
+		<prop key="hibernate.connection.useUnicode">true</prop>
+		<prop key="hibernate.connection.charSet">UTF-8</prop>
+		<prop key="hibernate.jdbc.batch_size">${hibernate.jdbc.batch_size}</prop>
+		<prop key="hibernate.order_inserts">${hibernate.order_inserts}</prop>
+      	<prop key="hibernate.order_updates">${hibernate.order_updates}</prop> 
+		<prop key="hibernate.transaction.jta.platform">${hibernate.transaction.jta.platform}</prop>
+	 	<prop key="hibernate.ejb.resource_scanner">${hibernate.ejb.resource_scanner}</prop>
+	 	<prop key="hibernate.query.startup_check">${hibernate.query.startup_check}</prop>
+	 	<prop key="hibernate.query.plan_cache_max_size">4096</prop>
+	 	<prop key="hibernate.cache.infinispan.statistics">${hibernate.cache.infinispan.statistics}</prop>
+	 	<prop key="hibernate.synonyms">true</prop>
+		<prop key="hibernate.default_schema">#{'${hibernate.hbm2ddl.auto}' == 'update'?'${hibernate.default_schema}':''}</prop>
+		<prop key="timezone.config.applicable">${timezone.config.applicable}</prop>
+		<prop key="hibernate.connection.handling_mode">${hibernate.connection.handling_mode}</prop>
+		<prop key="hibernate.ejb.interceptor">${hibernate.ejb.interceptor}</prop>
+<!--	<prop key="hibernate.multiTenancy">SCHEMA</prop>
+		<prop key="hibernate.tenant_identifier_resolver">com.nucleus.core.mutitenancy.CustomSchemaResolver</prop>
+		<prop key="hibernate.multi_tenant_connection_provider">com.nucleus.core.mutitenancy.CustomMultiTenantConnectionProvider</prop>
+-->
+	</util:properties>
+	</beans>
+	
+	
+	<beans profile="dev-with-jta">
+		<bean id="dataSource" class="org.apache.tomcat.dbcp.dbcp.BasicDataSource"
+			destroy-method="close">
+			<property name="driverClassName" value="${database.driver.class}" />
+			<property name="url" value="${database.connection.url}" />
+			<property name="username" value="${database.username}" />
+			<property name="password" value="${database.password}" />
+			<!-- Max number of connections that can remain idle in pool, without extra 
+				conns being released -->
+			<property name="maxIdle" value="${database.connection.pool.maxIdle}" />
+			<!-- Max number of active connections in the pool -->
+			<property name="maxActive" value="${database.connection.pool.maxActive}" />
+			<!-- In milliseconds - wait no longer for a connection to be returned 
+				(when no conns available in pool) -->
+			<property name="maxWait" value="${database.connection.pool.maxWait}" />
+			<property name="removeAbandoned" value="${database.connection.pool.removeAbandoned}" />
+			<property name="testWhileIdle" value="${database.connection.pool.testWhileIdle}" />
+			<property name="validationQuery" value="${database.connection.pool.validationQuery}" />
+			<property name="testOnBorrow" value="${database.connection.pool.testOnBorrow}" />
+		</bean>
+		
+		<bean id="transactionManager" class="org.springframework.transaction.jta.JtaTransactionManager">
+			<property name="transactionManager" ref="arjunaTransactionManager"/>
+			<property name="userTransaction" ref="arjunaUserTransaction"/>
+			<property name ="defaultTimeout" value = "${dev.jta.transaction.timeout}"/>
+		</bean>
+		
+		<bean id="arjunaTransactionManager" class="com.arjuna.ats.jta.TransactionManager" factory-method="transactionManager" />
+		<bean id="arjunaUserTransaction" class="com.arjuna.ats.jta.UserTransaction" factory-method="userTransaction"/>
+		
+		<util:properties id="jpaProperties">
+		<prop key="hibernate.hbm2ddl.auto">${hibernate.hbm2ddl.auto}</prop>
+		<!-- <prop key="hibernate.ejb.naming_strategy">com.nucleus.core.generator.NeutrinoNamingStrategy</prop> -->
+		<prop key ="hibernate.implicit_naming_strategy">com.nucleus.core.generator.NeutrinoImplicitNamingStratergy</prop>
+		<prop key = "hibernate.physical_naming_strategy">com.nucleus.core.generator.NeutrinoNamingStrategy</prop>
+		<prop key="hibernate.format_sql">${hibernate.format_sql}</prop>
+		<prop key="hibernate.dialect">${hibernate.dialect}</prop>
+		<prop key="hibernate.cache.region.factory_class">${appserver.hibernate.cache.region.factory_class}</prop>
+		<!-- <prop key="hibernate.cache.infinispan.cachemanager">${infinispan.hibernate.cache.infinispan.cachemanager}</prop>  --> 
+		<prop key="hibernate.cache.provider_configuration">${ehcache.hibernate.cache.provider_configuration}</prop>
+		<prop key="net.sf.ehcache.configurationResourceName">${ehcache.hibernate.cache.provider_configuration}</prop>
+		<prop key="net.sf.ehcache.hibernate.cache_lock_timeout">${ehcache.hibernate.cache.lock_timeout}</prop>		
+		<prop key="hibernate.cache.redis.cfg">${hibernate.cache.redis.cfg}</prop>
+		<prop key="hibernate.cache.use_second_level_cache">${hibernate.use.second.level.cache}</prop>
+		<prop key="hibernate.cache.use_query_cache">${hibernate.cache.use_query_cache}</prop>
+		<prop key="hibernate.generate_statistics">${hibernate.generate.second.level.cache.stats}</prop>
+		<prop key="hibernate.session.events.log">${hibernate.session.events.log}</prop>
+		<prop key="hibernate.cache.infinispan.cfg">${infinispan.hibernate.cache.cfg}</prop>
+		<prop key="hibernate.id.new_generator_mappings">true</prop>
+		<prop key="hibernate.cache.region_prefix">${hibernate.cache.region_prefix}</prop>
+		<prop key="hibernate.use_sql_comments">${hibernate.use_sql_comments}</prop>
+		<prop key="hibernate.connection.characterEncoding">UTF-8</prop>
+		<prop key="hibernate.connection.useUnicode">true</prop>
+		<prop key="hibernate.connection.charSet">UTF-8</prop>
+		<prop key="hibernate.jdbc.batch_size">${hibernate.jdbc.batch_size}</prop>
+		<prop key="hibernate.order_inserts">${hibernate.order_inserts}</prop>
+      	<prop key="hibernate.order_updates">${hibernate.order_updates}</prop> 
+		<prop key="hibernate.transaction.jta.platform">JBossTS</prop>
+	 	<prop key="hibernate.ejb.resource_scanner">${hibernate.ejb.resource_scanner}</prop>
+	 	<prop key="hibernate.query.startup_check">${hibernate.query.startup_check}</prop>
+	 	<prop key="hibernate.query.plan_cache_max_size">4096</prop>
+	 	<prop key="hibernate.cache.infinispan.statistics">${hibernate.cache.infinispan.statistics}</prop>
+	 	<prop key="hibernate.synonyms">true</prop>
+		<prop key="hibernate.default_schema">#{'${hibernate.hbm2ddl.auto}' == 'update'?'${hibernate.default_schema}':''}</prop>
+		<prop key="timezone.config.applicable">${timezone.config.applicable}</prop>
+		<prop key="hibernate.connection.handling_mode">${hibernate.connection.handling_mode}</prop>
+		<prop key="hibernate.ejb.interceptor">${hibernate.ejb.interceptor}</prop>
+<!--	<prop key="hibernate.multiTenancy">SCHEMA</prop>
+		<prop key="hibernate.tenant_identifier_resolver">com.nucleus.core.mutitenancy.CustomSchemaResolver</prop>
+		<prop key="hibernate.multi_tenant_connection_provider">com.nucleus.core.mutitenancy.CustomMultiTenantConnectionProvider</prop>
+-->
+	</util:properties>
+	</beans>
+	
+	
+	<!-- If we are not deployed in EE application server, then use our own connection pooled datasource -->
+	<beans profile="!app-server-provided">
+	<beans profile="!app-server-cluster-provided">
+	<beans profile="!dev-with-jta">
+		<bean id="dataSource" class="org.apache.tomcat.dbcp.dbcp.BasicDataSource"
+			destroy-method="close">
+			<property name="driverClassName" value="${database.driver.class}" />
+			<property name="url" value="${database.connection.url}" />
+			<property name="username" value="${database.username}" />
+			<property name="password" value="${database.password}" />
+			<!-- Max number of connections that can remain idle in pool, without extra 
+				conns being released -->
+			<property name="maxIdle" value="${database.connection.pool.maxIdle}" />
+			<!-- Max number of active connections in the pool -->
+			<property name="maxActive" value="${database.connection.pool.maxActive}" />
+			<!-- In milliseconds - wait no longer for a connection to be returned 
+				(when no conns available in pool) -->
+			<property name="maxWait" value="${database.connection.pool.maxWait}" />
+			<property name="removeAbandoned" value="${database.connection.pool.removeAbandoned}" />
+			<property name="testWhileIdle" value="${database.connection.pool.testWhileIdle}" />
+			<property name="validationQuery" value="${database.connection.pool.validationQuery}" />
+			<property name="testOnBorrow" value="${database.connection.pool.testOnBorrow}" />
+		</bean>	
+		
+		<bean id="transactionManager" class="${jpa.transaction.manager.class}">
+			<property name="entityManagerFactory" ref="entityManagerFactory" />
+		</bean>	
+		
+		<util:properties id="jpaProperties">
+			<prop key="hibernate.hbm2ddl.auto">${hibernate.hbm2ddl.auto}</prop>
+			<!-- <prop key="hibernate.ejb.naming_strategy">com.nucleus.core.generator.NeutrinoNamingStrategy</prop> -->
+			<prop key ="hibernate.implicit_naming_strategy">com.nucleus.core.generator.NeutrinoImplicitNamingStratergy</prop>
+			<prop key = "hibernate.physical_naming_strategy">com.nucleus.core.generator.NeutrinoNamingStrategy</prop>
+			<prop key="hibernate.format_sql">${hibernate.format_sql}</prop>
+			<prop key="hibernate.dialect">${hibernate.dialect}</prop>
+			<prop key="hibernate.cache.region.factory_class">${ehcache.hibernate.cache.region.factory_class}</prop>
+			<prop key="hibernate.cache.use_second_level_cache">${hibernate.use.second.level.cache}</prop>
+			<prop key="hibernate.cache.use_query_cache">${hibernate.cache.use_query_cache}</prop>
+			<prop key="hibernate.generate_statistics">${hibernate.generate.second.level.cache.stats}</prop>
+			<prop key="hibernate.session.events.log">${hibernate.session.events.log}</prop>
+			<prop key="hibernate.cache.provider_configuration">${ehcache.hibernate.cache.provider_configuration}</prop>		
+			<prop key="hibernate.id.new_generator_mappings">true</prop>
+			<prop key="hibernate.cache.region_prefix">${hibernate.cache.region_prefix}</prop>
+			<prop key="hibernate.use_sql_comments">${hibernate.use_sql_comments}</prop>
+			<prop key="hibernate.connection.characterEncoding">UTF-8</prop>
+			<prop key="hibernate.connection.useUnicode">true</prop>
+			<prop key="hibernate.connection.charSet">UTF-8</prop>
+			<prop key="hibernate.jdbc.batch_size">${hibernate.jdbc.batch_size}</prop>
+			<prop key="hibernate.order_inserts">${hibernate.order_inserts}</prop>
+      		<prop key="hibernate.order_updates">${hibernate.order_updates}</prop>     		
+	 		<prop key="hibernate.ejb.resource_scanner">${hibernate.ejb.resource_scanner}</prop>
+	 		<prop key="hibernate.query.startup_check">${hibernate.query.startup_check}</prop>
+	 		<prop key="hibernate.query.plan_cache_max_size">4096</prop>
+	 		<prop key="hibernate.synonyms">true</prop>
+			<prop key="hibernate.default_schema">#{'${hibernate.hbm2ddl.auto}' == 'update'?'${hibernate.default_schema}':''}</prop>
+			<prop key="timezone.config.applicable">${timezone.config.applicable}</prop>
+			<prop key="hibernate.connection.handling_mode">${hibernate.connection.handling_mode}</prop>
+			<prop key="hibernate.ejb.interceptor">${hibernate.ejb.interceptor}</prop>
+<!--		<prop key="hibernate.multiTenancy">SCHEMA</prop>
+			<prop key="hibernate.tenant_identifier_resolver">com.nucleus.core.mutitenancy.CustomSchemaResolver</prop>
+			<prop key="hibernate.multi_tenant_connection_provider">com.nucleus.core.mutitenancy.CustomMultiTenantConnectionProvider</prop>
+-->
+		</util:properties>
+	</beans>
+	</beans>
+	</beans>
+	
+	<beans profile="sql_query_logging_enabled">
+		<bean id="dataSourceProxy" class="net.ttddyy.dsproxy.support.ProxyDataSource">
+			<property name="dataSource" ref="dataSource" />
+			<property name="listener" ref="listeners" />
+		</bean>
+
+		<bean id="listeners" class="net.ttddyy.dsproxy.listener.ChainListener">
+			<property name="listeners">
+				<list>
+					<bean
+						class="com.nucleus.core.datasource.logging.DataSourceQueryLoggingListener" />
+				</list>
+			</property>
+		</bean>
+
+		<bean id="persistenceUnitPostProcessor"
+			class="com.nucleus.persistence.JtaPersistenceUnitPostProcessor">
+			<property name="dataSource" ref="dataSourceProxy" />
+			<property name="jtaEnabled" value="${transaction.management.jtaEnabled}" />
+		</bean>
+	</beans>
+
+
+</beans>

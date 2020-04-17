@@ -1,0 +1,859 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:security="http://www.springframework.org/schema/security"
+	xmlns:util="http://www.springframework.org/schema/util" xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd
+           http://www.springframework.org/schema/util
+    http://www.springframework.org/schema/util/spring-util.xsd">
+
+	<!-- <context:annotation-config /> <context:component-scan base-package="com.nucleus.*" 
+		/> -->
+
+	<import resource="core-security-context-ldap-search.xml" />
+	<import resource="core-captcha-context.xml" />
+
+	<bean id="coreWebSecurityConfigResourceLoader" parent="rootConfigResourceLoader">
+		<property name="moduleName" value="core-web-config" />
+	</bean>
+	<bean id="activeDirectoryAuthenticationProvider"
+		class="com.nucleus.web.security.NeutrinoCustomADLdapAuthenticationProvider">
+
+		<property name="userDetailsContextMapper" ref="ldapUserDetailMapper" />
+		<property name="groupforRole" value="${core.web.config.group.role}" />
+
+	</bean>
+
+
+	<bean id="customUsernamePasswordAuthenticationFilter"
+		class="com.nucleus.web.security.CustomUsernamePasswordAuthenticationFilter">
+		<property name="authenticationManagerMap">
+			<map>
+				<entry key="db" value-ref="authdbManager"></entry>
+				<entry key="ldap" value-ref="authldapManager"></entry>
+			</map>
+		</property>
+		<property name="authenticationManager" ref="authManager" />
+		<property name="authenticationFailureHandler" ref="failureHandler" />
+		<property name="authenticationSuccessHandler" ref="successHandler" />
+		<property name="sessionAuthenticationStrategy" ref="sessionStrategy" />
+		<property name="captchaEnabled" value="${core.web.config.captcha.enabled}" />
+	</bean>
+	<bean id="authdbManager"
+		class="com.nucleus.web.security.SingleProviderAuthenticationManager">
+		<constructor-arg name="providers">
+			<list>
+				<ref bean="daoAuthenticationProvider" />
+			</list>
+		</constructor-arg>
+		<property name="authenticationProvider" ref="daoAuthenticationProvider" />
+		<property name="tokenBasedAuthenticationProvider" ref="tokenBasedAuthenticationProvider" />
+		<property name="tokenBasedAuthenticationEnable"
+			value="${core.web.config.token.authentication.enable}" />
+
+	</bean>
+
+	<bean id="authldapManager"
+		class="com.nucleus.web.security.SingleProviderAuthenticationManager">
+		<constructor-arg name="providers">
+			<list>
+				<ref bean="activeDirectoryAuthenticationProvider" />
+			</list>
+		</constructor-arg>
+		<property name="authenticationProvider" ref="activeDirectoryAuthenticationProvider" />
+		<property name="tokenBasedAuthenticationProvider" ref="tokenBasedAuthenticationProvider" />
+		<property name="tokenBasedAuthenticationEnable"
+			value="${core.web.config.token.authentication.enable}" />
+	</bean>
+
+	<bean id="ajaxTimeoutRedirectFilter" class="com.nucleus.web.security.AjaxTimeoutRedirectFilter">
+		<property name="customSessionExpiredErrorCode" value="901" />
+	</bean>
+
+	<bean id="daoAuthenticationProvider"
+		class="org.springframework.security.authentication.dao.DaoAuthenticationProvider">
+		<property name="userDetailsService" ref="userDetailService" />
+		<property name="passwordEncoder" ref="neutrinoPasswordEncoder" />
+	</bean>
+	<bean id="tokenBasedAuthenticationProvider"
+		class="com.nucleus.web.security.TokenBasedLoginAuthenticationProvider">
+		<property name="key" value="customTokenKey" />
+	</bean>
+
+	<bean id="coreWebSecurityMasterConfigurationLoader" class="com.nucleus.makerchecker.MasterConfigurationLoader">
+		<property name="resourceLoader" ref="coreWebSecurityConfigResourceLoader" />
+	</bean>
+	<bean id="csrfSecurityRequestMatcher" class="com.nucleus.web.csrf.CSRFExclusionPatternMatcher">
+		<property name="patternsList">
+			<list>
+			</list>
+		</property>
+	</bean>
+	<bean parent="csrfSecurityRequestPluginBeanPostProcessor">
+		<property name="pluginBeanName" value="csrfExcludedUrlPatterns" />
+	</bean>
+
+	<bean id="authManager" class="com.nucleus.web.security.CustomAuthenticationManager">
+		<constructor-arg name="providers">
+			<list>
+				<ref bean="daoAuthenticationProvider" />
+			</list>
+		</constructor-arg>
+		<property name="dbAuthenticationProvider" ref="daoAuthenticationProvider" />
+		<property name="ldapAuthenticationProvider" ref="activeDirectoryAuthenticationProvider" />
+		<property name="tokenBasedAuthenticationProvider" ref="tokenBasedAuthenticationProvider" />
+		<property name="authenticationMode" value="${core.web.config.authentication.mode}" />
+		<property name="tokenBasedAuthenticationEnable"
+			value="${core.web.config.token.authentication.enable}" />
+
+	</bean>
+	<util:list id="csrfExcludedUrlPatterns" list-class="java.util.ArrayList">
+		<value>/app/downloadCache/**</value>
+		<value>/ws/**</value>
+		<value>/app/systemSetup/saveAndRunSeedConfig</value>
+		<value>/app/v1/mcas/**</value>
+		<value>/application/search/**</value>
+		<value>/app/master/getDataByMasterId/**</value>
+		<value>/app/user/getUserDependentMasters/**</value>
+		<value>/rest/**</value>
+		<value>/oauth/token</value>
+		<value>/**/restservice/**</value>
+		<value>/app/licenseInfo/**</value>
+
+		<value>/app/apm/validateLogin/**</value>
+		<value>/app/sso/**</value>
+		<value>/app/externalService/getProxyCookie</value>
+		<value>/app/CommunicationCallback/**</value>
+		<value>/app/emailApproval/**</value>
+		<value>/**/webSocketEndPoint/**</value>
+		<value>/app/userService/resetPassword</value>
+		<value>/app/userService/forgotPassword</value>
+		<value>/app/ec/customTokenUrl/**</value>
+		<value>/app/configuration/getMobileValidationConfig</value>
+		<value>/app/configuration/validateMobileNumber</value>
+		<value>/app/configuration/allowInvalidNumber</value>
+		<value>/app/refresh/**</value>
+		<value>/app/extService/**</value>
+		<value>/app/v2/api-docs</value>		
+		<value>/rest/api-docs/fetchAllMessageCodes</value>
+	</util:list>
+
+	<bean id="filterExcludedUrlHolder" class="com.nucleus.web.security.FilterExcludedUrlHolder">
+		<property name="excludedUrlList">
+			<list>
+			</list>
+		</property>
+	</bean>
+	<bean id="excludedUrlFilterPluginBeanPostProcessor" class="com.nucleus.core.spring.PluginBeanFactoryPostProcessor"
+		abstract="true">
+		<property name="extensionBeanName" value="filterExcludedUrlHolder" />
+		<property name="propertyName" value="excludedUrlList" />
+	</bean>
+
+	<bean parent="excludedUrlFilterPluginBeanPostProcessor">
+		<property name="pluginBeanName" value="coreFilterUrlExclusionMap" />
+	</bean>
+
+	<util:map id="coreFilterUrlExclusionMap">
+		<entry key="excludeForAllFilters">
+			<util:set>
+				<value>/static-resources/**</value>
+				<value>/favicon/**</value>
+				<value>/js/**</value>
+				<value>/styles/**</value>
+				<value>/images/**</value>
+				<value>/images/**</value>
+				<value>/app/emailApproval/**</value>
+				<value>/app/refresh/**</value>
+			</util:set>
+		</entry>
+		<entry key="NeutrinoSecurityFilter">
+			<util:set>
+				<value>/app/auth/**</value>
+				<value>/app/sso/**</value>
+				<value>/app/externalService/getProxyCookie</value>
+				<value>/app/restservice/**</value>
+				<value>/lms/restservice/**</value>
+				<value>/collection/restservice/**</value>
+			</util:set>
+		</entry>
+		<entry key="NeutrinoUrlValidatorFilter">
+			<util:set>
+				<value>/app/downloadCache/**</value>
+				<value>/app/monitoring/**</value>
+				<value>/app/auth/**</value>
+				<value>/app/sso/**</value>
+				<value>/app/externalService/getProxyCookie</value>
+				<value>/**/webSocketEndPoint/**</value>
+				<value>/systemSetup/**</value>
+				<value>/app/UserInfo/getLoggedInUserPhoto/**</value>
+				<value>/app/upload/renderimage/**</value>
+				<value>/**/restservice/**</value>
+				<value>/app/licenseInfo/**</value>
+				<value>/apm/validateLogin/**</value>
+				<value>/app/apm/validateLogin/**</value>
+				<value>/**/entityWatcher/**</value>
+				<value>/app/resetPassword/forceResetPasswordOnLogin/**</value>
+				<value>/app/resetPassword/redirectDirectToResetPasswordPage/**
+				</value>
+				<value>/app/UserInfo/resetPasswordSecurityQuestion/**</value>
+				<value>/app/UserInfo/validatePassword/**</value>
+				<value>/resource-bundles/**</value>
+				<value>/app/CommunicationCallback/**</value>
+				<value>/app/licenseAgreement/licenseAcceptanceOnLogin/**</value>
+				<value>/app/userService/resetPassword</value>
+				<value>/app/userService/forgotPassword</value>
+				<value>/app/ec/customTokenUrl/**</value>
+				<value>/app/configuration/getMobileValidationConfig</value>
+				<value>/app/configuration/validateMobileNumber</value>
+				<value>/app/configuration/allowInvalidNumber</value>
+				<value>/app/extService/**</value>
+				<value>/app/v2/api-docs</value>		
+				<value>/rest/api-docs/fetchAllMessageCodes</value>		
+			</util:set>
+		</entry>
+		<entry key="NeutrinoBodyManipulationFilter">
+			<util:set>
+				<value>/app/downloadCache/**</value>
+				<value>/app/auth/**</value>
+				<value>/oauth/token</value>
+				<value>/**/webSocketEndPoint/**</value>
+				<value>/systemSetup/**</value>
+				<value>/app/UserInfo/getLoggedInUserPhoto/**</value>
+				<value>/app/upload/renderimage/**</value>
+				<value>/**/restservice/**</value>
+				<value>/app/licenseInfo/**</value>
+				<value>/apm/validateLogin/**</value>
+				<value>/app/apm/validateLogin/**</value>
+				<value>/**/entityWatcher/**</value>
+				<value>/app/resetPassword/forceResetPasswordOnLogin/**</value>
+				<value>/**/${core.web.config.default.target.url}/**</value>
+				<value>/app/resetPassword/redirectDirectToResetPasswordPage/**
+				</value>
+				<value>/app/UserInfo/resetPasswordSecurityQuestion/**</value>
+				<value>/app/UserInfo/validatePassword/**</value>
+				<value>/resource-bundles/**</value>
+				<value>/app/CommunicationCallback/**</value>
+				<value>/app/v2/api-docs</value>		
+				<value>/rest/api-docs/fetchAllMessageCodes</value>		
+			</util:set>
+		</entry>
+
+		<entry key="NeutrinoPageRefreshSecurityFilter">
+			<util:set>
+				<value>/app/downloadCache/**</value>
+				<value>/app/monitoring/**</value>
+				<value>/app/auth/**</value>
+				<value>/app/sso/**</value>
+				<value>/app/externalService/getProxyCookie</value>
+				<value>/**/webSocketEndPoint/**</value>
+				<value>/systemSetup/**</value>
+				<value>/app/UserInfo/getLoggedInUserPhoto/**</value>
+				<value>/app/upload/renderimage/**</value>
+				<value>/**/restservice/**</value>
+				<value>/app/licenseInfo/**</value>
+				<value>/apm/validateLogin/**</value>
+				<value>/app/apm/validateLogin/**</value>
+				<value>/**/entityWatcher/**</value>
+				<value>/app/resetPassword/forceResetPasswordOnLogin/**</value>
+				<value>/app/resetPassword/redirectDirectToResetPasswordPage/**
+				</value>
+				<value>/app/UserInfo/resetPasswordSecurityQuestion/**</value>
+				<value>/app/UserInfo/validatePassword/**</value>
+				<value>/app/v2/api-docs</value>	
+				<value>/rest/api-docs/fetchAllMessageCodes</value>			
+			</util:set>
+		</entry>
+
+
+	</util:map>
+
+
+	<bean id="coreWebSecurityConfigResourceFactoryBean"
+		class="com.nucleus.core.initialization.NeutrinoResourceFactoryBean"
+		abstract="true">
+		<property name="resourceLoader" ref="coreWebSecurityConfigResourceLoader" />
+	</bean>
+	<bean id="neutrinoCSRFAccessDeniedHandler"
+		class="com.nucleus.web.security.NeutrinoCSRFAccessDeniedHandler">
+	</bean>
+
+	<bean id="csrfSecurityRequestPluginBeanPostProcessor" class="com.nucleus.core.spring.PluginBeanFactoryPostProcessor"
+		abstract="true">
+		<property name="extensionBeanName" value="csrfSecurityRequestMatcher" />
+		<property name="propertyName" value="patternsList" />
+	</bean>
+	<bean id="coreWebSecurityPropertyPlaceholderConfigurer"
+		class="org.jasypt.spring31.properties.EncryptablePropertySourcesPlaceholderConfigurer">
+		<constructor-arg ref="stringEncryptor" />
+		<property name="ignoreUnresolvablePlaceholders" value="true" />
+		<property name="locations">
+			<list>
+				<bean parent="coreWebSecurityConfigResourceFactoryBean">
+					<property name="resourceName" value="core-web-security-config.properties" />
+				</bean>
+			</list>
+		</property>
+	</bean>
+
+	<security:global-method-security
+		secured-annotations="enabled" pre-post-annotations="enabled"
+		proxy-target-class="true" />
+
+	<bean id="neutrinoSessionInformationExpiredStrategy"
+		class="com.nucleus.web.security.NeutrinoSessionInformationExpiredStrategy">
+		<property name="sessionRegistry" ref="sessionRegistry"></property>
+		<property name="redirectStrategy" ref="neutrinoRedirectStrategy"></property>
+	</bean>
+
+	<bean id="concurrencyFilter"
+		class="org.springframework.security.web.session.ConcurrentSessionFilter">
+		<constructor-arg ref="sessionRegistry" />
+		<constructor-arg ref="neutrinoSessionInformationExpiredStrategy"></constructor-arg>
+		<property name="redirectStrategy" ref="neutrinoRedirectStrategy"></property>
+	</bean>
+
+	<bean id="licenseApplicationURLControlFilter"
+		class="com.nucleus.web.security.LicenseApplicationURLControlFilter">
+		<property name="redirectStrategy" ref="neutrinoRedirectStrategy"></property>
+		<property name="acceptedURL">
+			<util:set>
+			    <value>/app/sso/**</value>
+				<value>/app/externalService/getProxyCookie</value>
+				<value>/login/cas</value>
+			    
+				<value>/app/UserInfo/CheckUserName/**</value>
+				<value>/app/UserInfo/validatePassword/**</value>
+				<value>/**/systemSetup/**</value>
+				<value>/static-resources/**</value>
+				<value>/favicon/**</value>
+				<value>/js/**</value>
+				<value>/styles/**</value>
+				<value>/images/**</value>
+				<value>/resource-bundles/**</value>
+				<value>/**/restservice/**</value>
+				<value>/app/licenseInfo/**</value>
+				<value>/apm/validateLogin/**</value>
+				<value>/app/apm/validateLogin/**</value>
+				<value>/app/resetPassword/forceResetPasswordOnLogin/**</value>
+				<value>/app/resetPassword/redirectDirectToResetPasswordPage/**
+				</value>
+				<value>/app/UserInfo/resetPasswordSecurityQuestion/**</value>
+				<value>/**/auth/getCaptcha</value>
+				<value>/app/resetPassword/resetPasswordOnLogin</value>
+				<value>/app/licenseAgreement/**</value>
+                 <value>/app/gethotkeys/**</value>
+                 <value>/app/auth/**</value>
+                <value>/</value>
+			</util:set>
+		</property>
+	</bean>
+
+	<bean id="apiSecurityFilter" class="com.nucleus.web.security.APISecurityFilter">
+		<property name="acceptedUrls">
+			<util:set>
+				<value>/**/restservice/**</value>
+				<value>/**/rest/**</value>
+				<value>/**/ws/**</value>
+			</util:set>
+		</property>
+		
+		<property name="excludedUrls">
+			<util:set>
+				<value>/**/lms/restservice/eod/**</value>
+				<value>/**/lms/restservice/JOBSchedulerDetail/**</value>
+				<value>/**/reset-password/generateOTP</value>
+				<value>/**/reset-password/verifyOTP</value>
+				<value>/**/reset-password/getSecurityQuestionsList</value>
+				<value>/**/reset-password/checkSecurityQuestionAnswers</value>
+				<value>/**/reset-password/resetUserPassword</value>
+				<value>/**/reset-password/sendMailToResetPassword</value>
+				<value>/**/api-docs/fetchAllMessageCodes</value>
+				<value>/**/ws/scanner/createToken</value>
+				<value>/**/ws/scanner/authenticateSignIn</value>
+				<value>/**/ws/scanner/getTokenForRefreshToken</value>
+			</util:set>
+		</property>
+	</bean>
+
+
+	<bean id="filterSecurityInterceptor"
+		class="com.nucleus.web.security.CustomFilterSecurityInterceptor">
+		<property name="authenticationManager" ref="authManager" />
+		<property name="accessDecisionManager" ref="httpRequestAccessDecisionManager" />
+		<property name="securityMetadataSource" ref="securityMetadataSource" />
+		<property name="observeOncePerRequest" value="false" />
+	</bean>
+
+
+
+
+	<bean id="decisionVoters"
+		class="org.springframework.security.web.access.expression.WebExpressionVoter" />
+
+	<bean id="httpRequestAccessDecisionManager"
+		class="org.springframework.security.access.vote.AffirmativeBased">
+		<constructor-arg ref="decisionVoters" />
+	</bean>
+
+	<!-- <bean id="httpRequestAccessDecisionManager" class="org.springframework.security.access.vote.AffirmativeBased"> 
+		<constructor-arg ref="decisionVoters"/> <property name="decisionVoters"> 
+		<list> <bean class="org.springframework.security.web.access.expression.WebExpressionVoter" 
+		/> </list> </property> </bean> -->
+
+	<bean id="logoutFilter"
+		class="org.springframework.security.web.authentication.logout.LogoutFilter">
+		<constructor-arg index="0" ref="customUrlLogoutSuccessHandler" />
+		<constructor-arg index="1">
+			<list>
+				<ref bean="rememberMeServices" />
+				<bean id="customLogoutHandler" class="com.nucleus.web.security.CustomLogoutHandler" />
+				<bean id="securityContextLogoutHandler"
+					class="org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler" />
+			</list>
+		</constructor-arg>
+		<property name="filterProcessesUrl" value="${core.web.config.logout.perform.url}" />
+	</bean>
+
+	<bean id="customUrlLogoutSuccessHandler" class="com.nucleus.web.security.CustomUrlLogoutSuccessHandler">
+		<property name="redirectStrategy" ref="neutrinoRedirectStrategy" />
+	</bean>
+
+	<bean id="rememberMeServices"
+		class="org.springframework.security.web.authentication.rememberme.PersistentTokenBasedRememberMeServices">
+
+		<constructor-arg index="0" value="rememberMeKey" />
+		<constructor-arg index="2" ref="jdbcTokenRepository" />
+		<constructor-arg index="1" ref="userDetailService" />
+		<property name="tokenValiditySeconds" value="864000" />
+		<!-- <property name="tokenRepository" ref="jdbcTokenRepository" /> <property 
+			name="key" value="rememberMeKey" /> <property name="userDetailsService" ref="userDetailService" 
+			/> -->
+	</bean>
+
+	<bean id="jdbcTokenRepository"
+		class="org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+
+	<bean id="tokenLoginFilter" class="com.nucleus.web.security.CustomTokenLoginFilter">
+		<constructor-arg name="authenticationManager" ref="authManager" />
+		<constructor-arg name="customTokenLoginServices" ref="tokenLoginServices" />
+		<constructor-arg name="filterProcessesUrl" value="/customTokenUrl/*" />
+		<constructor-arg name="successHandler">
+			<null />
+		</constructor-arg>
+		<constructor-arg name="failureHandler" ref="failureHandler" />
+	</bean>
+
+
+
+
+	<bean id="tokenLoginServices"
+		class="com.nucleus.web.security.NonPersitentCustomTokenLoginServices">
+		<constructor-arg index="0" value="customTokenKey" />
+		<constructor-arg index="1" ref="userDetailService" />
+		<constructor-arg index="2" value="864000" />
+		<constructor-arg index="3" value="token" />
+	</bean>
+
+	<!-- Session management filter -->
+	<bean id="sessionManagementFilter"
+		class="org.springframework.security.web.session.SessionManagementFilter">
+		<constructor-arg index="0">
+			<bean
+				class="org.springframework.security.web.context.HttpSessionSecurityContextRepository" />
+		</constructor-arg>
+		<constructor-arg index="1" ref="sessionStrategy" />
+		<property name="invalidSessionStrategy" ref="simpleRedirectInvalidSessionStrategy" />
+	</bean>
+
+
+	<bean id="neutrinoRedirectStrategy" class="com.nucleus.web.security.NeutrinoRedirectStrategy">
+	</bean>
+
+
+	<bean id="simpleRedirectInvalidSessionStrategy"
+		class="com.nucleus.web.security.CustomSimpleRedirectInvalidSessionStrategy">
+		<property name="createNewSession" value="false" />
+		<property name="redirectStrategy" ref="neutrinoRedirectStrategy" />
+	</bean>
+
+
+	<bean parent="abstractSqlInitializerBean">
+		<!-- The value of placeholder property ${database.type} is coming from 
+			database-config.properties file -->
+		<property name="resources"
+			value="classpath:db-seed-scripts/spring-security-remember-me-ddl-${database.type}.sql" />
+		<property name="ignoreAllFailures" value="true" />
+	</bean>
+
+	<bean id="neutrinoSecurityFilterChain" class="org.springframework.security.web.FilterChainProxy">
+		<constructor-arg>
+			<list>
+				<security:filter-chain filters="springCorsFilter,neutrinoHostHeaderFilter,clientCredentialFilter"
+					pattern="/**" />
+			</list>
+		</constructor-arg>
+	</bean>
+
+	<bean id="encryptionHandlingFilter" class="com.nucleus.web.security.browser.EncryptionHandlingFilter">
+	</bean>
+
+
+	<bean id="neutrinoCORSConfig" class="com.nucleus.web.security.cors.NeutrinoCORSConfig" />
+
+	<util:map id="neutrinoCorsConfigurations">
+		<entry key="/**" value-ref="neutrinoCORSConfig">
+		</entry>
+	</util:map>
+
+	<bean id="neutrinoCorsConfigurationSource"
+		class="org.springframework.web.cors.UrlBasedCorsConfigurationSource">
+		<property name="corsConfigurations" ref="neutrinoCorsConfigurations"></property>
+	</bean>
+
+	<bean id="springCorsFilter" class="org.springframework.web.filter.CorsFilter">
+		<constructor-arg ref="neutrinoCorsConfigurationSource">
+		</constructor-arg>
+	</bean>
+
+	<bean id="neutrinoHostHeaderFilter" class="com.nucleus.web.security.NeutrinoHostHeaderFilter">
+		<property name="requestMatcher" ref="hostHeaderFilterRequestMatcher"></property>
+	</bean>
+
+	<bean id="hostHeaderFilterRequestMatcher" class="com.nucleus.web.util.GenericRequestMatcher"></bean>
+
+	<bean id="hostHeaderFilterRequestMatcherConfig" class="com.nucleus.web.util.RequestMatcherConfig">
+		<property name="targetRequestMatcher" value="hostHeaderFilterRequestMatcher"></property>
+		<property name="includedPatterns">
+			<list>
+				<value>/**</value>
+			</list>
+		</property>
+		<property name="excludedPatterns">
+			<list>
+				<value>/static-resources/**</value>
+				<value>/favicon/**</value>
+				<value>/js/**</value>
+				<value>/styles/**</value>
+				<value>/images/**</value>
+			</list>
+		</property>
+	</bean>
+	
+	<bean id="clientCredentialFilter" class="com.nucleus.web.security.oauth.ClientCredentialFilter">
+		<property name="requestMatcher" ref="clientCredentialFilterRequestMatcher"></property>
+	</bean>
+
+	<bean id="clientCredentialFilterRequestMatcher" class="com.nucleus.web.util.GenericRequestMatcher"></bean>
+
+	<bean id="clientCredentialFilterRequestMatcherConfig" class="com.nucleus.web.util.RequestMatcherConfig">
+		<property name="targetRequestMatcher" value="clientCredentialFilterRequestMatcher"></property>
+		<property name="includedPatterns">
+			<list>
+				<value>/**/client-credential-auth/**</value>
+			</list>
+		</property>
+		<property name="excludedPatterns">
+			<list>
+				<value>/static-resources/**</value>
+				<value>/favicon/**</value>
+				<value>/js/**</value>
+				<value>/styles/**</value>
+				<value>/images/**</value>
+			</list>
+		</property>
+	</bean>
+
+	<!-- <constructor-arg name="sessionRegistry" ref="sessionRegistry" /> -->
+	<!-- <property name="maximumSessions" value="${core.web.config.sessionStrategy.maximumSessions.value}" 
+		/> <property name="exceptionIfMaximumExceeded" value="true" /> </bean> -->
+
+
+
+
+	<!-- <constructor-arg name="successHandler" ref="restAuthenticationSuccessHandler" 
+		index="2"/> <constructor-arg name="failureHandler" ref="restAuthenticationFailureHandler" 
+		index="3" /> <property name="browserFailureHandler" ref="failureHandler"></property> -->
+
+	<!-- depends on frameworkDatabaseSeed due to a call to a configuration, 
+		which should already be seeded -->
+	<bean id="successHandler"
+		class="com.nucleus.web.security.CustomSavedRequestAwareAuthenticationSuccessHandler">
+		<property name="targetUrlParameter" value="${core.web.config.target.url.param}" />
+		<!-- If this property is set to true then the redirect will always take 
+			to the default target url -->
+		<property name="alwaysUseDefaultTargetUrl" value="${core.web.config.alwaysUseDefaultTargetUrl}" />
+		<property name="redirectStrategy" ref="neutrinoRedirectStrategy" />
+	</bean>
+
+	<bean id="failureHandler"
+		class="com.nucleus.web.security.CustomSimpleUrlAuthenticationFailureHandler">
+		<property name="redirectStrategy" ref="neutrinoRedirectStrategy" />
+	</bean>
+
+	<bean id="csrfTokenManager" class="com.nucleus.web.csrf.CSRFTokenManager"></bean>
+
+	<!-- <bean id="sessionRegistry" class="com.nucleus.security.core.session.NeutrinoSessionRegistryImpl" 
+		depends-on="FW_CACHE"/> -->
+
+	<!-- <bean id="userSessionManagerService" class="com.nucleus.user.UserSessionManagerServiceCacheImpl"/> -->
+
+	<bean id="neutrino-frameOptionsWriter"
+		class="com.nucleus.web.security.frameoptions.NeutrinoXFrameOptionsHeaderWriter" />
+
+	<bean id="clearNeutrinoThreadLocalFilter" class="com.nucleus.web.security.ClearNeutrinoThreadLocalFilter"></bean>
+
+	<beans profile="ldap">
+		<import resource="core-security-context-ldapAndDB.xml" />
+		<security:filter-security-metadata-source
+			id="securityMetadataSource" request-matcher="ant" use-expressions="true">
+			<security:intercept-url pattern="/app/auth/*"
+				access="permitAll" />
+			<security:intercept-url pattern="/app/licenseInfo/**"
+				access="permitAll" />
+			<security:intercept-url pattern="/app/refresh/**"
+				access="permitAll" />
+			<security:intercept-url pattern="/apm/validateLogin/**"
+				access="permitAll" />
+			<security:intercept-url pattern="/app/apm/validateLogin/**"
+				access="permitAll" />
+			<security:intercept-url pattern="/app/restservice/**"
+				access="permitAll" />
+			<security:intercept-url pattern="/lms/restservice/**"
+				access="permitAll" />
+			<security:intercept-url pattern="/app/externalService/getProxyCookie"
+				access="permitAll" />
+			<security:intercept-url pattern="/collection/restservice/**"
+				access="permitAll" />
+
+			<!-- <security:intercept-url pattern="/app/sso/**" access="permitAll" 
+				/> -->
+			<security:intercept-url pattern="/app/UserInfo/resetPasswordForDBUsers"
+				access="permitAll" />
+			<security:intercept-url
+				pattern="/app/UserInfo/resetPasswordSecurityQuestion/**" access="permitAll" />
+			<security:intercept-url pattern="/app/UserInfo/validatePassword/**"
+				access="permitAll" />
+			<security:intercept-url pattern="/app/SourceDetails/**"
+				access="permitAll" />
+			<security:intercept-url pattern="/app/autocomplete/**"
+				access="permitAll" />
+			<security:intercept-url pattern="/app/PhoneNumber/**"
+				access="permitAll" />
+			<security:intercept-url pattern="/app/temp/Customer/**"
+				access="permitAll" />
+			<security:intercept-url pattern="/app/money/*"
+				access="permitAll" />
+			<security:intercept-url pattern="/app/resetPassword/**"
+				access="permitAll" />
+			<security:intercept-url pattern="/app/loanstatus/**"
+				access="permitAll" />
+			<security:intercept-url pattern="/app/systemSetup/login"
+				access="permitAll" />
+			<security:intercept-url pattern="/app/systemSetup/setUpInProgress"
+				access="permitAll" />
+			<security:intercept-url pattern="/app/systemSetup/license/**"
+				access="permitAll" />
+			<security:intercept-url pattern="/app/upload/**"
+				access="isAuthenticated()" />
+			<security:intercept-url pattern="/app/DocumentChecklistForIC/**"
+				access="permitAll" />
+			<security:intercept-url pattern="/app/emailApproval/**"
+				access="permitAll" />
+			<security:intercept-url pattern="/app/updateReceiptStatus/**"
+				access="permitAll" />
+			<security:intercept-url
+				pattern="/app/Underwriter/customTokenUrl/emailAuthenticationForUW"
+				access="permitAll" />
+			<security:intercept-url pattern="/app/OTP/sendOTPtoRegdMobile"
+				access="permitAll" />
+			<security:intercept-url pattern="/app/Underwriter/takeDecisionByMail"
+				access="permitAll" />
+			<security:intercept-url pattern="/app/emailDeliveryStatus/**"
+				access="permitAll" />
+			<security:intercept-url pattern="/app/UserInfo/askSecurityQuestion"
+				access="permitAll" />
+			<security:intercept-url pattern="/app/UserInfo/checkAnswers"
+				access="permitAll" />
+			<security:intercept-url pattern="/app/UserInfo/getSourceSystemByUserName"
+				access="permitAll" />
+			<security:intercept-url pattern="/app/UserInfo/checkSecurityAnswers"
+				access="permitAll" />
+			<security:intercept-url pattern="/app/licenseAgreement/**"
+				access="permitAll" />
+			<security:intercept-url pattern="/rest/master/getDataByMasterId"
+				access="permitAll" />
+			<security:intercept-url pattern="/rest/application/search"
+				access="permitAll" />
+			<security:intercept-url pattern="/app/uploadFromIC/**"
+				access="permitAll" />
+			<security:intercept-url pattern="/app/CommunicationCallback/**"
+				access="permitAll" />
+			<security:intercept-url pattern="/app/userService/resetPassword"
+				access="permitAll" />
+			<security:intercept-url pattern="/app/userService/forgotPassword"
+				access="permitAll" />
+			<security:intercept-url pattern="/app/ec/customTokenUrl/**"
+				access="permitAll" />
+			<security:intercept-url
+				pattern="/app/configuration/getMobileValidationConfig" access="permitAll" />
+			<security:intercept-url pattern="/app/configuration/validateMobileNumber"
+				access="permitAll" />
+			<security:intercept-url pattern="/app/configuration/allowInvalidNumber"
+				access="permitAll" />	
+			<security:intercept-url pattern="/app/extService/**"
+				access="permitAll" />
+			<security:intercept-url pattern="/app/v2/api-docs"
+				access="permitAll" />
+			<security:intercept-url pattern="/rest/api-docs/fetchAllMessageCodes"
+				access="permitAll" />
+			<security:intercept-url pattern="/ws/scanner/createToken"
+				access="permitAll" />
+			<security:intercept-url pattern="/ws/scanner/authenticateSignIn"
+				access="permitAll" />
+			<security:intercept-url pattern="/ws/scanner/getTokenForRefreshToken"
+				access="permitAll" />			
+			<security:intercept-url pattern="/webhelp/**"
+				access="isAuthenticated()" />
+			<security:intercept-url pattern="/app/**"
+				access="isAuthenticated()" />
+			<security:intercept-url pattern="/lms/**"
+				access="isAuthenticated()" />
+			<security:intercept-url pattern="/monitoring/**"
+				access="hasAuthority('VIEW_MONITORING')" />
+		</security:filter-security-metadata-source>
+
+	</beans>
+
+	<beans profile="sso">
+		<import resource="core-security-context-sso.xml" />
+		<security:filter-security-metadata-source
+			id="securityMetadataSource" request-matcher="ant" use-expressions="true">
+
+			<!-- PAGE TO BE HIDDEN IF SSO IS ENABLED -->
+			<security:intercept-url pattern="/app/auth/login"
+				access="isAuthenticated()" />
+			<security:intercept-url pattern="/app/auth/*"
+				access="permitAll" />
+
+			<security:intercept-url pattern="/app/refresh/**"
+				access="permitAll" />
+			<security:intercept-url pattern="/app/licenseInfo/**"
+				access="permitAll" />
+
+			<security:intercept-url pattern="/apm/validateLogin/**"
+				access="permitAll" />
+			<security:intercept-url pattern="/app/apm/validateLogin/**"
+				access="permitAll" />
+
+			<security:intercept-url pattern="/app/restservice/**"
+				access="permitAll" />
+			<security:intercept-url pattern="/lms/restservice/**"
+				access="permitAll" />
+			<security:intercept-url pattern="/collection/restservice/**"
+				access="permitAll" />
+
+			<security:intercept-url pattern="/app/sso/**"
+				access="permitAll" />
+			<security:intercept-url pattern="/app/externalService/getProxyCookie"
+				access="permitAll" />	
+			<security:intercept-url pattern="/app/UserInfo/resetPasswordForDBUsers"
+				access="permitAll" />
+			<security:intercept-url
+				pattern="/app/UserInfo/resetPasswordSecurityQuestion/**" access="permitAll" />
+			<security:intercept-url pattern="/app/UserInfo/validatePassword/**"
+				access="permitAll" />
+			<security:intercept-url pattern="/app/SourceDetails/**"
+				access="permitAll" />
+			<security:intercept-url pattern="/app/autocomplete/**"
+				access="permitAll" />
+			<security:intercept-url pattern="/app/PhoneNumber/**"
+				access="permitAll" />
+			<security:intercept-url pattern="/app/temp/Customer/**"
+				access="permitAll" />
+			<security:intercept-url pattern="/app/money/*"
+				access="permitAll" />
+			<security:intercept-url pattern="/app/resetPassword/**"
+				access="permitAll" />
+			<security:intercept-url pattern="/app/loanstatus/**"
+				access="permitAll" />
+			<security:intercept-url pattern="/app/systemSetup/login"
+				access="permitAll" />
+			<security:intercept-url pattern="/app/systemSetup/setUpInProgress"
+				access="permitAll" />
+			<security:intercept-url pattern="/app/systemSetup/license/**"
+				access="permitAll" />
+			<security:intercept-url pattern="/app/upload/**"
+				access="isAuthenticated()" />
+			<security:intercept-url pattern="/app/DocumentChecklistForIC/**"
+				access="permitAll" />
+			<security:intercept-url pattern="/app/emailApproval/**"
+				access="permitAll" />
+			<security:intercept-url pattern="/app/updateReceiptStatus/**"
+				access="permitAll" />
+			<security:intercept-url
+				pattern="/app/Underwriter/customTokenUrl/emailAuthenticationForUW"
+				access="permitAll" />
+			<security:intercept-url pattern="/app/OTP/sendOTPtoRegdMobile"
+				access="permitAll" />
+			<security:intercept-url pattern="/app/Underwriter/takeDecisionByMail"
+				access="permitAll" />
+			<security:intercept-url pattern="/app/emailDeliveryStatus/**"
+				access="permitAll" />
+			<security:intercept-url pattern="/app/UserInfo/askSecurityQuestion"
+				access="permitAll" />
+			<security:intercept-url pattern="/app/UserInfo/checkAnswers"
+				access="permitAll" />
+			<security:intercept-url pattern="/app/UserInfo/getSourceSystemByUserName"
+				access="permitAll" />
+			<security:intercept-url pattern="/app/UserInfo/checkSecurityAnswers"
+				access="permitAll" />
+			<security:intercept-url pattern="/app/licenseAgreement/**"
+				access="permitAll" />
+			<security:intercept-url pattern="/rest/master/getDataByMasterId"
+				access="permitAll" />
+			<security:intercept-url pattern="/rest/application/search"
+				access="permitAll" />
+			<security:intercept-url pattern="/app/uploadFromIC/**"
+				access="permitAll" />
+			<security:intercept-url pattern="/app/CommunicationCallback/**"
+				access="permitAll" />
+			<security:intercept-url pattern="/app/userService/resetPassword"
+				access="permitAll" />
+			<security:intercept-url pattern="/app/userService/forgotPassword"
+				access="permitAll" />
+			<security:intercept-url pattern="/app/ec/customTokenUrl/**"
+				access="permitAll" />
+			<security:intercept-url
+				pattern="/app/configuration/getMobileValidationConfig" access="permitAll" />
+			<security:intercept-url pattern="/app/configuration/validateMobileNumber"
+				access="permitAll" />
+			<security:intercept-url pattern="/app/configuration/allowInvalidNumber"
+				access="permitAll" />	
+			<security:intercept-url pattern="/app/extService/**"
+				access="permitAll" />
+			<security:intercept-url pattern="/app/v2/api-docs" 
+				access="permitAll" />				
+			<security:intercept-url pattern="/rest/api-docs/fetchAllMessageCodes"
+				access="permitAll" />
+			<security:intercept-url pattern="/ws/scanner/createToken"
+				access="permitAll" />
+			<security:intercept-url pattern="/ws/scanner/authenticateSignIn"
+				access="permitAll" />
+			<security:intercept-url pattern="/ws/scanner/getTokenForRefreshToken"
+				access="permitAll" />
+			<security:intercept-url pattern="/webhelp/**"
+				access="isAuthenticated()" />
+			<security:intercept-url pattern="/app/**"
+				access="isAuthenticated()" />
+			<security:intercept-url pattern="/lms/**"
+				access="isAuthenticated()" />
+			<security:intercept-url pattern="/monitoring/**"
+				access="hasAuthority('VIEW_MONITORING')" />
+		</security:filter-security-metadata-source>
+
+	</beans>
+
+</beans>

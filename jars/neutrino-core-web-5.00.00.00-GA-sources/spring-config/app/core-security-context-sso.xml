@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:security="http://www.springframework.org/schema/security"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans.xsd
+  	http://www.springframework.org/schema/security
+  	http://www.springframework.org/schema/security/spring-security.xsd">
+
+
+	<!-- This is where we configure Spring-Security -->
+	<security:http auto-config="false" use-expressions="true"
+		entry-point-ref="casAuthenticationEntryPoint">
+		<security:request-cache ref="httpSessionRequestCache" />
+		<security:custom-filter position="CAS_FILTER"
+			ref="customCASUsernamePasswordAuthenticationFilter" />
+		<security:custom-filter before="CAS_FILTER"
+			ref="tokenLoginFilter" />	
+		<security:custom-filter position="CONCURRENT_SESSION_FILTER"
+			ref="concurrencyFilter" />
+		<security:custom-filter ref="requestSingleLogoutFilter"
+			position="LOGOUT_FILTER" />
+		<security:custom-filter ref="requestNormalLogoutFilter"
+			after="LOGOUT_FILTER" />
+		<security:custom-filter ref="singleLogoutFilter"
+			before="CSRF_FILTER" />
+		<security:custom-filter after="FILTER_SECURITY_INTERCEPTOR"
+			ref="filterSecurityInterceptor" />
+		<security:custom-filter ref="ajaxTimeoutRedirectFilter"
+			after="EXCEPTION_TRANSLATION_FILTER" />
+		<security:custom-filter before="EXCEPTION_TRANSLATION_FILTER"
+			ref="apiSecurityFilter" />
+			<security:custom-filter position="LAST"
+		 	ref="licenseApplicationURLControlFilter"/>
+		<security:custom-filter ref="clearNeutrinoThreadLocalFilter" before="CONCURRENT_SESSION_FILTER" />
+		<security:custom-filter after="SECURITY_CONTEXT_FILTER"
+								ref="encryptionHandlingFilter"/>
+		<security:headers>
+			<security:header ref="neutrino-frameOptionsWriter" />
+			<security:frame-options disabled="true" />
+		</security:headers>
+		<security:csrf request-matcher-ref="csrfSecurityRequestMatcher"
+			token-repository-ref="csrfTokenManager" />
+		<security:access-denied-handler ref="neutrinoCSRFAccessDeniedHandler" />
+	</security:http>
+
+	<bean id="httpSessionRequestCache" class="org.springframework.security.web.savedrequest.HttpSessionRequestCache"> 
+	       <property name="createSessionAllowed" value="false" /> 
+	</bean>
+
+	<!-- This filter handles a Single Logout Request from the CAS Server -->
+	<!-- <bean id="singleLogoutFilter" class="org.jasig.cas.client.session.SingleSignOutFilter" /> -->
+	<bean id="singleLogoutFilter" class="com.nucleus.sso.client.session.NeutrinoSingleSignOutFilter" />
+	<!-- This filter redirects to the CAS Server to signal Single Logout should 
+		be performed -->
+	<bean id="requestSingleLogoutFilter"
+		class="com.nucleus.web.security.CustomSSOLogoutFilter">
+		<constructor-arg
+			value="${core.web.config.SSO.logout.url.value}" />
+		<constructor-arg>
+				<bean  class="org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler" />
+					</constructor-arg>
+		<property name="filterProcessesUrl"
+			value="${core.web.config.SSO.logout.perform.url.value}" />
+				<property name="sessionRegistry"
+			ref="sessionRegistry" />
+	</bean>
+	
+		<bean id="requestNormalLogoutFilter"
+	class="com.nucleus.web.security.CustomSSOLogoutFilter">
+		<constructor-arg
+			value="${core.web.config.SSO.login.url.value}?loggedOutService=${core.web.config.SSO.serviceproperty.url.value}" />
+		<constructor-arg>
+				<bean  class="org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler" />
+					</constructor-arg>
+		<property name="filterProcessesUrl"
+			value="${core.web.config.SSO.nonSLOLogout.url.value}" />
+				<property name="sessionRegistry"
+			ref="sessionRegistry" />
+ 		
+	</bean>
+	<bean id="casAuthenticationEntryPoint"
+		class="com.nucleus.web.security.CustomCasAuthenticationEntryPoint">
+		<property name="loginUrl"
+			value="${core.web.config.SSO.login.url.value}"></property>
+		<property name="serviceProperties" ref="serviceProperties"></property>
+	</bean>
+	
+		<bean id="customSessionDestroyedEventListener"
+		class="com.nucleus.web.security.CustomSessionDestroyedEventListener">
+		<property name="sessionRegistry" ref="sessionRegistry"/>
+</bean>
+
+	<bean id="serviceProperties" class="org.springframework.security.cas.ServiceProperties">
+		<property name="service"
+			value="${core.web.config.SSO.serviceproperty.url.value}"></property>
+		<property name="sendRenew" value="false"></property>
+	</bean>
+	
+
+	<!-- Enable CAS as authentication provider -->
+	<security:authentication-manager id="ssoAuthManager">
+		<security:authentication-provider
+			ref="casAuthenticationProvider" />
+	</security:authentication-manager>
+
+	<bean id="customCASUsernamePasswordAuthenticationFilter" class="com.nucleus.web.security.CustomCasAuthenticationFilter">
+		<property name="authenticationManager" ref="ssoAuthManager"></property>
+		<property name="sessionAuthenticationStrategy" ref="sessionStrategy" />
+		<property name="authenticationSuccessHandler" ref="successHandler" />
+		
+		
+	</bean>
+	<bean id="customConcurrentSessionControlStrategy" class = "com.nucleus.web.security.CustomConcurrentSessionControlStrategy" >
+	<constructor-arg ref="sessionRegistry"/>
+						<property name="exceptionIfMaximumExceeded" value="true" />
+			
+	</bean>
+
+	<bean id="sessionStrategy"
+	    class="org.springframework.security.web.authentication.session.CompositeSessionAuthenticationStrategy">
+	    	<constructor-arg>
+				<list>
+					<bean class="com.nucleus.web.security.CustomRegisterSessionAuthenticationStrategy">
+						<constructor-arg index="0" ref="sessionRegistry"/>
+						<constructor-arg index="1" ref="apiSecurityService"/>
+					</bean>
+				</list>
+			</constructor-arg>
+	</bean>
+
+	<bean id="casAuthenticationProvider"
+		class="org.springframework.security.cas.authentication.CasAuthenticationProvider">
+		
+		<property name="userDetailsService" ref="userDetailService" />	
+		
+		<property name="serviceProperties" ref="serviceProperties"></property>
+	
+		<property name="ticketValidator">
+	       <bean class="org.jasig.cas.client.validation.Cas20ServiceTicketValidator">
+		<constructor-arg index="0" value="${core.web.config.SSO.ticketvalidator.url.value}" />
+	       </bean>
+	</property>
+	<property name="key" value="ssoticket"></property>
+	</bean>	
+	
+
+	
+</beans>

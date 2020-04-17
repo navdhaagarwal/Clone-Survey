@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-mappings version="2.0"
+	xmlns="http://java.sun.com/xml/ns/persistence/orm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm http://java.sun.com/xml/ns/persistence/orm_2_0.xsd">
+
+	<!-- NAMED QUERIES for generic operations -->
+	
+	
+		<named-query name="apiDetails.loadAPIDetailsbyAPICode">
+		<query>
+			select apiDetails FROM APIDetails apiDetails WHERE apiDetails.apiCode in :listOfCodes
+		</query>
+	</named-query>
+	
+	
+	
+	
+	
+	
+	
+	
+
+</entity-mappings>
+	

@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:security="http://www.springframework.org/schema/security"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/util
+    http://www.springframework.org/schema/util/spring-util.xsd
+  	http://www.springframework.org/schema/security
+  	http://www.springframework.org/schema/security/spring-security.xsd">
+
+	<import resource="core-captcha-context.xml" />
+
+	<!--<context:component-scan base-package="com.nucleus.web.csrf" />-->
+	<!-- <security:http auto-config="false" use-expressions="true" create-session="stateless" 
+		entry-point-ref="restAuthenticationEntryPoint" pattern="/app/**/services/**" 
+		authentication-manager-ref="authManager"> <security:custom-filter position="FORM_LOGIN_FILTER" 
+		ref="restCustomUsernamePasswordAuthenticationFilter" /> <security:intercept-url 
+		pattern='/**' access='isAuthenticated()' /> </security:http> -->
+
+	<!-- <http entry-point-ref="restAuthenticationEntryPoint"> <intercept-url 
+		pattern="/api/admin/**" access="ROLE_ADMIN" /> <form-login authentication-success-handler-ref="mySuccessHandler" 
+		authentication-failure-handler-ref="myFailureHandler" /> <logout /> </http> -->
+	<!-- This is where we configure Spring-Security -->
+	 <security:http auto-config="false" use-expressions="true"
+		entry-point-ref="loginUrlAuthenticationEntryPoint"
+		authentication-manager-ref="authManager">
+		<security:custom-filter position="CONCURRENT_SESSION_FILTER"
+			ref="concurrencyFilter" />
+		<security:custom-filter position="LOGOUT_FILTER"
+			ref="logoutFilter" />
+		<security:custom-filter position="FORM_LOGIN_FILTER"
+			ref="customUsernamePasswordAuthenticationFilter" />
+		<security:custom-filter after="FORM_LOGIN_FILTER"
+			ref="tokenLoginFilter" />
+		<security:custom-filter after="SESSION_MANAGEMENT_FILTER"
+			ref="sessionManagementFilter" />
+		<security:custom-filter after="FILTER_SECURITY_INTERCEPTOR"
+			ref="filterSecurityInterceptor" />
+		<security:custom-filter after="EXCEPTION_TRANSLATION_FILTER" 
+			ref="ajaxTimeoutRedirectFilter"/>
+		<security:custom-filter before="EXCEPTION_TRANSLATION_FILTER"
+			ref="apiSecurityFilter" />
+		<security:custom-filter position="LAST"
+		 	ref="licenseApplicationURLControlFilter"/>
+		 <security:custom-filter after="SECURITY_CONTEXT_FILTER"
+								 ref="encryptionHandlingFilter"/>
+		<security:custom-filter before="CONCURRENT_SESSION_FILTER"
+			ref="clearNeutrinoThreadLocalFilter" />	
+		<!--<security:csrf disabled="true" />-->
+		<security:headers>
+			<!--<security:header name="Content-Security-Policy" value="frame-ancestors none"/>-->
+			<security:header name="Server" value="FinnOne-NEO"/>
+			<security:header ref="neutrino-frameOptionsWriter"/>
+			<security:frame-options disabled="true"/>
+		</security:headers>	
+		<security:csrf request-matcher-ref="csrfSecurityRequestMatcher"  token-repository-ref="csrfTokenManager"/>
+		<security:access-denied-handler ref="neutrinoCSRFAccessDeniedHandler"/>
+	</security:http>
+	
+		<bean id="loginUrlAuthenticationEntryPoint"
+			class="com.nucleus.web.security.CustomLoginUrlAuthenticationEntryPoint"  depends-on="consolidatedDatabaseSeed">
+			<constructor-arg value="/app/auth/login"/>
+			</bean>	
+
+	<bean id="sessionStrategy"
+	    class="org.springframework.security.web.authentication.session.CompositeSessionAuthenticationStrategy">
+	    	<constructor-arg>
+				<list>
+					<bean class="com.nucleus.web.security.CustomConcurrentSessionControlStrategy">
+						<constructor-arg ref="sessionRegistry"/>
+						<property name="exceptionIfMaximumExceeded" value="true" />
+					</bean>
+					
+		
+			<bean class="org.springframework.security.web.authentication.session.SessionFixationProtectionStrategy">
+						<property name="migrateSessionAttributes" value ="false"></property>
+				</bean>
+					<bean class="com.nucleus.web.security.CustomRegisterSessionAuthenticationStrategy">
+						<constructor-arg index="0" ref="sessionRegistry"/>
+						<constructor-arg index="1" ref="apiSecurityService"/>
+					</bean>
+				</list>
+			</constructor-arg>
+		</bean>
+
+</beans>

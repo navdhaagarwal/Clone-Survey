@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns="http://schema.base.ws.pro.finnone.nucleus.com" 
+	xmlns:base="http://schema.base.ws.pro.finnone.nucleus.com"
+	targetNamespace="http://schema.base.ws.pro.finnone.nucleus.com"
+	elementFormDefault="qualified">
+
+ <xsd:include  schemaLocation="NumberTypes.xsd" />
+ <xsd:include schemaLocation="StringTypes.xsd" />
+ 
+  <xsd:element name="phone" type="PhoneType" />
+	<xsd:element name="mobile" type="MobileType" />
+	<xsd:element name="email" type="EmailType" />
+ 
+	<xsd:simpleType name="AmountType">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Common Amount Type
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="DecimalType" />
+	</xsd:simpleType>
+	
+	
+	 <xsd:simpleType name="LanguageCodeType">
+    <xsd:annotation>
+        <xsd:documentation xml:lang="en">LoggedIn Language Code Type</xsd:documentation>
+    </xsd:annotation>
+  <xsd:restriction base="base:String_0008Type" />
+  </xsd:simpleType>
+  
+  
+   <xsd:simpleType name="IDType">
+    <xsd:annotation>
+        <xsd:documentation xml:lang="en">LoggedIn Language Code Type</xsd:documentation>
+    </xsd:annotation>
+  <xsd:restriction base="base:LongType" />
+  </xsd:simpleType>
+  
+ 	
+	<xsd:simpleType name="PhoneType">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Phone Type
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="base:String_0255Type">
+		</xsd:restriction>
+	</xsd:simpleType>
+
+	<xsd:simpleType name="MobileType">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Mobile Type
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="base:String_0255Type">
+		</xsd:restriction>
+	</xsd:simpleType>
+	
+		<xsd:simpleType name="EmailType">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Email Type
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="base:String_0255Type">
+		</xsd:restriction>
+	</xsd:simpleType>
+	
+	<xsd:simpleType name="MessageCodeType">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Message Code Type
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="base:String_0255Type">
+		</xsd:restriction>
+	</xsd:simpleType>
+	
+	<xsd:simpleType name="MessageType">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Message Type
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="base:String_4000Type">
+		</xsd:restriction>
+	</xsd:simpleType>
+	
+	
+
+</xsd:schema>

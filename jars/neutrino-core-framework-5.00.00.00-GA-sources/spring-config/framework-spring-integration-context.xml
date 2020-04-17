@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:integration="http://www.springframework.org/schema/integration"
+	xmlns:jms="http://www.springframework.org/schema/integration/jms"
+	xmlns:task="http://www.springframework.org/schema/task"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+ 		http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration.xsd
+ 		http://www.springframework.org/schema/integration/jms http://www.springframework.org/schema/integration/jms/spring-integration-jms.xsd
+ 		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
+ 		 http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd">
+
+	<import resource="framework-spring-integration-config.xml" />
+
+	<integration:channel id="accessLogMessageChannel">
+		<integration:queue capacity="${message.channel.queue.size}" />
+	</integration:channel>
+
+	<integration:channel id="accessLogMessageAggregatorOutChannel" />
+
+	<integration:channel id="accessLogInBoundMessageChannel">
+		<integration:queue capacity="${message.channel.queue.size}" />
+	</integration:channel>
+
+	<integration:aggregator id="accessLogMessageAggregatorId"
+		input-channel="accessLogMessageChannel" output-channel="accessLogMessageAggregatorOutChannel"
+		send-partial-result-on-expiry="true"
+		send-timeout="${aggregator.message.endpoint.send.timeout}"
+		group-timeout="${aggregator.message.endpoint.group.timeout}"
+		expire-groups-upon-completion="true">
+		<integration:poller fixed-delay="${aggregator.message.endpoint.poller.fixedDelay}"
+			max-messages-per-poll="${aggregator.message.endpoint.poller.maxMessages.per.poll}"
+			receive-timeout="${message.channel.poller.receive.timeout}"
+			task-executor="executor" />
+	</integration:aggregator>
+
+	<task:executor id="executor"
+		keep-alive="${aggregator.message.endpoint.poller.executor.keepAlive.time}"
+		queue-capacity="${aggregator.message.endpoint.poller.executor.queueCapacity}"
+		pool-size="${aggregator.message.endpoint.poller.executor.pool.size}" />
+
+	<bean id="accessLogChannelService"
+		class="com.nucleus.integration.messageChannel.service.AccessLogMessageServiceImpl" />
+</beans>

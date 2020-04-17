@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns="http://schema.base.ws.pro.finnone.nucleus.com" targetNamespace="http://schema.base.ws.pro.finnone.nucleus.com"
+	xmlns:base="http://schema.base.ws.pro.finnone.nucleus.com"
+	elementFormDefault="qualified">
+	
+	<xsd:include schemaLocation="StringTypes.xsd" />
+	<xsd:include  schemaLocation="NumberTypes.xsd" />
+	<xsd:include  schemaLocation="CommonBaseTypes.xsd" />
+	
+		<xsd:complexType name="Branch">
+		<xsd:sequence>
+			<xsd:element ref="branchId" minOccurs="1" maxOccurs="1"/>
+			<xsd:element ref="branchCode" minOccurs="1" maxOccurs="1"/>
+	 		<xsd:element ref="branchName" minOccurs="1" maxOccurs="1"/>
+	 	</xsd:sequence>
+	</xsd:complexType>
+	
+		<xsd:element name="branchCode" type="base:String_0008Type"  />
+		<xsd:element name="branchName" type="base:String_0100Type" />
+	 	<xsd:element name="branchId" type="IDType"  />
+		
+	</xsd:schema>

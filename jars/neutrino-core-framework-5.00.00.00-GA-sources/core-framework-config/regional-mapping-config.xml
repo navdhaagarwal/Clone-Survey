@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<regional-config>
+<!--
+	<source-entity name="com.nucleus.person.entity.PersonInfo">
+		<field name="regionalFirstName" fieldName= "regionalField1" ></field>
+		<field name="regionalFullName" fieldName= "regionalField2"></field>
+	</source-entity>
+	<source-entity name="com.nucleus.core.employer.entity.Employer">
+
+		<field name="nameInArabic" fieldName= "regionalField1"></field>
+	</source-entity>
+-->
+</regional-config>

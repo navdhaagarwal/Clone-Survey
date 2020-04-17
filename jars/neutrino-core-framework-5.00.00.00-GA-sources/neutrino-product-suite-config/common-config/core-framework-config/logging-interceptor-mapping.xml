@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?><neutrino-auditing-context>
+
+<parameter-interceptors className="com.nucleus.user.UserServiceImpl"
+		methodName="validateUserIp" active="true">
+
+		<parameter-interceptor loggingcontext="LOCAL"
+			index="2" key="" name="ipCameFrom"></parameter-interceptor>
+		<parameter-interceptor loggingcontext="GLOBAL"
+			index="3" key="" name="firstName"></parameter-interceptor>
+		<parameter-interceptor loggingcontext="GLOBAL"
+			index="3" key="" name="lastName"></parameter-interceptor>
+
+	</parameter-interceptors>
+
+
+	<parameter-interceptors className="com.nucleus.user.UserServiceImpl"
+		methodName="getUserProfile" active="true">
+
+		<parameter-interceptor loggingcontext="LOCAL"
+			index="1" key="" name="username"></parameter-interceptor>
+		<parameter-interceptor loggingcontext="LOCAL"
+			index="1" key="" name="password"></parameter-interceptor>
+		<parameter-interceptor loggingcontext="LOCAL"
+			index="1" key="" name="userStatus"></parameter-interceptor>
+
+	</parameter-interceptors>
+</neutrino-auditing-context>

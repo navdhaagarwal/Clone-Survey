@@ -1,0 +1,11 @@
+package com.nucleus.finnone.pro.communicationgenerator.serviceinterface;
+
+import com.nucleus.finnone.pro.communicationgenerator.vo.CommunicationGenerationDetailVO;
+
+
+public interface ICommunicationGenerationCompletionCallback {
+
+	void communicationGenerationHistoryDetailOnSucess(CommunicationGenerationDetailVO communicationGeneratedDetailVO);
+	void communicationGenerationHistoryDetailOnFailure(CommunicationGenerationDetailVO communicationGeneratedDetailVO);
+				
+}

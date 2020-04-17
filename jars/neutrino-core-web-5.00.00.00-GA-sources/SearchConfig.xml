@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<searchConfigurations>
+	<searchConfig id="loanApplication" entityClass="com.nucleus.core.loan.LoanApplication">
+		<selectField>
+		</selectField>
+		<searchCriteriaClause>
+			<and-Group>
+				<searchAttribute id="applicationNumber" display=""
+					ognl="applicationDetails.applicationNumber" lookup="">
+					<svalue-equal value=""></svalue-equal>
+				</searchAttribute>
+				<searchAttribute id="applicationFormNumber" display=""
+					ognl="applicationDetails.applicationFormNumber" lookup="">
+					<svalue-equal value=""></svalue-equal>
+				</searchAttribute>
+				<searchAttribute id="parties_customer_customerNumber"
+					display="" ognl="parties.customer.customerNumber" lookup="">
+					<svalue-equal value=""></svalue-equal>
+				</searchAttribute>
+				<searchAttribute id="parties_customer_personInfo_gender_id"
+					display="" ognl="parties.customer.personInfo.gender.id"
+					lookup="genderType">
+					<lvalue-equal value=""></lvalue-equal>
+				</searchAttribute>
+				<searchAttribute id="parties_customer_personInfo_firstName"
+					display="" ognl="parties.customer.personInfo.firstName"
+					lookup="">
+					<svalue-equal value=""></svalue-equal>
+				</searchAttribute>
+				<searchAttribute id="parties_customer_personInfo_lastName"
+					display="visible" ognl="parties.customer.personInfo.lastName"
+					lookup="">
+					<svalue-equal value=""></svalue-equal>
+				</searchAttribute>
+				<!-- Hidden Search Attribute -->
+				<searchAttribute id="loanStage" display="hidden"
+					ognl="loanStage" lookup="">
+					<ivalue-equal value="2"></ivalue-equal>
+				</searchAttribute>
+				<or-group>
+					<searchAttribute id="entityLifeCycleData_snapshotRecord"
+						display="hidden" ognl="entityLifeCycleData.snapshotRecord" lookup="">
+						<bvalue-isNull value=""></bvalue-isNull>
+					</searchAttribute>
+					<searchAttribute id="entityLifeCycleData_snapshotRecord"
+						display="hidden" ognl="entityLifeCycleData.snapshotRecord" lookup="">
+						<bvalue-equal value="false"></bvalue-equal>
+					</searchAttribute>
+				</or-group>
+			</and-Group>
+		</searchCriteriaClause>
+		<groupByClause>
+		</groupByClause>
+		<searchType value="JPA_CRITERIA_SEARCH"></searchType>
+	</searchConfig>
+	<searchConfig id="loanApplicationPolicySimulation" entityClass="com.nucleus.core.loan.LoanApplication">
+		<selectField>
+		<field>id</field>
+		<field>applicationDetails.applicationNumber</field>
+		<field>parties.customer.customerNumber</field>
+		<field>parties.customer.personInfo.fullName</field>
+		<!-- <field>applicationWorkflowTracker.currentAppStepData.stageName</field> -->
+		<field>applicationDetails.applicationCreationDate</field>
+		<field>applicationDetails.applicationSource</field>
+		</selectField>
+		<searchCriteriaClause>
+			<and-Group>
+				<searchAttribute id="applicationNumber" display=""
+					ognl="applicationDetails.applicationNumber" lookup="">
+					<svalue-equal value=""></svalue-equal>
+				</searchAttribute>
+				<searchAttribute id="applicationFormNumber" display=""
+					ognl="applicationDetails.applicationFormNumber" lookup="">
+					<svalue-equal value=""></svalue-equal>
+				</searchAttribute>
+				<searchAttribute id="parties_customer_customerNumber"
+					display="" ognl="parties.customer.customerNumber" lookup="">
+					<svalue-equal value=""></svalue-equal>
+				</searchAttribute>
+				<searchAttribute id="parties_customer_personInfo_gender_id"
+					display="" ognl="parties.customer.personInfo.gender.id"
+					lookup="genderType">
+					<lvalue-equal value=""></lvalue-equal>
+				</searchAttribute>
+				<searchAttribute id="parties_customer_personInfo_firstName"
+					display="" ognl="parties.customer.personInfo.firstName"
+					lookup="">
+					<svalue-equal value=""></svalue-equal>
+				</searchAttribute>
+				<searchAttribute id="parties_customer_personInfo_lastName"
+					display="visible" ognl="parties.customer.personInfo.lastName"
+					lookup="">
+					<svalue-equal value=""></svalue-equal>
+				</searchAttribute>
+				<!-- Hidden Search Attribute -->
+				<searchAttribute id="loanStage" display="hidden"
+					ognl="loanStage" lookup="">
+					<ivalue-equal value="2"></ivalue-equal>
+				</searchAttribute>
+				<or-group>
+					<searchAttribute id="entityLifeCycleData_snapshotRecord"
+						display="hidden" ognl="entityLifeCycleData.snapshotRecord" lookup="">
+						<bvalue-isNull value=""></bvalue-isNull>
+					</searchAttribute>
+					<searchAttribute id="entityLifeCycleData_snapshotRecord"
+						display="hidden" ognl="entityLifeCycleData.snapshotRecord" lookup="">
+						<bvalue-equal value="false"></bvalue-equal>
+					</searchAttribute>
+				</or-group>
+			</and-Group>
+		</searchCriteriaClause>
+		<groupByClause>
+		</groupByClause>
+		<searchType value="JPA_CRITERIA_SEARCH"></searchType>
+	</searchConfig>
+	<searchConfig id="schemes" entityClass="com.nucleus.core.loanproduct.LoanScheme">
+		<selectField>
+			<field>schemeName</field>
+			<field>schemeCode</field>
+			<field>minLoanValue.baseAmount.baseValue</field>
+			<field>maxLoanValue.baseAmount.baseValue</field>
+			<field>productType.description</field>
+			<field>loanType.loanTypeName</field>
+		</selectField>
+		<searchCriteriaClause>
+			<and-Group>
+				<searchAttribute id="schemeName" display=""
+					ognl="schemeName" lookup="">
+					<svalue-contain value=""></svalue-contain>
+				</searchAttribute>
+				<searchAttribute id="loanProduct_lineOfBusiness_id"
+					display="" ognl="loanProduct.lineOfBusiness.id" lookup="businessLine">
+					<lvalue-equal value=""></lvalue-equal>
+				</searchAttribute>
+				<searchAttribute id="loanProduct_productType_shortName"
+					display="" ognl="loanProduct.productType.shortName" lookup="">
+					<svalue-equal value=""></svalue-equal>
+				</searchAttribute>
+				<!-- <searchAttribute id="minLoanValue_baseAmount_baseValue" display="enable" 
+					ognl="minLoanValue.baseAmount.baseValue" lookup=""> <nvalue-between value=""></nvalue-between> 
+					</searchAttribute> <searchAttribute id="ltv" display="enable" ognl="ltv" 
+					lookup=""> <ivalue-between value=""></ivalue-between> </searchAttribute> -->
+			</and-Group>
+		</searchCriteriaClause>
+		<groupByClause>
+		</groupByClause>
+		<searchType value="JPA_CRITERIA_SEARCH"></searchType>
+	</searchConfig>
+<searchConfig id="ruleAudit"
+		entityClass="com.nucleus.rules.model.RulesAuditLog">
+		<selectField>
+		    <field>ruleInvocationUUID</field>
+		    <field>ruleInvocationPoint</field>		    
+			<field>associatedUser.username</field>
+			<field>entityLifeCycleData.creationTimeStamp</field>
+		</selectField>
+		<searchCriteriaClause>
+			<and-Group>
+				<searchAttribute  id ="associatedUser_id" display="visible"
+					ognl="associatedUser.id" lookup="">
+					<lvalue-equal value=""></lvalue-equal>
+				</searchAttribute>
+				<searchAttribute  id ="ruleInvocationPoint" display="visible"
+					ognl="ruleInvocationPoint" lookup="">
+					<svalue-equal value=""></svalue-equal>
+				</searchAttribute>
+				<searchAttribute  id ="entityLifeCycleData_creationTimeStamp" display="visible"
+					ognl="entityLifeCycleData.creationTimeStamp" lookup="">
+					<dvalue-between value=""></dvalue-between>
+				</searchAttribute>
+			</and-Group>
+		</searchCriteriaClause>
+		<groupByClause>
+			<field>ruleInvocationUUID</field>
+		</groupByClause>
+		<searchType value="JPA_CRITERIA_SEARCH"></searchType>
+	</searchConfig>
+	<searchConfig id="Customer" entityClass="com.nucleus.core.customer.entity.Customer">
+		<selectField>
+		<field>id</field>
+		<field>customerNumber</field>
+		<field>cIFNumber</field>
+		<field>personInfo.fullName</field>
+		</selectField>
+		<searchCriteriaClause>
+			<and-Group>
+				<searchAttribute id="customerNumber"
+					display="" ognl="customerNumber" lookup="">
+					<svalue-equal value=""></svalue-equal>
+				</searchAttribute>
+				<searchAttribute id="cIFNumber"
+					display="" ognl="cIFNumber" lookup="">
+					<svalue-equal value=""></svalue-equal>
+				</searchAttribute>
+				<searchAttribute id="customer_personInfo_gender_id"
+					display="" ognl="personInfo.gender.id" displayName="name"
+					lookup="genderType">
+					<lvalue-equal value=""></lvalue-equal>
+				</searchAttribute>
+				<searchAttribute id="customer_personInfo_firstName"
+					display="" ognl="personInfo.firstName"
+					lookup="">
+					<svalue-equal value=""></svalue-equal>
+				</searchAttribute>
+				<searchAttribute id="customer_personInfo_lastName"
+					display="visible" ognl="personInfo.lastName"
+					lookup="">
+					<svalue-equal value=""></svalue-equal>
+				</searchAttribute>
+				<!-- Hidden Search Attribute -->
+				<or-group>
+					<searchAttribute id="entityLifeCycleData_snapshotRecord"
+						display="hidden" ognl="entityLifeCycleData.snapshotRecord" lookup="">
+						<bvalue-isNull value=""></bvalue-isNull>
+					</searchAttribute>
+					<searchAttribute id="entityLifeCycleData_snapshotRecord"
+						display="hidden" ognl="entityLifeCycleData.snapshotRecord" lookup="">
+						<bvalue-equal value="false"></bvalue-equal>
+					</searchAttribute>
+				</or-group>
+			</and-Group>
+		</searchCriteriaClause>
+		<groupByClause>
+		</groupByClause>
+		<searchType value="JPA_CRITERIA_SEARCH"></searchType>
+	</searchConfig>
+	
+	<searchConfig id="Comment" entityClass="com.nucleus.core.comment.entity.Comment">
+		<selectField>
+		<field>text</field>
+		<field>addedBy</field>
+		</selectField>
+		<searchCriteriaClause>
+			<and-Group>
+				<searchAttribute id="text"
+					display="" ognl="text" lookup="">
+					<svalue-equal value=""></svalue-equal>
+				</searchAttribute>
+				<searchAttribute id="addedBy"
+					display="" ognl="addedBy" lookup="">
+					<svalue-equal value=""></svalue-equal>
+				</searchAttribute>
+				
+			</and-Group>
+		</searchCriteriaClause>
+		<groupByClause>
+		</groupByClause>
+		<searchType value="JPA_CRITERIA_SEARCH"></searchType>
+	</searchConfig>
+</searchConfigurations>

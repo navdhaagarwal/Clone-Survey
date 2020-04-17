@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true">
+
+<contextName>Core-Webapp</contextName>
+
+<jmxConfigurator />
+
+	<contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator">
+    	<resetJUL>true</resetJUL>
+  	</contextListener>
+
+	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<charset>utf-8</charset>
+			<pattern>%d{HH:mm:ss.SSS} %X{UUID} [%thread] %-5level %logger{36} - %msg%n</pattern>
+		</encoder>
+	</appender>
+	
+	<appender name="METRICS" class="ch.qos.logback.core.FileAppender">
+		<file>target/logs/hibernate-metrics.log</file>
+		<encoder>
+			<charset>utf-8</charset>
+			<pattern>%date %X{UUID} %level [%thread] %logger{10} [%file:%line] %msg%n</pattern>
+		</encoder>
+	</appender>
+
+	<appender name="FILE" class="ch.qos.logback.core.FileAppender">
+		<file>target/logs/application.log</file>
+		<encoder>
+			<charset>utf-8</charset>
+			<pattern>%date %X{UUID} %level [%thread] %logger{10} [%file:%line] %msg%n</pattern>
+		</encoder>
+	</appender>
+	
+	<appender name="ACCESS" class="ch.qos.logback.core.FileAppender">
+		<file>target/logs/access.log</file>
+		<encoder>
+			<charset>utf-8</charset>
+			<pattern>%date %X{UUID} %level [%thread] %logger{10} [%file:%line] %msg%n</pattern>
+		</encoder>
+	</appender>
+	
+	<appender name="MASTER_DATA_GRID_LOGGER" class="ch.qos.logback.core.FileAppender">
+		<file>target/logs/masterdatagrid.log</file>
+		<encoder>
+			<charset>utf-8</charset>
+			<pattern>%date %X{UUID} %level [%thread] %logger{10} [%file:%line] %msg%n</pattern>
+		</encoder>
+	</appender>
+	
+ 	<logger name="com">
+        <level value="error"/>
+    </logger>
+    <logger name="org">
+        <level value="error"/>
+    </logger>
+    <logger name="net">
+        <level value="error"/>
+    </logger>
+	
+	
+	<logger name="com.nucleus">
+        <level value="error"/>
+    </logger>
+    
+     <logger name="com.nucleus.access" additivity="false">
+        <level value="error"/>
+        <appender-ref ref="ACCESS"/>
+    </logger>
+	
+	<logger name="com.nucleus.makerchecker.GridDataUtility" additivity="false">
+        <level value="error"/>
+        <appender-ref ref="MASTER_DATA_GRID_LOGGER"/>
+	</logger>
+	
+	<logger name="org.springframework.jdbc.datasource.init.ResourceDatabasePopulator">
+        <level value="error"/>
+    </logger>
+	
+	<logger name="org.springframework.web.servlet.FrameworkServlet">
+        <level value="error"/>
+    </logger>
+    
+     <logger name="org.hibernate.engine.internal.StatisticalLoggingSessionEventListener" additivity="false">
+        <level value="error"/>
+        <appender-ref ref="METRICS"/>
+    </logger>
+	
+	<root level="info">
+		<appender-ref ref="STDOUT" />
+		<appender-ref ref="FILE" />
+	</root>
+</configuration>

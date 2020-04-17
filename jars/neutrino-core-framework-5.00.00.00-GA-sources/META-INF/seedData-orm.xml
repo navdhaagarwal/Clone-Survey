@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-mappings version="2.0"
+	xmlns="http://java.sun.com/xml/ns/persistence/orm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm http://java.sun.com/xml/ns/persistence/orm_2_0.xsd">
+	<named-query name="SeedDataAudit.FindByFileAndTableName">
+		<query>
+          Select sda FROM SeedDataAudit sda WHERE sda.seedFileName = :fileName and sda.tableName = :tableName and sda.productInfoCode = :productInfoCode and sda.version =:version
+          
+    </query>
+	</named-query>
+	<named-query name="SeedDataAudit.RetreiveActualSeedCount">
+		<query>
+		select sda.actualSeededCount from SeedDataAudit sda where sda.tableName = :tableName and sda.seedFileName != :seedFileName and sda.productInfoCode = :productInfoCode and sda.version =:version
+	 </query>
+	</named-query>
+	
+	
+	<named-query name="SeedDataAudit.getCount">
+		<query>
+		select count(sda) from SeedDataAudit sda where sda.productInfoCode = :productInfoCode order by sda.entityLifeCycleData.creationTimeStamp desc
+	 </query>
+	</named-query>
+	
+	<named-query name="SeedDataAudit.getLatestVersion">
+		<query>
+		select max(version) from SeedDataAudit sda where sda.productInfoCode = :productInfoCode 
+	 </query>
+	</named-query>
+</entity-mappings>

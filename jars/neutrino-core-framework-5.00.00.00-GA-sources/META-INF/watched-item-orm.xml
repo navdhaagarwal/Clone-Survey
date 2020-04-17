@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-mappings version="2.0"
+	xmlns="http://java.sun.com/xml/ns/persistence/orm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm http://java.sun.com/xml/ns/persistence/orm_2_0.xsd">
+
+	<named-query name="WatchedItem.findByEntityUri">
+		<query>
+          FROM WatchedItem wi WHERE wi.entityUri = :entityUri
+        </query>
+	</named-query>
+
+	<named-query name="WatchedItem.findItemsByUserUri">
+		<query>
+           FROM WatchedItem wi inner join wi.userUris userUri WHERE userUri = :userUri
+        </query>
+	</named-query>
+	
+	<named-query name="WatchedItem.findItemCountByUserUri">
+		<query>
+           Select count(*) FROM WatchedItem wi inner join wi.userUris userUri WHERE wi.entityUri = :entityUri AND userUri = :userUri
+        </query>
+	</named-query>
+
+	<named-query name="WatchedItem.findNumberOfWatchersByEntityUri">
+		<query>
+           Select count(userUri) FROM WatchedItem wi inner join wi.userUris userUri WHERE wi.entityUri = :entityUri
+        </query>
+	</named-query>
+
+</entity-mappings>
