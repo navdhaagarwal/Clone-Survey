@@ -51,3 +51,21 @@ def update(participant_pairs, userid):
         connection.commit()
         p+=1
 
+
+# connection = sqlite3.connect("clones_db.db")
+# c = connection.cursor()
+# with open('pairs.txt', 'r') as f:
+#     pairs = f.read().split('\n')
+# i = 1
+# for pair in pairs:
+#     pair = pair.split('\t')
+#     file1 = pair[0]
+#     file2 = pair[1]
+#     query = 'UPDATE CLONETABLE SET ' 
+#     query += 'File_1 = "' +file1 +'", '
+#     query += 'File_2 = "' +file2 +'" '
+#     query += 'WHERE Id = '+ str(i)
+#     i += 1
+#     print(query)
+#     c.execute(query)
+#     connection.commit()
