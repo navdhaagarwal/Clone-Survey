@@ -2,16 +2,17 @@ from flask import Flask, render_template, redirect, url_for, request, session, f
 from functools import wraps
 import sqlite3
 import time
-from database import participantPairs, findCompleted, update
-from functions import users, grabSourceCode
-from functions import ClonePair
+from database import clone_pairs, java_content, update, update_time
+from functions import users, functionality
 
 app = Flask(__name__)
 
 app.secret_key = "random"
 app.database = "clones_db.db"
 app.users = users()
+app.functionality = functionality()
 
+start_time = 0
 
 # login required decorator
 def login_required(f):
@@ -24,112 +25,119 @@ def login_required(f):
             return redirect(url_for('login'))
     return wrap
 
-current_cp_no = 1
-participant_pairs = []
-start_time = time.time()
 # flash message when nothing is selected
 @app.route('/', methods=['GET','POST'])
 @login_required
 def home():
 
-    global current_cp_no # 1 indexing
-    global participant_pairs # contains the group information
     global start_time
+    current_userid = session['userid']
+    current_clone_no = session['current_clone_no']
+    clone_pairs = session['clone_pairs']
+    current_clone_pair = clone_pairs[current_clone_no-1]
+    r = session['result'][current_clone_no-1]
+    Clone_reason = session['reason'][current_clone_no-1]
+    if(r == 0):
+        result = "No"
+    elif(r == 1):
+        result = "Yes"
+    elif(r == 2):
+        result = "Can't say"
+    else:
+        result = "None"
 
-    if ('Prev' in request.form):
-        participant_pairs[current_cp_no-1][4] += (time.time() - start_time)
-        start_time = time.time()
-        if (current_cp_no == 1):
-            flash('You have reached the first pair!')
-        else:
-            current_cp_no -= 1
-        return redirect(url_for("home"))
 
-    elif ('Next' in request.form):
-        participant_pairs[current_cp_no-1][4] += (time.time() - start_time)
-        start_time = time.time()
-        if ('Clone_result' in request.form):
-            result = resultParticipant(request.form['Clone_result'])
-            participant_pairs[current_cp_no-1][3] = result
-            participant_pairs[current_cp_no-1][5] = request.form['reason']
+    lines = [str(current_clone_pair[3]+1), str(current_clone_pair[4]+1), str(current_clone_pair[6]+1), str(current_clone_pair[7]+1)]
+    contents, contents1 , info= java_content(current_clone_no, clone_pairs)
 
-        if ('Clone_result' not in request.form and participant_pairs[current_cp_no-1][3] == None):
-            flash('Please make the choice first!')
+    if (current_clone_no == 150):
+        flash('Please press "Next" option before logout to register your last choice')
 
-        elif (current_cp_no == 150):
-            flash('You have reached the last pair. Kindly logout to save your answers!')
-        else:
-            current_cp_no += 1
+    if (request.method == 'POST'):
+        print(session['result'][current_clone_no-1])
+        print(request.form)
 
-        return redirect(url_for("home"))
+        if ('Prev' in request.form):
+            if(current_clone_no > 1):
 
-    
-    source_code1, source_code2, file1, file2 = grabSourceCode(session['userid'] ,current_cp_no)
-    for i in range (len(participant_pairs)):
-        p = participant_pairs[i]
-        print(p[0], p[3], p[4], p[5])
-        if (i == 10):
-            break
+                current_time = time.time()
+                session['time'][current_clone_no-1] += current_time - start_time
+                start_time = time.time()
 
-    clonepair = ClonePair(current_cp_no, source_code1, source_code2, file1, file2, selectedResult(participant_pairs[current_cp_no-1][3]), participant_pairs[current_cp_no-1][4], participant_pairs[current_cp_no-1][5])
-    return render_template("index.html", Clonepair = clonepair)
+                current_clone_no -= 1
+                session['current_clone_no'] = current_clone_no
+                return redirect(url_for("home"))
 
+        if( "Clone_result" not in request.form and session['result'][current_clone_no-1] == -1):
+            flash('Please make the choice first.')
+            return redirect(url_for("home"))
+        
+        if("Clone_result" in request.form):
+            Clone_res_value = request.form['Clone_result']
+            if (Clone_res_value == 'clone'):
+                session['result'][current_clone_no-1] = 1
+            if (Clone_res_value == 'not_clone'):
+                session['result'][current_clone_no-1] = 0
+            if (Clone_res_value == 'unknown'):
+                session['result'][current_clone_no-1] = 2
+
+            Clone_reason = request.form['reason']
+            session['reason'][current_clone_no-1] = Clone_reason
+
+            update(current_userid, current_clone_no, app.users, session['result'][current_clone_no-1], Clone_reason)
+
+        if ('Next' in request.form):
+            if(current_clone_no < 82):
+
+                current_time = time.time()
+                session['time'][current_clone_no-1] += current_time - start_time
+                start_time = time.time()
+
+                current_clone_no += 1
+                session['current_clone_no'] = current_clone_no
+                return redirect(url_for("home"))
+
+        print(current_clone_no)
+        
+    return render_template("index.html", contents = contents, contents1 = contents1, clone_pair = str(current_clone_no), lines = lines, info=info, functionality = app.functionality, result=result, reason=Clone_reason)
 
 @app.route('/login', methods=['GET','POST'])
 def login():
     error = None
-    global participant_pairs
-    global current_cp_no
-    global start_time 
-    start_time = time.time()
-
+    global start_time
     if (request.method == 'POST'):
         if ( check_user(request.form['userid']) == False):
             error = 'Invalid userID. Please try again.'
         else:
+            print("Session", session)
             session['logged_in'] = True
-            session['userid'] = request.form['userid']
-            participant_pairs = participantPairs(session['userid'])
-            current_cp_no = findCompleted(participant_pairs) + 1
-            if (current_cp_no == 150):
-                return render_template("logout.html")
+            start_time = time.time()
+            if('first_login' not in session):
+                session['userid'] = request.form['userid']
+                session['current_clone_no'] = 1
+                session['result'] = [-1]*150
+                session['time'] = [0]*150
+                session['reason'] = ['']*150
+                session['first_login'] = True
+                g.db = connect_db()
+                # session['clone_pairs'] = clone_pairs(g.db, app.users, request.form['userid'])
             return redirect(url_for('home'))
 
-    return render_template('login.html', error=error)
+    return render_template('login.html',error=error)
 
 def check_user(user_id):
     return (user_id in app.users.keys())
 
-
 @app.route('/logout')
 @login_required
 def logout():
-    global participant_pairs
-    update(participant_pairs, session['userid'])
+    update_time( session['userid'] , session['time'], app.users)
     session.pop('logged_in', None)
     return render_template("logout.html")
 
-
-def resultParticipant(value):
-    if (value == 'clone'):
-        return 1
-    elif (value == 'not_clone'):
-        return 0
-    elif (value == 'unknown'):
-        return 2
-
-def selectedResult(value):
-    if (value == 1):
-        return 'Yes'
-    elif (value == 0):
-        return 'No'
-    elif (value == 2):
-        return "Can't say"
 
 def connect_db():
     return sqlite3.connect(app.database)
 
 if (__name__ == '__main__'):
     app.run(debug=True)
-
-
