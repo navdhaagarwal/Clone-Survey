@@ -36,9 +36,9 @@ def grabSourceCode(userid, current_cp_no):
     file1 = pair[0]
     file2 = pair[1]
 
-    with open(file1, 'r') as f:
+    with open(file1, 'r', errors = 'ignore') as f:
         source_code1 = f.read()
-    with open(file2, 'r') as f:
+    with open(file2, 'r', errors = 'ignore') as f:
         source_code2 = f.read()
     
     return source_code1, source_code2, file1, file2
